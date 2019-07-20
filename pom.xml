@@ -1,0 +1,136 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>dp</groupId>
+  <artifactId>sdp</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>sdp</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.doc.encoding>UTF-8</maven.doc.encoding>
+  </properties>
+
+ 
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  	<dependency>
+  		<groupId>org.apache.commons</groupId>
+  		<artifactId>commons-math3</artifactId>
+  		<version>3.6.1</version>
+  	</dependency>
+
+  </dependencies>
+  
+    
+  <build>
+  	<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<!-- get all project dependencies -->
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<!-- MainClass in mainfest make a executable jar -->
+					<archive>
+						<manifest>
+							<mainClass>dp.normal.SDP</mainClass>
+						</manifest>
+					</archive>
+ 
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<!-- bind to the packaging phase -->
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+  	
+         <plugin>  
+                <groupId>org.apache.maven.plugins</groupId>  
+                <artifactId>maven-jar-plugin</artifactId>  
+                <configuration>
+                  
+                    <classesDirectory>target/classes/</classesDirectory>  
+                    <archive>  
+                        <manifest>  
+                            <!-- 主函数的入口 -->  
+                            <mainClass>dp.normal.SDP</mainClass>  
+                            <!-- 打包时 MANIFEST.MF文件不记录的时间戳版本 -->  
+                            <useUniqueVersions>false</useUniqueVersions>  
+                            <addClasspath>true</addClasspath>  
+                            <classpathPrefix>lib/</classpathPrefix>  
+                        </manifest>  
+                        <manifestEntries>  
+                            <Class-Path>.</Class-Path>  
+                        </manifestEntries>  
+                    </archive>  
+                </configuration>  
+            </plugin>  
+  	   <plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-source-plugin</artifactId>
+		  <version>3.0.1</version>
+		   <configuration>
+		  		<locale>en_US</locale>
+		                    <encoding>${maven.doc.encoding}</encoding>
+                    <charset>${maven.doc.encoding}</charset>
+                    <docencoding>${maven.doc.encoding}</docencoding>
+
+
+                <!--
+                <additionalOptions>
+                    <additionalOption>-html5 -locale en_US</additionalOption>
+                </additionalOptions>
+                <nodeprecatedlist>true</nodeprecatedlist>
+                <notree>true</notree>
+                <quiet>true</quiet>
+                <show>public</show>
+                <splitindex>true</splitindex>
+                -->
+            </configuration>
+		  <executions>
+		    <execution>
+		      <id>attach-sources</id>
+		      <goals>
+		        <goal>jar</goal>
+		      </goals>
+		    </execution>
+		  </executions>
+		</plugin>
+		<plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-javadoc-plugin</artifactId>
+		  <version>3.0.0</version>
+		  <executions>
+		    <execution>
+		      <id>attach-javadocs</id>
+		      <goals>
+		        <goal>jar</goal>
+		      </goals>
+		    </execution>
+		  </executions>
+
+		</plugin>		
+  	</plugins>
+  </build>
+  
+  
+</project>
