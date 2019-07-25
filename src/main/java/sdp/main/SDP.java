@@ -1,5 +1,15 @@
 package sdp.main;
 
+import java.text.DecimalFormat;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
 import sdp.dataProcess.Data;
 import sdp.dataProcess.Demand;
 import sdp.stage.ICostOriginalInventory;
@@ -17,9 +27,14 @@ public class SDP {
 		int stateSpace = sdp.demand.getInventory().length;
 		
 		
+		DecimalFormat df = new DecimalFormat("#.000000"); 
+
+		
+		
 		//last stage
 		ICostWithoutHistory stageFour = new CostWithoutHistory();
 		double f [] = stageFour.calCostWithoutHistory(sdp.demand);
+		
 		
 		//stage 3 and 2
 		ICostWithHistory stageThree = new CostWithHistory();
@@ -29,13 +44,28 @@ public class SDP {
 			f = answer [t-1];
 		}
 		
+		
 		//first stage
 		ICostOriginalInventory stageOne = new CostOriginalInventory();
 		f = stageOne.calCostOriginalInventory(sdp.demand, f);
 		
-
-		for(int i=0; i<f.length; i++) {
-			System.out.println(f[i]);
+		//try to plot the total cost
+		
+	    XYSeries series = new XYSeries("SDP Plot");
+	    for(int i=Data.stage*Data.maxDemand;i<Data.stage*Data.maxDemand+200;i++) {
+	    	series.add(i-Data.stage*Data.maxDemand,f[i]);
+	    }
+	    XYDataset xyDataset = new XYSeriesCollection(series);
+	    JFreeChart chart = ChartFactory.createXYLineChart("SDP Model - "+Data.stage+" period expected total cost", "Opening inventory level", "Expected total cost",
+	          xyDataset, PlotOrientation.VERTICAL, false, true, false);
+	    ChartFrame frame = new ChartFrame("SDP Plot",chart);
+	    frame.setVisible(true);
+	    frame.setSize(500,400);
+	    
+	    
+	    //print the cost values
+		for(int i=Data.stage*Data.maxDemand; i<Data.stage*Data.maxDemand+201; i++) {
+			System.out.println((i-Data.stage*Data.maxDemand)+" " +df.format(f[i]));
 		}
 		
 
