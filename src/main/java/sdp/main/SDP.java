@@ -20,8 +20,32 @@ import sdp.stage.impl.CostWithHistory;
 import sdp.stage.impl.CostWithoutHistory;
 
 public class SDP {
-	private Demand demand = new Demand();
+	private Demand demand = new Demand(); //DO NOT USE
+   
+   static void computeExpectedTotalCost(int t, int inventoryLevel) {
+      
+   }
+   
+   static double computeTransitionProbabilities(int t, int i, int a, int j, int[] demandMean) {
+      //create a Poisson demand d with mean demandMean[t]
+      return 0.0; // need to return d.pmf(i+a-j)
+   }
 	
+   /** Don't need to precompute!!! **/
+   static double[][][][] computeTransitionProbabilities(int[] demandMean) {
+      double[][][][] transitionProbabilities = new double[10][10][10][10];
+      for(int t = 0; t < 10; t++) { //this is the time index
+         for(int i = 0; i < 10; i++) { //this is the initial state inventory level 
+            for(int a = 0; a < 10; a++) { //this is the action
+               for(int j = 0; j < 10; j++) { //this is the end state inventory level level
+                  transitionProbabilities[t][i][a][j] = computeTransitionProbabilities(t,i,a,j,demandMean);
+               }
+            }
+         }
+      }
+      return null;
+   }
+   
 	public static void main(String[] args) {
 	   
 	   /*** Problem instance ***/
@@ -31,6 +55,7 @@ public class SDP {
 	   double penaltyCost = 10;
 	   int[] demandMean = {20,40,60,40};
 	   
+	   /** Follow the template https://github.com/gwr3n/jsdp/wiki/Introduction-to-Stochastic-Dynamic-Programming **/
 	   
 	   /** SDP boundary conditions **/
 	   double tail = 0.0001;
@@ -39,6 +64,39 @@ public class SDP {
 	   int maxInventory = 250;
 	   int maxQuantity = 250;
 	   
+	   /** Working arrays **/
+	   
+	   double transitionProbabilities[][][][] = computeTransitionProbabilities(demandMean); // But do you really need this array?
+	   
+	   double expectedTotalCost[][][] = null; //Valuable expectedTotalCost[t][i][a]
+	         
+      double expectedTotalOptimalCost[][] = null; //Valuable expectedTotalOptimalCost[t][i]
+            
+      double expectedTotalOptimalAction[][] = null; //Valuable expectedTotalOptimalAction[t][i]
+	                   
+	   
+	   /** How do you model stages? **/
+	   // # stages = demandMean.length
+	   
+	   /** How do you model states? **/
+	   // Choice about the indexing strategy for your arrays in the code. What does the first index represent? What does the second? And so on...
+	   
+	   /** How do you model actions? **/
+	   // Actions are a consequence of the stage, state in which you are. YOu need a "way" of recording or generating these actions. Could be a matrix or a function.
+	   //int generateOptimalAction(int t, int inventoryLevel)
+	   //int[] generateFeasibleActions(int t, int inventoryLevel)
+	   //void computeExpectedTotalCost(int t, int inventoryLevel)
+	   
+	   /** How do you model transition probabilities? **/
+	   
+	   /** How do you model immediate costs? **/
+	   
+	   /** How do you model/compute expected total costs? **/
+      
+      
+      
+      
+      /************* DO NOT USE ****************************************/
 		
 		SDP sdp = new SDP();
 		int stateSpace = sdp.demand.getInventory().length;
