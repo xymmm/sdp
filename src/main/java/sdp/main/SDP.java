@@ -29,15 +29,15 @@ public class SDP {
 	   double unitCost = 0;
 	   double holdingCost = 1;
 	   double penaltyCost = 10;
-	   
 	   int[] demandMean = {20,40,60,40};
+	   
+	   
+	   /** SDP boundary conditions **/
 	   double tail = 0.0001;
 	   
 	   int maxDemand = 200;
 	   int maxInventory = 250;
 	   int maxQuantity = 250;
-		
-	   int stage = 4;
 	   
 		
 		SDP sdp = new SDP();
