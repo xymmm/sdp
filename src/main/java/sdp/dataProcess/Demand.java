@@ -19,26 +19,29 @@ public class Demand {
 		quantity = calQuantity(Data.maxQuantity);
 		inventory = calInventory(Data.maxDemand, Data.maxInventory, Data.stage);
 		demand = calDemand(Data.maxDemand);
+
+		//demand = testDemand(Data.maxDemand);
 		//probability = calProbability(Data.maxDemand,Data.stage,Data.demandMean,Data.stdCoefficient);
 		probability = PoissonProbability(Data.maxDemand, Data.stage, Data.demandMean, Data.tail);
+		//probability = testProbability(Data.maxDemand, Data.stage, 0.5);
 	}
 	
 
 	
 	 // the following method is to test the generated data locally.
 	  
-	  public static void main(String[] args) { Demand demand = new Demand();
+	  public static void main(String[] args) { 
+		  
+		  Demand demand = new Demand();
 	  
   
-	  for(int i=0;i<demand.probability.length;i++) {
-		  System.out.print(i+" ");
-		  for(int j=0;j<demand.probability[0].length;j++) {
-			  System.out.print(df.format(demand.probability[i][j])+" "); 
+		  for(int i=0;i<demand.probability.length;i++) {
+			  System.out.print(demand.demand[i]+" ");
+			  for(int j=0;j<demand.probability[0].length;j++) {
+				  System.out.print(df.format(demand.probability[i][j])+" "); 
+			  }
+			  System.out.println(); 
 		  }
-		  System.out.println(); 
-	  }
-	  
-	  
 	  }
 	 
 	
@@ -90,6 +93,14 @@ public class Demand {
 		int[] demand = new int[maxDemand+1];
 		for(int i=0;i<demand.length;i++) {
 			demand[i] = i;
+		}
+		return demand;
+	}
+	
+	private int [] testDemand(int maxDemand) {
+		int [] demand = new int[maxDemand];
+		for(int i=0;i<demand.length;i++) {
+			demand[i] = i+1;
 		}
 		return demand;
 	}
@@ -151,9 +162,6 @@ public class Demand {
 		
 		return prob;
 	}
-	
-	
-	
 	
 	public int[] getQuantity() {
 		return quantity;

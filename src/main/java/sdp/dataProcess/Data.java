@@ -16,7 +16,7 @@ public class Data {
 	
 
 	// the maximum value of demand
-	public static int maxDemand = 250;
+	public static int maxDemand = 200;
 	
 	// the maximum storage of the inventory
 	public static int maxInventory = 250;
@@ -27,6 +27,12 @@ public class Data {
 	// the number of stages
 	public static int stage = 4;
 	
+	/*
+	public static int maxDemand = 2;
+	public static int maxInventory = 3;
+	public static int maxQuantity = 4;
+	public static int stage = 3;
+	*/
 	
 	
 	// unit costs
@@ -35,4 +41,10 @@ public class Data {
 	public static double holdingCost = 1;
 	public static double penaltyCost = 10;
 
+	/*
+	public static double fixCost = 3;
+	public static double unitCost = 2;
+	public static double holdingCost = 1;
+	public static double penaltyCost = 2;
+	*/
 }

@@ -23,13 +23,12 @@ public class SDP {
 	private Demand demand = new Demand();
 	
 	public static void main(String[] args) {
+		
 		SDP sdp = new SDP();
 		int stateSpace = sdp.demand.getInventory().length;
 		
 		
 		DecimalFormat df = new DecimalFormat("#.000000"); 
-
-		
 		
 		//last stage
 		ICostWithoutHistory stageFour = new CostWithoutHistory();
@@ -37,17 +36,30 @@ public class SDP {
 		
 		
 		//stage 3 and 2
+		
 		ICostWithHistory stageThree = new CostWithHistory();
 		double answer [][] = new double [2][stateSpace];
 		for(int t = Data.stage-2; t>0; t--) {
 			answer[t-1] = stageThree.calCostWithHistory(sdp.demand, f, t);
 			f = answer [t-1];
 		}
+		/*
+		//for test
+		ICostWithHistory stageMediem = new CostWithHistory();
+		double answer [][] = new double [1][stateSpace];
+		int t = 1; //period 2
+		answer[t] = stageMediem.calCostWithHistory(sdp.demand, f, t+1);
+		f = answer[t];
+		*/
 		
 		
 		//first stage
 		ICostOriginalInventory stageOne = new CostOriginalInventory();
 		f = stageOne.calCostOriginalInventory(sdp.demand, f);
+
+		for(int i=0;i<f.length;i++) {
+			System.out.println(f[i]);
+		}
 		
 		//try to plot the total cost
 		
