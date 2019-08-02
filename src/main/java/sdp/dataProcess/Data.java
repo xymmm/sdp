@@ -2,6 +2,11 @@ package sdp.dataProcess;
 
 
 public class Data {
+   
+   public Instance getInstanceSmall() {
+      return null; // new Instance(data in it)
+   }
+   
 	/**
 	 * This class contains all input data for the problem including:
 	 */

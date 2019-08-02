@@ -25,6 +25,8 @@ public class SDP {
 	public static void main(String[] args) {
 	   
 	   /*** Problem instance ***/
+	   double fixedOrderingCost = 100;
+	   double holdingCost = 1;
 		
 		SDP sdp = new SDP();
 		int stateSpace = sdp.demand.getInventory().length;
