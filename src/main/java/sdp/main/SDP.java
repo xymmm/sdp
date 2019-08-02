@@ -23,6 +23,8 @@ public class SDP {
 	private Demand demand = new Demand();
 	
 	public static void main(String[] args) {
+	   
+	   /*** Problem instance ***/
 		
 		SDP sdp = new SDP();
 		int stateSpace = sdp.demand.getInventory().length;
