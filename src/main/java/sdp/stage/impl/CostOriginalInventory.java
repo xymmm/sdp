@@ -27,30 +27,48 @@ public class CostOriginalInventory extends OrderingCost implements ICostOriginal
 		int quantity[] = dm.getQuantity();
 		int demand[] = dm.getDemand();
 		double prob[][] = dm.getProbability();
-		double oc[] = calOderingCost(Data.maxQuantity);
+		//double oc[] = calOderingCost(Data.maxQuantity);
 		
 		double imCost;
 		double[][] v = new double[inventory.length][quantity.length]; 
 		double[] f = new double[inventory.length];
-
-		for(int i = 0;i< inventory.length;i++) {
-			for(int q=0;q<quantity.length;q++) {
-				
-				v[i][q] = oc[q];
-				imCost = 0;
-				
-				for(int d=0;d<demand.length;d++) {
-					if((inventory[i]-demand[d]<=Data.maxInventory) && (inventory[i]-demand[d]>=-Data.stage*Data.maxDemand) ) {
-						imCost=prob[d][0]*(Data.holdingCost*Math.max(inventory[i]-demand[d],0)+Data.penaltyCost*Math.max(demand[d]-inventory[i],0))+prob[d][0]*preCost[i-d];//prob[d][0]*f[i-d][1];
-					}else {
-						imCost = Double.POSITIVE_INFINITY;
-					}
-
+		
+		double[] arr = new double[quantity.length];
+		for(int i=0;i<arr.length;i++) {
+			arr[i] = 1;
+		}
+		for(int i = Data.stage*Data.maxDemand;i<inventory.length;i++) {
+			imCost = 0;
+			for(int a=0;a<arr.length;a++) {
+				arr[a] = Data.unitCost*(inventory[i]-1);
+			}
+			v[i] = arr;
+			for(int d=0;d<demand.length;d++) {
+				imCost=prob[d][0]*(Data.holdingCost*Math.max(inventory[i]-demand[d],0)+Data.penaltyCost*Math.max(demand[d]-inventory[i],0))+prob[d][0]*preCost[i-d];
+				for(int q=0;q<quantity.length;q++) {
 					v[i][q] = v[i][q] + imCost;
 				}
 			}
 			f[i] = getMinimum(v[i]);
 		}
+		
+		
+		
+
+		/*
+		 * for(int i = 0;i< inventory.length;i++) { for(int q=0;q<quantity.length;q++) {
+		 * 
+		 * v[i][q] = oc[q]; imCost = 0;
+		 * 
+		 * for(int d=0;d<demand.length;d++) {
+		 * if((inventory[i]-demand[d]<=Data.maxInventory) &&
+		 * (inventory[i]-demand[d]>=-Data.stage*Data.maxDemand) ) {
+		 * imCost=prob[d][0]*(Data.holdingCost*Math.max(inventory[i]-demand[d],0)+Data.
+		 * penaltyCost*Math.max(demand[d]-inventory[i],0))+prob[d][0]*preCost[i-d];//
+		 * prob[d][0]*f[i-d][1]; }else { imCost = Double.POSITIVE_INFINITY; }
+		 * 
+		 * v[i][q] = v[i][q] + imCost; } } f[i] = getMinimum(v[i]); }
+		 */
 		
 		return f;
 	}

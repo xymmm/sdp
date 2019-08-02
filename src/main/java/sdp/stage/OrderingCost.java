@@ -15,7 +15,11 @@ public abstract class OrderingCost {
 	public double [] calOderingCost(int maxQuantity) {
 		double[] oc = new double[maxQuantity+1];
 		for(int i=0;i<oc.length;i++) {
-			oc[i] = Data.fixCost + Data.unitCost*i;	
+			if(i==0) {
+				oc[i] = 0;
+			}else {
+				oc[i] = Data.fixCost + Data.unitCost*i;	
+			}
 		}
 		return oc;
 	}

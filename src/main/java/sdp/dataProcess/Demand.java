@@ -3,6 +3,7 @@ package sdp.dataProcess;
 import java.text.DecimalFormat;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.PoissonDistribution;
 
 public class Demand {
 	
@@ -18,32 +19,32 @@ public class Demand {
 		quantity = calQuantity(Data.maxQuantity);
 		inventory = calInventory(Data.maxDemand, Data.maxInventory, Data.stage);
 		demand = calDemand(Data.maxDemand);
-		probability = calProbability(Data.maxDemand,Data.stage,Data.demandMean,Data.stdCoefficient);
+		//demand = testDemand(Data.maxDemand);
+		//probability = calProbability(Data.maxDemand,Data.stage,Data.demandMean,Data.stdCoefficient);
+		probability = PoissonProbability(Data.maxDemand, Data.stage, Data.demandMean, Data.tail);
+		//probability = testProbability(Data.maxDemand, Data.stage, 0.5);
 	}
 	
 
-	/*
-	 * the following method is to test the generated data locally.
-	 * 
-	 * public static void main(String[] args) { Demand demand = new Demand();
-	 * 
-	 * for(int i=0;i<demand.quantity.length;i++) {
-	 * System.out.println(demand.quantity[i]); }
-	 * 
-	 * for(int i=0;i<demand.inventory.length;i++) {
-	 * System.out.println(demand.inventory[i]); }
-	 * 
-	 * for(int i=0;i<demand.demand.length;i++) {
-	 * System.out.println(demand.demand[i]); }
-	 * 
-	 * for(int i=0;i<demand.probability.length;i++) { for(int
-	 * j=0;j<demand.probability[0].length;j++) {
-	 * System.out.print(df.format(demand.probability[i][j])+" "); }
-	 * System.out.println(); }
-	 * 
-	 * 
-	 * }
-	 */
+	
+	 // the following method is to test the generated data locally.
+	  
+	  public static void main(String[] args) { 
+		  
+		  Demand demand = new Demand();
+	  
+  
+		  for(int i=0;i<demand.probability.length;i++) {
+			  System.out.print(demand.demand[i]+" ");
+			  for(int j=0;j<demand.probability[0].length;j++) {
+				  System.out.print(df.format(demand.probability[i][j])+" "); 
+			  }
+			  System.out.println(); 
+		  }
+	  
+	  
+	  }
+	 
 	
 	/**
 	 * Method: CalInventory
@@ -97,6 +98,14 @@ public class Demand {
 		return demand;
 	}
 	
+	private int [] testDemand(int maxDemand) {
+		int [] demand = new int[maxDemand];
+		for(int i=0;i<demand.length;i++) {
+			demand[i] = i+1;
+		}
+		return demand;
+	}
+	
 	
 	/**
 	 * Method: calProbability
@@ -123,6 +132,43 @@ public class Demand {
 			for(int i=0;i<maxDemand;i++) {
 				prob[i][t] = dist.probability(i-0.5, i+0.5);
 				prob[i][t] = prob[i][t]/factor;
+			}
+		}
+		return prob;
+	}
+	
+	private double [][] PoissonProbability(int maxDemand, int stage, int[] demandMean, double tail){
+		double [][] prob = new double [maxDemand+1][stage];
+		
+		for(int t=0;t<stage;t++) {
+			PoissonDistribution dist = new PoissonDistribution(demandMean[t]);
+			
+			for(int i=0;i<maxDemand;i++) {
+				prob[i][t] = dist.probability(i);
+				if(prob[i][t]<=tail) {
+					prob[i][t] = 0;
+				}
+			}
+		}	
+		
+		for(int t=0;t<stage;t++) {
+			double sum = 0;
+			for(int i=0;i<maxDemand;i++) {
+				sum = sum + prob[i][t];
+			}
+			for(int i=0;i<maxDemand;i++) {
+				prob[i][t] = prob[i][t]/sum;
+			}
+		}
+		
+		return prob;
+	}
+	
+	private double [][] testProbability(int maxDemand, int stage, double definedprob){
+		double [][] prob = new double [maxDemand][stage];
+		for(int i=0;i<maxDemand;i++) {
+			for(int j=0;j<stage;j++) {
+				prob[i][j] = definedprob;
 			}
 		}
 		return prob;
