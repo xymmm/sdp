@@ -21,34 +21,36 @@ import sdp.stage.impl.CostWithHistory;
 import sdp.stage.impl.CostWithoutHistory;
 
 public class SDP {
+	private static final int StateSpace = 0;
+
+
+
+
+
+
+	/************************* 2nd Aug **************************/
 	//private Demand demand = new Demand(); //DO NOT USE
    
    static void computeExpectedTotalCost(int t, int inventoryLevel) {
       
    }
    
-   static double computeTransitionProbabilities(int t, int i, int a, int j, int[] demandMean, int maxInventory, double tail) {
-      double prob;
-      
+   static double computeTransitionProbabilities(int t, int i, int a, int j, int[] demandMean, double tail) {  
+      double prob;    
       //create a Poisson demand d with mean demandMean[t]
 	  PoissonDistribution dist = new PoissonDistribution(demandMean[t]);
+	  
 	  //compute transition probability
-	  if((i+a<j)&&(j<=maxInventory)) {
-		  prob = 0;
-	  }else {
-		  if(j==-maxInventory) {
-			  prob = dist.cumulativeProbability(i+a+maxInventory);
-		  }else {
-			  prob = dist.probability(i+a-j);
-		  }
-	  }
-	 //discard small values 
+	  prob = dist.probability(i+a-j);
+	  
+	  //discard small values 
 	  if(prob<=tail) {
 		  prob = 0;
 	  }   
       return prob; // need to return d.pmf(i+a-j)
    }
-	
+   
+
    /** Don't need to precompute!!! **/
    static double[][][][] computeTransitionProbabilities(int[] demandMean, int maxInventory, int maxQuantity, double tail) {
       double[][][][] transitionProbabilities = new double[demandMean.length][2*maxInventory+1][maxQuantity+1][2*maxInventory+1];//[time][initial state][action][end state]
@@ -57,13 +59,93 @@ public class SDP {
          for(int i = 0; i < 2*maxInventory+1; i++) { //this is the initial state inventory level 
             for(int a = 0; a < maxQuantity+1; a++) { //this is the action
                for(int j = 0; j < 2*maxInventory+1; j++) { //this is the end state inventory level level
-                  transitionProbabilities[t][i][a][j] = computeTransitionProbabilities(t,i,a,j,demandMean,maxInventory,tail);
+                  transitionProbabilities[t][i][a][j] = computeTransitionProbabilities(t,i,a,j,demandMean,tail);
                }
             }
          }
       }
       return transitionProbabilities;
    }
+   
+   /************************* 2nd Aug Ends **************************/
+   
+   
+   
+   /** compute transition probability via computing probability of that a demand could appear in this period**/
+   static double[][] computeDemandProbability(int[] demandMean, int maxDemand, double tail) {
+	   double[][] demandProbability = new double [maxDemand+1][demandMean.length];
+	   for(int t=0; t<demandMean.length;t++) {
+		   PoissonDistribution dist = new PoissonDistribution(demandMean[t]);
+		   for(int i=0;i<=maxDemand;i++) {
+			   demandProbability [i][t] = dist.probability(i);
+			   if(demandProbability [i][t]<tail) {
+				   demandProbability[i][t] = 0;
+			   }
+		   }
+	   }
+	   return demandProbability;
+   }
+   
+   /** generate feasible action for a given state (inventory level) **/
+   static int[] generateFeasibleActions(int inventoryLevel, int demand, int maxInventory, int maxQuantity, int Stages, int maxDemand) {
+	   int[] feasibleActions = new int [maxQuantity+1];
+	   for(int a=0;a<feasibleActions.length;a++) {
+		   feasibleActions[a] = a;
+	   }
+	   for(int a = 0;a<feasibleActions.length;a++) {
+		   if ( (inventoryLevel + feasibleActions[a] -demand <= maxInventory) && (inventoryLevel + feasibleActions[a] - demand >= -Stages*maxDemand) ){
+			   feasibleActions[a] = a;
+		   }else {
+			   feasibleActions[a] = (int) Double.POSITIVE_INFINITY;
+		   }
+	   }
+	   return feasibleActions;
+   }
+   
+   /** compute immediate cost **/
+   static double computeImmediateCostLastPeriod(int inventoryLevel, int Actions, int demand,
+		   										double holdingCost, double penaltyCost, double fixedOrderingCost, double unitCost) {
+	   if(Actions == 0) {
+		   return holdingCost*Math.max(0, inventoryLevel + Actions - demand) + penaltyCost *Math.max(0, demand - inventoryLevel -Actions);
+	   }else {
+		   return fixedOrderingCost + unitCost * Actions 
+				   + holdingCost*Math.max(0, inventoryLevel + Actions - demand) + penaltyCost *Math.max(0, demand - inventoryLevel -Actions);
+	   }
+   }
+   
+   static double computeImmediateCost(int inventoryLevel, int Actions, int demand, double[][] ExpectedTotalOptimalCost,
+									  double holdingCost, double penaltyCost, double fixedOrderingCost, double unitCost, int currentStageIndex) {
+	   if(Actions == 0) {
+		   return holdingCost*Math.max(0, inventoryLevel + Actions - demand) + penaltyCost *Math.max(0, demand - inventoryLevel -Actions)+
+			   + ExpectedTotalOptimalCost[inventoryLevel+Actions-demand+1][currentStageIndex+1];
+	   }else {
+		   return fixedOrderingCost + unitCost * Actions 
+				   + holdingCost*Math.max(0, inventoryLevel + Actions - demand) + penaltyCost *Math.max(0, demand - inventoryLevel -Actions)
+				   + ExpectedTotalOptimalCost[inventoryLevel+Actions-demand+1][currentStageIndex+1];
+	   }
+   }
+   
+   static double computeImmediateCostFirstPeriod(int inventoryLevel, int demand, double [][] ExpectedTotalOptimalCost,
+		   										 double holdingCost, double penaltyCost) {
+	   return holdingCost*Math.max(0, inventoryLevel - demand) + penaltyCost*Math.max(0, demand - inventoryLevel)
+			   + ExpectedTotalOptimalCost[inventoryLevel-demand+1][1];
+   }
+   
+   
+   static double getOptimalCost(double[] arr) {
+		double min = arr[0];
+		for(int i=1;i<arr.length;i++) {
+			if(arr[i]<min) {
+				min = arr[i];
+			}
+		}
+		return min;
+	}
+   
+
+   
+   
+
    
 	public static void main(String[] args) {
 	   
@@ -79,55 +161,70 @@ public class SDP {
 	   /** SDP boundary conditions **/
 	   double tail = 0.0001;
 	   
-	   int maxDemand = 200;
+	   int maxDemand = 250;
 	   int maxInventory = 250;
 	   int maxQuantity = 250;
+
+
+	   /** How do you model stages? **/
+	   int Stages = demandMean.length;
 	   
-	   /**
-	    * There are (demandMean.length =) 4 periods in the planning horizon.
+	   
+	   /** How do you model states? 
 	    * 
 	    * The state s in period t represents the initial inventory level at the beginning of period t, 
 	    * which takes the values in -maxInventory,...,0,...,maxInventory with possible backorders.
 	    * 
-	    * The action given a state in period t is the order quantity Q, which takes the value 0,...,maxQuantity and does not exceed the maxInventory.
-	    * 
-	    * The transition probability p[i,j,a] from state i to state j when action a is taken in state i
-	    * is derived from the probability of demand in the period t, with the consideration of the inventory capacity.
-	    */
+	    **/
+	   // Choice about the indexing strategy for your arrays in the code. What does the first index represent? What does the second? And so on...
+	   int[] inventoryLevel = new int [maxInventory + Stages*maxInventory+1];
+	   for(int i=0;i<inventoryLevel.length;i++) {
+		   inventoryLevel[i] = i - Stages*maxDemand;
+	   }
+	   
 	   
 	   
 	   /** Working arrays **/
 	   
-	   double transitionProbabilities[][][][] = computeTransitionProbabilities(demandMean, maxInventory, maxQuantity, tail); // But do you really need this array?
+	   //double transitionProbabilities[][][][] = computeTransitionProbabilities(demandMean, maxInventory, maxQuantity, tail); // But do you really need this array?
 	   
-	   double expectedTotalCost[][][] = new double [demandMean.length][2*maxInventory+1][maxQuantity+1]; //Valuable expectedTotalCost[t][i][a]
-	         
-	   double expectedTotalOptimalCost[][] = new double [demandMean.length][2*maxInventory+1]; //Valuable expectedTotalOptimalCost[t][i]
-            
-	   double expectedTotalOptimalAction[][] = new double [demandMean.length][2*maxInventory+1]; //Valuable expectedTotalOptimalAction[t][i]
-	                   
-	   
-	   /** How do you model stages? **/
-	   int stages = demandMean.length;
-	   
-	   /** How do you model states? **/
-	   // Choice about the indexing strategy for your arrays in the code. What does the first index represent? What does the second? And so on...
-	   
+
 	   /** How do you model actions? **/
-	   // Actions are a consequence of the stage, state in which you are. YOu need a "way" of recording or generating these actions. Could be a matrix or a function.
+	   // Actions are a consequence of the stage, state in which you are. You need a "way" of recording or generating these actions. Could be a matrix or a function.
 	   //int generateOptimalAction(int t, int inventoryLevel)
 	   //int[] generateFeasibleActions(int t, int inventoryLevel)
 	   //void computeExpectedTotalCost(int t, int inventoryLevel)
 	   
+	   
+	   
 	   /** How do you model transition probabilities? **/
+	   double demandProbabilities [][] = computeDemandProbability(demandMean, maxDemand, tail);
+	   /*
+	   for(int i=0;i<demandProbabilities.length;i++) {
+		   for(int j=0; j<demandProbabilities[0].length;j++) {
+			   System.out.print(demandProbabilities[i][j]+" ");
+		   }System.out.println();
+	   }*/
 	   
 	   /** How do you model immediate costs? **/
 	   
 	   /** How do you model/compute expected total costs? **/
+	   double expectedTotalCost[][][] = new double [Stages][inventoryLevel.length][maxQuantity+1]; //Valuable expectedTotalCost
       
+	   double expectedTotalOptimalCost[][] = new double [Stages][inventoryLevel.length]; //Valuable expectedTotalOptimalCost
       
-      
-      
+	   //double expectedTotalOptimalAction[][] = new double [StateSpace][Stages]; //Valuable expectedTotalOptimalAction
+	   
+	   
+	   double immediateCost;
+	   
+	   
+	   /** Compute Expected Cost **/
+	   
+
+	   
+	   
+	   
       /************* DO NOT USE ****************************************/
 		/*
 		SDP sdp = new SDP();
