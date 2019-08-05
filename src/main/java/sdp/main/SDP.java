@@ -2,6 +2,7 @@ package sdp.main;
 
 import java.text.DecimalFormat;
 
+import org.apache.commons.math3.distribution.PoissonDistribution;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
@@ -20,30 +21,48 @@ import sdp.stage.impl.CostWithHistory;
 import sdp.stage.impl.CostWithoutHistory;
 
 public class SDP {
-	private Demand demand = new Demand(); //DO NOT USE
+	//private Demand demand = new Demand(); //DO NOT USE
    
    static void computeExpectedTotalCost(int t, int inventoryLevel) {
       
    }
    
-   static double computeTransitionProbabilities(int t, int i, int a, int j, int[] demandMean) {
+   static double computeTransitionProbabilities(int t, int i, int a, int j, int[] demandMean, int maxInventory, double tail) {
+      double prob;
+      
       //create a Poisson demand d with mean demandMean[t]
-      return 0.0; // need to return d.pmf(i+a-j)
+	  PoissonDistribution dist = new PoissonDistribution(demandMean[t]);
+	  //compute transition probability
+	  if((i+a<j)&&(j<=maxInventory)) {
+		  prob = 0;
+	  }else {
+		  if(j==-maxInventory) {
+			  prob = dist.cumulativeProbability(i+a+maxInventory);
+		  }else {
+			  prob = dist.probability(i+a-j);
+		  }
+	  }
+	 //discard small values 
+	  if(prob<=tail) {
+		  prob = 0;
+	  }   
+      return prob; // need to return d.pmf(i+a-j)
    }
 	
    /** Don't need to precompute!!! **/
-   static double[][][][] computeTransitionProbabilities(int[] demandMean) {
-      double[][][][] transitionProbabilities = new double[10][10][10][10];
-      for(int t = 0; t < 10; t++) { //this is the time index
-         for(int i = 0; i < 10; i++) { //this is the initial state inventory level 
-            for(int a = 0; a < 10; a++) { //this is the action
-               for(int j = 0; j < 10; j++) { //this is the end state inventory level level
-                  transitionProbabilities[t][i][a][j] = computeTransitionProbabilities(t,i,a,j,demandMean);
+   static double[][][][] computeTransitionProbabilities(int[] demandMean, int maxInventory, int maxQuantity, double tail) {
+      double[][][][] transitionProbabilities = new double[demandMean.length][2*maxInventory+1][maxQuantity+1][2*maxInventory+1];//[time][initial state][action][end state]
+      
+      for(int t = 0; t < demandMean.length; t++) { //this is the time index
+         for(int i = 0; i < 2*maxInventory+1; i++) { //this is the initial state inventory level 
+            for(int a = 0; a < maxQuantity+1; a++) { //this is the action
+               for(int j = 0; j < 2*maxInventory+1; j++) { //this is the end state inventory level level
+                  transitionProbabilities[t][i][a][j] = computeTransitionProbabilities(t,i,a,j,demandMean,maxInventory,tail);
                }
             }
          }
       }
-      return null;
+      return transitionProbabilities;
    }
    
 	public static void main(String[] args) {
@@ -64,19 +83,32 @@ public class SDP {
 	   int maxInventory = 250;
 	   int maxQuantity = 250;
 	   
+	   /**
+	    * There are (demandMean.length =) 4 periods in the planning horizon.
+	    * 
+	    * The state s in period t represents the initial inventory level at the beginning of period t, 
+	    * which takes the values in -maxInventory,...,0,...,maxInventory with possible backorders.
+	    * 
+	    * The action given a state in period t is the order quantity Q, which takes the value 0,...,maxQuantity and does not exceed the maxInventory.
+	    * 
+	    * The transition probability p[i,j,a] from state i to state j when action a is taken in state i
+	    * is derived from the probability of demand in the period t, with the consideration of the inventory capacity.
+	    */
+	   
+	   
 	   /** Working arrays **/
 	   
-	   double transitionProbabilities[][][][] = computeTransitionProbabilities(demandMean); // But do you really need this array?
+	   double transitionProbabilities[][][][] = computeTransitionProbabilities(demandMean, maxInventory, maxQuantity, tail); // But do you really need this array?
 	   
-	   double expectedTotalCost[][][] = null; //Valuable expectedTotalCost[t][i][a]
+	   double expectedTotalCost[][][] = new double [demandMean.length][2*maxInventory+1][maxQuantity+1]; //Valuable expectedTotalCost[t][i][a]
 	         
-      double expectedTotalOptimalCost[][] = null; //Valuable expectedTotalOptimalCost[t][i]
+	   double expectedTotalOptimalCost[][] = new double [demandMean.length][2*maxInventory+1]; //Valuable expectedTotalOptimalCost[t][i]
             
-      double expectedTotalOptimalAction[][] = null; //Valuable expectedTotalOptimalAction[t][i]
+	   double expectedTotalOptimalAction[][] = new double [demandMean.length][2*maxInventory+1]; //Valuable expectedTotalOptimalAction[t][i]
 	                   
 	   
 	   /** How do you model stages? **/
-	   // # stages = demandMean.length
+	   int stages = demandMean.length;
 	   
 	   /** How do you model states? **/
 	   // Choice about the indexing strategy for your arrays in the code. What does the first index represent? What does the second? And so on...
@@ -97,7 +129,7 @@ public class SDP {
       
       
       /************* DO NOT USE ****************************************/
-		
+		/*
 		SDP sdp = new SDP();
 		int stateSpace = sdp.demand.getInventory().length;
 		
@@ -124,7 +156,7 @@ public class SDP {
 		int t = 1; //period 2
 		answer[t] = stageMediem.calCostWithHistory(sdp.demand, f, t+1);
 		f = answer[t];
-		*/
+		
 		
 		
 		//first stage
@@ -153,7 +185,7 @@ public class SDP {
 		for(int i=Data.stage*Data.maxDemand; i<Data.stage*Data.maxDemand+201; i++) {
 			System.out.println((i-Data.stage*Data.maxDemand)+" " +df.format(f[i]));
 		}
-		
+		*/
 
 	}
 
