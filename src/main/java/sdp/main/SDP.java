@@ -219,8 +219,7 @@ public class SDP {
 	   double immediateCost;
 	   
 	   
-	   /** Compute Expected Cost **/
-	   
+
 
 	   
 	   

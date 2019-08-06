@@ -13,11 +13,21 @@ public class SDP_modified {
 	    * 
 	    * **/
 	   static double[][] computeDemandProbability(int[] demandMean, int maxDemand, double tail) {
+		   
+		   //create 2D array to store the probabilities
 		   double[][] demandProbability = new double [maxDemand+1][demandMean.length];
+		   
 		   for(int t=0; t<demandMean.length;t++) {
+			   
+			   //create Poisson distribution according to demand mean of each time period
 			   PoissonDistribution dist = new PoissonDistribution(demandMean[t]);
+			   
 			   for(int i=0;i<=maxDemand;i++) {
+				   
+				   //probability = Pr(x=X)
 				   demandProbability [i][t] = dist.probability(i);
+				   
+				   //discard small values
 				   if(demandProbability [i][t]<tail) {
 					   demandProbability[i][t] = 0;
 				   }
@@ -25,6 +35,8 @@ public class SDP_modified {
 		   }
 		   return demandProbability;
 	   }
+	   
+	   
 	   
 	   /** compute immediate cost **/
 	   
@@ -74,6 +86,8 @@ public class SDP_modified {
 			}
 			return min;
 		}
+	   
+	   
 	   
 
 
@@ -172,8 +186,27 @@ public class SDP_modified {
 		   
 		   
 		   /** How do you model/compute expected total costs? **/
+		   
+		   /**
+		    * A 2D array is created to store the expected total cost for a period.
+		    * The first index represents the possible states, and the second index represents the possible actions.
+		    * 
+		    * For a state, we go through all possible actions; 
+		    * 	for a state and a possible action, we judge if the action is feasible, and then compute the immediate cost.
+		    * 	if the action is feasible, we multiply the demand probability to the immediate cost to obtain expected cost cumulatively,
+		    * 		and the cost of previous periods is added when it is applicable.
+		    * This value is stored in totalCost[state][action] and is renewed cumulatively.
+		    * 	
+		    * **/
 		   double totalCost[][] = new double [inventory.length][maxQuantity+1]; //Valuable expectedTotalCost for a period, to renew 
 	      
+		   
+		   /**
+		    * A 2D array is created to store the optimal cost.
+		    * The first index represents the possible states, and the second index represents the stages.
+		    * 
+		    * Each entry in the array optimalCost[state][stage] is obtained by selecting the minimum value of array totalCost[state] within each period.
+		    * **/
 		   double optimalCost[][] = new double [inventory.length][Stages]; //Valuable expectedTotalOptimalCost 
 	      
 		   //double expectedTotalOptimalAction[][] = new double [StateSpace][Stages]; //Valuable expectedTotalOptimalAction
@@ -191,21 +224,28 @@ public class SDP_modified {
 				   
 				   for(int demand=0;demand<=maxDemand;demand++) {
 					   
-					   /** Select feasible actions according to the condition **/
+					   /** 
+					    * Select feasible actions according to the condition 
+					    * If the action is feasible, the immediate cost is calculated by certain method;
+					    * If not, the immediate cost is assigned as the positive infinity, which will be neglected when we select the minimum cost.
+					    * **/
 					   if((inventory[i] + a - demand <= maxInventory) && (inventory[i] + a - demand >= -Stages*maxDemand)) {
 						   
-						   /** Computed backward, no cost for the previous period added**/
+						   //Computed backward, no cost for the previous period added
 						   immediateCost = demandProbabilities[demand][Stages-1]
 								   			*computeImmediateCost(inventory, i, a, demand,
 																	  	  	holdingCost, penaltyCost, fixedOrderingCost, unitCost);
 					   }else {
 						   immediateCost = Double.POSITIVE_INFINITY;
 					   }
+					   
+					   //cumulatively compute the expected total cost for each state with each feasible action.
 					   totalCost[i][a] = totalCost[i][a] + immediateCost;
 				   }
 				   
 	 
 			   }
+			   //For each state, compute the expected optimal cost from all feasible actions
 			   optimalCost[i][Stages-1] = getOptimalCost(totalCost[i]);
 		   }
 		   
@@ -215,12 +255,14 @@ public class SDP_modified {
 			   for(int i=0;i<inventory.length; i++) {
 				   for(int a=0;a<=maxQuantity;a++) {
 					   
+					   //renew information in the array
 					   totalCost[i][a] = 0;
 					   
 					   for(int demand=0;demand<=maxDemand;demand++) {
 						   
 						   if((inventory[i] + a - demand <= maxInventory) && (inventory[i] + a - demand >= -Stages*maxDemand)) {
 							   
+							   // the cost of previous periods is added
 							   immediateCost = demandProbabilities[demand][t]
 									   			*computeImmediateCost(inventory,i, a, demand,
 																	  holdingCost, penaltyCost, fixedOrderingCost, unitCost)
@@ -256,6 +298,9 @@ public class SDP_modified {
 			   optimalCost[i][0] = getOptimalCost(totalCost[i]);
 		   }
 
+		   
+		   
+		   /** print the results **/
 		   for(int i=Stages*maxDemand;i<inventory.length;i++) {
 			   System.out.print((i-Stages*maxDemand)+" ");
 			   for(int t=0;t<Stages;t++) {
