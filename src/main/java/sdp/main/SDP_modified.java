@@ -1,5 +1,12 @@
 package sdp.main;
 import org.apache.commons.math3.distribution.PoissonDistribution;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 public class SDP_modified {
 
@@ -88,7 +95,9 @@ public class SDP_modified {
 		}
 	   
 	   
-	   
+	   /*public static int inventory(int i, ) {
+	      return i+1 - (Stages*maxDemand+1);
+	   }*/
 
 
 		public static void main(String[] args) {
@@ -102,7 +111,7 @@ public class SDP_modified {
 		   
 		   
 		   /** SDP boundary conditions **/
-		   double tail = 0.0001;
+		   double tail = 0.00000001;
 		   
 		   int maxDemand = 250;
 		   int maxInventory = 250;
@@ -285,8 +294,8 @@ public class SDP_modified {
 				   totalCost[i][a] = 0;
 			   }
 		   }
-		   for(int i=Stages*maxDemand;i<inventory.length; i++) {
-			   for(int demand=0;demand<=maxDemand;demand++) {
+		   for(int i=0;i<inventory.length; i++) {
+			   for(int demand=0;demand<=Math.min(i,maxDemand);demand++) {
 					immediateCost = demandProbabilities[demand][0]
 								   		*computeImmediateCostFirstPeriod(inventory, i, demand,
 		   										 holdingCost, penaltyCost)
@@ -301,13 +310,23 @@ public class SDP_modified {
 		   
 		   
 		   /** print the results **/
-		   for(int i=Stages*maxDemand;i<inventory.length;i++) {
+		   for(int i=0;i<inventory.length;i++) {
 			   System.out.print((i-Stages*maxDemand)+" ");
 			   for(int t=0;t<Stages;t++) {
 				   System.out.print(optimalCost[i][t] + " ");
 			   }System.out.println();
 		   }
-
+		   
+		   XYSeries series = new XYSeries("SDP Plot");
+		   for(int i=Stages*maxDemand;i<inventory.length;i++) {
+           series.add(i-Stages*maxDemand,optimalCost[i][0]);
+         }
+         XYDataset xyDataset = new XYSeriesCollection(series);
+         JFreeChart chart = ChartFactory.createXYLineChart("SDP Model", "Opening inventory level", "Expected total cost",
+               xyDataset, PlotOrientation.VERTICAL, false, true, false);
+         ChartFrame frame = new ChartFrame("SDP Plot",chart);
+         frame.setVisible(true);
+         frame.setSize(500,400);
 
 		   
 		   
