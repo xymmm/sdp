@@ -207,7 +207,7 @@ public class SDP_modified {
 		    * This value is stored in totalCost[state][action] and is renewed cumulatively.
 		    * 	
 		    * **/
-		   double totalCost[][] = new double [inventory.length][maxQuantity+1]; //Valuable expectedTotalCost for a period, to renew 
+		   double totalCost[][][] = new double [Stages][inventory.length][maxQuantity+1]; //Valuable expectedTotalCost for a period, to renew 
 	      
 		   
 		   /**
@@ -249,13 +249,13 @@ public class SDP_modified {
 					   }
 					   
 					   //cumulatively compute the expected total cost for each state with each feasible action.
-					   totalCost[i][a] = totalCost[i][a] + immediateCost;
+					   totalCost[Stages-1][i][a] = totalCost[Stages-1][i][a] + immediateCost;
 				   }
 				   
 	 
 			   }
 			   //For each state, compute the expected optimal cost from all feasible actions
-			   optimalCost[i][Stages-1] = getOptimalCost(totalCost[i]);
+			   optimalCost[i][Stages-1] = getOptimalCost(totalCost[Stages-1][i]);
 		   }
 		   
 		   
@@ -265,7 +265,7 @@ public class SDP_modified {
 				   for(int a=0;a<=maxQuantity;a++) {
 					   
 					   //renew information in the array
-					   totalCost[i][a] = 0;
+					   //totalCost[t][i][a] = 0;
 					   
 					   for(int demand=0;demand<=maxDemand;demand++) {
 						   
@@ -279,21 +279,23 @@ public class SDP_modified {
 						   }else {
 							   immediateCost = Double.POSITIVE_INFINITY;
 						   }
-						   totalCost[i][a] = totalCost[i][a] + immediateCost;
+						   totalCost[t][i][a] = totalCost[t][i][a] + immediateCost;
 					   }
 					   
 		 
 				   }
-				   optimalCost[i][t] = getOptimalCost(totalCost[i]);
+				   optimalCost[i][t] = getOptimalCost(totalCost[t][i]);
 			   }
 		   }
 		   
 		   /** Period 1 **/
+		   /*
 		   for(int i=0;i<inventory.length; i++) {
 			   for(int a=0; a<=maxQuantity;a++) {
 				   totalCost[i][a] = 0;
 			   }
 		   }
+		   */
 		   for(int i=0;i<inventory.length; i++) {
 			   for(int demand=0;demand<=Math.min(i,maxDemand);demand++) {
 					immediateCost = demandProbabilities[demand][0]
@@ -301,10 +303,10 @@ public class SDP_modified {
 		   										 holdingCost, penaltyCost)
 								   		+ demandProbabilities[demand][0]*optimalCost[i-demand][1];
 					for(int a=0; a<=maxQuantity;a++) {
-						totalCost[i][a] = totalCost[i][a] + immediateCost;
+						totalCost[0][i][a] = totalCost[0][i][a] + immediateCost;
 					}
 			   }
-			   optimalCost[i][0] = getOptimalCost(totalCost[i]);
+			   optimalCost[i][0] = getOptimalCost(totalCost[0][i]);
 		   }
 
 		   
