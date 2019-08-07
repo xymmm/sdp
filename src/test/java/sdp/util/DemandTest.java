@@ -20,8 +20,8 @@ public class DemandTest {
 
    @Test
    public void testTabulateProbability() {
-      double[] tabulatedProbabilities = Demand.tabulateProbability(50, 55, 0.1);
-      assertEquals(
+      double[] tabulatedProbabilities = Demand.tabulateProbability(50, 0.1);
+      assertEquals(" The sum is: "+Arrays.stream(tabulatedProbabilities).sum(),
             1.0,
             Arrays.stream(tabulatedProbabilities).sum(),
             0.0001);

@@ -27,7 +27,6 @@ public class TestSDP {
       /** SDP boundary conditions **/
       double tail = 0.00000001;
       
-      int maxDemand = 250;
       int minInventory = -250;
       int maxInventory = 250;
       int maxQuantity = 250;
@@ -40,7 +39,6 @@ public class TestSDP {
             penaltyCost,
             demandMean,
             tail,
-            maxDemand,
             minInventory,
             maxInventory,
             maxQuantity

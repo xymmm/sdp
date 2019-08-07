@@ -24,7 +24,6 @@ public class Instance {
          double penaltyCost,
          int[] demandMean,
          double tail,
-         int maxDemand,
          int minInventory,
          int maxInventory,
          int maxQuantity) {
@@ -34,7 +33,6 @@ public class Instance {
       this.penaltyCost = penaltyCost;
       this.demandMean = demandMean;
       this.tail = tail;
-      this.maxDemand = maxDemand;
       this.minInventory = minInventory;
       this.maxInventory = maxInventory;
       this.maxQuantity = maxQuantity;

@@ -27,7 +27,7 @@ public class SDP {
 	   static double[][] computeDemandProbability(int[] demandMean, int maxDemand, double tail) {
 		   double[][] demandProbability = new double [demandMean.length][maxDemand+1];
 		   for(int t=0; t<demandMean.length;t++) {
-		      demandProbability[t] = Demand.tabulateProbability(demandMean[t], maxDemand, tail);
+		      demandProbability[t] = Demand.tabulateProbability(demandMean[t], tail);
 			   /*PoissonDistribution dist = new PoissonDistribution(demandMean[t]);
 			   for(int i=0;i<=maxDemand;i++) {
 				   demandProbability [i][t] = dist.probability(i);
@@ -155,7 +155,7 @@ public class SDP {
            totalCost = new double [inventory.length][t == 0 ? 1 : instance.maxQuantity+1];
             for(int i=0;i<inventory.length;i++) { // Inventory
                for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
-                  for(int d=0;d<=instance.maxDemand;d++) { // Demand
+                  for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
                      if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
                         immediateCost = demandProbabilities[t][d]*(
                               computeImmediateCost(inventory,i, a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
@@ -223,7 +223,6 @@ public class SDP {
 		   /** SDP boundary conditions **/
 		   double tail = 0.00000001;
 		   
-		   int maxDemand = 250;
 		   int minInventory = -250;
 		   int maxInventory = 250;
 		   int maxQuantity = 250;
@@ -236,7 +235,6 @@ public class SDP {
 		         penaltyCost,
 		         demandMean,
 		         tail,
-		         maxDemand,
 		         minInventory,
 		         maxInventory,
 		         maxQuantity
