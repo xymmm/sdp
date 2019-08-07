@@ -197,7 +197,6 @@ public class SDP {
 						   }else {
 							   immediateCost = Double.POSITIVE_INFINITY;
 						   }
-					   
 						   totalCost[i][a] = totalCost[i][a] + immediateCost;
 					   }
 				   }
