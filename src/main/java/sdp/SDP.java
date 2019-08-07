@@ -28,13 +28,6 @@ public class SDP {
 		   double[][] demandProbability = new double [demandMean.length][maxDemand+1];
 		   for(int t=0; t<demandMean.length;t++) {
 		      demandProbability[t] = Demand.tabulateProbability(demandMean[t], tail);
-			   /*PoissonDistribution dist = new PoissonDistribution(demandMean[t]);
-			   for(int i=0;i<=maxDemand;i++) {
-				   demandProbability [i][t] = dist.probability(i);
-				   if(demandProbability [i][t]<tail) {
-					   demandProbability[i][t] = 0;
-				   }
-			   }*/
 		   }
 		   return demandProbability;
 	   }
@@ -66,20 +59,31 @@ public class SDP {
 	   
 	   /** get optimal cost
 	    * 
-	    * This method selects the minimum value of a double array, 
-	    * which is used for obtaining the optimal expected cost among costs of all feasible actions for each inventory level.
 	    * **/
-	   static double[] getOptimal(double[] expectedTotalCosts) {
+	   static double getOptimalCost(double[] expectedTotalCosts) {
 			double min = expectedTotalCosts[0];
-			double action = 0;
 			for(int a=1;a<expectedTotalCosts.length;a++) {
 				if(expectedTotalCosts[a]<min) {
 					min = expectedTotalCosts[a];
-					action = a;
 				}
 			}
-			return new double[] {min,action};
+			return min;
 		}
+	   
+	   /** get optimal action
+	    * 
+	    */
+      static double getOptimalAction(double[] expectedTotalCosts) {
+         double min = expectedTotalCosts[0];
+         double action = 0;
+         for(int a=1;a<expectedTotalCosts.length;a++) {
+            if(expectedTotalCosts[a]<min) {
+               min = expectedTotalCosts[a];
+               action = a;
+            }
+         }
+         return action;
+      }
 	   
 	   public static Solution solveInstance(Instance instance) {
 	      
@@ -167,8 +171,8 @@ public class SDP {
                   }
                }
                
-               optimalCost[i][t] = getOptimal(totalCost[i])[0];
-               optimalAction[i][t] = getOptimal(totalCost[i])[1];
+               optimalCost[i][t] = getOptimalCost(totalCost[i]);
+               optimalAction[i][t] = getOptimalAction(totalCost[i]);
             }
          }
          
