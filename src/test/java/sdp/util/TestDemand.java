@@ -8,7 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DemandTest {
+public class TestDemand {
 
    @Before
    public void setUp() throws Exception {
