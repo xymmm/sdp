@@ -86,16 +86,12 @@ public class sQ {
       }
       
       /** get optimal action from 0 or **/
-      public static int[][] getOptimalAction(double[][] CostQ, double[][] CostNoAction) {
-    	  int[][] optimalAction = new int[CostQ.length][CostQ[0].length];
-    	  for(int t=0;t<CostQ[0].length;t++) {
-    		  for(int i=0;i<CostQ.length; i++) {
-    			  if(CostQ[i][t] <= CostNoAction[i][t]) {
-    				  optimalAction [i][t] = 1;
-    			  }else {
-    				  optimalAction[i][t] = 0;
-    			  }
-    		  }
+      public static int getOptimalAction(double CostNoAction, double TotalCost) {
+    	  int optimalAction ;
+    	  if(TotalCost <= CostNoAction) {
+    		  optimalAction = 1;
+    	  }else {
+    		  optimalAction = 0;
     	  }
     	  return optimalAction;
       }
@@ -106,7 +102,7 @@ public class sQ {
     	  for(int i=0;i<sQsolution.inventory.length;i++) {
     		  System.out.print((i+instance.minInventory)+" ");
     		  for(int t=0;t<instance.getStages();t++) {
-    			  System.out.print(sQsolution.optimalCost[i][t] + " ");
+    			  System.out.print(sQsolution.optimalAction[i][t] + " ");
     		  }System.out.println();
     	  }
     	  System.out.println();
@@ -156,50 +152,27 @@ public class sQ {
           for(int i=0;i<inventory.length;i++) {
              inventory[i] = i + instance.minInventory;
           }
-         
           
           double demandProbabilities [][] = computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
 
-          /** a=Q**/
           
-          /** Locally used. 
-           * The fist index represents the inventory level, second index represents the action quantity, and third index represents stages.
-           * An entry of totalCost[][] represents the cost for an inventory level with an action at one stage.
-           * **/
-          double totalCost[][][] = null;
-          /**
-           * This array stores the optimal cost for an inventory level among all possible actions.
-           * Every entry is obtained by searching the minimum entry for the local totalCost[i][:].
-           * **/
-          double CostQ[][] = new double [inventory.length][Stages];
+          /** when a=0 **/
           
           /**
-           * This array stores the quantity corresponding to the optimal cost for an inventory level at a stage.
-           * 
-          double optimalQuantity[][] = new double [inventory.length][Stages];
-          **/
-          
-          
-          /** a=0 **/
+           * This array stores the cost for an inventory level at one stage, when no replenishment order is placed.
+           * The first index represents the inventory level, and the second index represents the stages.
+           * **/
           double CostNoAction [][] = new double [inventory.length][Stages];
           
-          
-          double immediateCost;
-          
-          
-          /** The Optimal Action **/
-          int OptimalAction[][][] = new int[inventory.length][instance.maxQuantity][instance.getStages()];
-          
-          
-
           /** Cost Computation a=0 **/
+          double immediateCost;
           for(int t=instance.getStages()-1;t>=0;t--) { // Time       	                
         	  for(int i=0;i<inventory.length;i++) { // Inventory 	   
         		  for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
-        			  if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {
+        			  if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {// no action taken
         				  immediateCost = demandProbabilities[t][d]*(
         						  computeImmediateCost(inventory,i, 0, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
-        						  + ((t==Stages-1) ? 0 : CostNoAction[i-d][t+1]) );
+        						  + ((t==Stages-1) ? 0 : CostNoAction[i-d][t+1]) );// no previous cost for the last stage
         			  }else {
         				  immediateCost = Double.POSITIVE_INFINITY;
         			  }
@@ -209,11 +182,27 @@ public class sQ {
           }
           
           
+          /** when a=Q **/
+          
+          /** The fist index represents the inventory level, second index represents the action quantity, and third index represents stages.
+           *  An entry of totalCost[][] represents the cost for an [inventory level] with an [action] at one [stage].
+           *  
+           *  For an inventory level, the cost under an action Q=* will be compared with CostNoAction[i][:] for all stages 
+           *  	to decide if it is worthwhile to place the replenishment order at that stage.
+           *  
+           *  This result will be stored in OptimalActon[][][] as integer, 1 for placing orders, 0 if otherwise.
+           * **/
+          double totalCost[][][] = null;
+          int OptimalAction[][][] = new int[inventory.length][instance.maxQuantity][instance.getStages()];
+          
+          
           /** Cost Computation a = Q, single Q for all periods **/
           for(int a=1; a<=instance.maxQuantity;a++) { //for a possible quantity, start from Q=1 to maxQuantity
               for(int t=instance.getStages()-1;t>=0;t--) { // Time       	                
         		  for(int i=0;i<inventory.length;i++) { // Inventory
+        			  
         			  totalCost = new double [inventory.length][t == 0 ? 1 : instance.maxQuantity+1][instance.getStages()];
+        			  
         			  for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
         				  if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
         					  immediateCost = demandProbabilities[t][d]*(
@@ -224,15 +213,14 @@ public class sQ {
         				  }
         				  totalCost[i][a-1][t] = totalCost[i][a-1][t] + immediateCost;
         			  }
-        			  if(totalCost[i][a-1][t]<=CostNoAction[i][t]) {
-        				  OptimalAction[i][a-1][t] = 1;
-        			  }else {
-        				  OptimalAction [i][a-1][t] = 0;
-        			  }
+        			  
+        			  OptimalAction[i][a][t] = getOptimalAction(CostNoAction[i][t], totalCost[i][a][t]);
         		  }
         	  }
-              System.out.println("Q = "+a+" .");
+              System.out.println("Q = "+a+" Done.");
           }
+          
+          /** get the optimal action **/
 
     	  return new sQsolution(totalCost, CostNoAction, inventory, OptimalAction);
     	  

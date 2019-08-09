@@ -10,8 +10,8 @@ public class sQsolution {
 	   public int optimalAction[][][];
 
 	   
-	   public sQsolution(double totalCost[][][], 
-			   			 double CostNoAction[][], 
+	   public sQsolution(double[][][] totalCost, 
+			   			 double[][] CostNoAction, 
 			   			 int[] inventory, 
 			   			 int[][][] optimalAction) {
 		   this.totalCost = totalCost;
