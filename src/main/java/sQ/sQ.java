@@ -97,12 +97,17 @@ public class sQ {
       }
       
       /** print results **/
-      public static void printCost(Instance instance, Solution sQsolution) {
+      public static void printCost(Instance instance, sQsolution sQsolution) {
     	  /** print optimal costs **/
     	  for(int i=0;i<sQsolution.inventory.length;i++) {
     		  System.out.print((i+instance.minInventory)+" ");
     		  for(int t=0;t<instance.getStages();t++) {
-    			  System.out.print(sQsolution.optimalAction[i][t] + " ");
+    			  System.out.println("For Stage "+(t+1)+" ");
+    			  System.out.print("No Order Placed -> ");
+    			  System.out.print(sQsolution.CostNoAction[i][t] + " ");
+    			  for(int a=0; a<sQsolution.totalCost[t].length; a++) {
+    				  System.out.print(sQsolution.totalCost[i][a][t]+" ");
+    			  }System.out.println();
     		  }System.out.println();
     	  }
     	  System.out.println();
