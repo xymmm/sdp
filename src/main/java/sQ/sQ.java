@@ -113,16 +113,6 @@ public class sQ {
     	  System.out.println();
       }
 
-	  /** print optimal actions **/
-      public static void printAction(Instance instance, sQsolution sQsolution) {
-    	  for(int i=0;i<sQsolution.inventory.length;i++) {
-    		  System.out.print((i+instance.minInventory)+" ");
-    		  for(int t=0;t<instance.getStages();t++) {
-    			  System.out.print(sQsolution.optimalAction[i][t] + " ");
-    		  }System.out.println();
-    	  }
-    	  System.out.println();
-      }
 
       
       /** Plot the expected optimal cost *
@@ -218,14 +208,13 @@ public class sQ {
         				  }
         				  totalCost[i][a-1][t] = totalCost[i][a-1][t] + immediateCost;
         			  }
-        			  
+        			  /** get optimal actions **/
         			  OptimalAction[i][a][t] = getOptimalAction(CostNoAction[i][t], totalCost[i][a][t]);
         		  }
         	  }
               System.out.println("Q = "+a+" Done.");
           }
           
-          /** get the optimal action **/
 
     	  return new sQsolution(totalCost, CostNoAction, inventory, OptimalAction);
     	  
@@ -264,12 +253,13 @@ public class sQ {
 
     	  sQsolution sQsolution = solvesQInstance(instance);
     	  
+    	  /*
           for(int i=0;i<sQsolution.inventory.length;i++) {
         	  System.out.print((i+instance.minInventory)+" ");
         	  for(int t=0;t<instance.getStages();t++) {
         		  System.out.print(sQsolution.CostNoAction[i][t]+" ");
         	  }System.out.println();
-          }
+          }*/
 
       }
       
