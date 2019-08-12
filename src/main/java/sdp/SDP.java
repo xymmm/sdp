@@ -161,11 +161,13 @@ public class SDP {
                for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
                   for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
                      if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
+                        // Careful with purchasing cost, see Scarf!!
                         immediateCost = demandProbabilities[t][d]*(
                               computeImmediateCost(inventory,i, a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
                               + ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
+                        // Perhaps cumulate probability masses and if < 1 then normalise
                      }else {
-                        immediateCost = Double.POSITIVE_INFINITY;
+                        immediateCost = Double.POSITIVE_INFINITY; /** WRONG **/
                      }
                      totalCost[i][a] = totalCost[i][a] + immediateCost;
                   }
@@ -229,7 +231,7 @@ public class SDP {
 		   
 		   int minInventory = -250;
 		   int maxInventory = 250;
-		   int maxQuantity = 250;
+		   int maxQuantity = 1000;
 
 
 		   Instance instance = new Instance(
