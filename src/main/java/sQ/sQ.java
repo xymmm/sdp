@@ -191,7 +191,7 @@ public class sQ {
           int OptimalAction[][][] = new int[inventory.length][instance.maxQuantity][instance.getStages()];
           
           
-          /** Cost Computation a = Q, single Q for all periods **/
+          /** Cost Computation a = Q, single Q for all periods *
           for(int a=1; a<=instance.maxQuantity;a++) { //for a possible quantity, start from Q=1 to maxQuantity
               for(int t=instance.getStages()-1;t>=0;t--) { // Time       	                
         		  for(int i=0;i<inventory.length;i++) { // Inventory
@@ -208,13 +208,13 @@ public class sQ {
         				  }
         				  totalCost[i][a-1][t] = totalCost[i][a-1][t] + immediateCost;
         			  }
-        			  /** get optimal actions **/
+        			  /** get optimal actions *
         			  OptimalAction[i][a][t] = getOptimalAction(CostNoAction[i][t], totalCost[i][a][t]);
         		  }
         	  }
               System.out.println("Q = "+a+" Done.");
           }
-          
+          */
 
     	  return new sQsolution(totalCost, CostNoAction, inventory, OptimalAction);
     	  
@@ -253,13 +253,13 @@ public class sQ {
 
     	  sQsolution sQsolution = solvesQInstance(instance);
     	  
-    	  /*
+    	  
           for(int i=0;i<sQsolution.inventory.length;i++) {
         	  System.out.print((i+instance.minInventory)+" ");
         	  for(int t=0;t<instance.getStages();t++) {
         		  System.out.print(sQsolution.CostNoAction[i][t]+" ");
         	  }System.out.println();
-          }*/
+          }
 
       }
       
