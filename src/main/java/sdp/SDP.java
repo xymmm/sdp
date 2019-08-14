@@ -65,11 +65,19 @@ public class SDP {
 		   }
 	   }
 	   
-	   static int countScenario(int inventory, int actionLength,  double[] demandProbabilities, int maxInventory, int minInventory) {
+	   static int countScenario(int currentStage, int inventory, int actionLength,  double[] demandProbabilities, int maxInventory, int minInventory) {
 		   int count = 0;
-		   for(int a=0; a<actionLength;a++) {
+		   if(currentStage>0) {
+			   for(int a=0; a<actionLength;a++) {
+				   for(int demand=0;demand<demandProbabilities.length;demand++) {
+					   if((inventory + a - demand <= maxInventory) && (inventory + a - demand >= minInventory)) {
+						   count++;
+					   }
+				   }
+			   }
+		   }else {
 			   for(int demand=0;demand<demandProbabilities.length;demand++) {
-				   if((inventory + a - demand <= maxInventory) && (inventory + a - demand >= minInventory)) {
+				   if((inventory  - demand <= maxInventory) && (inventory  - demand >= minInventory)) {
 					   count++;
 				   }
 			   }
@@ -187,12 +195,13 @@ public class SDP {
             	   
             	   totalCost[i][a] = computePurchasingCost(instance.fixedOrderingCost, instance.unitCost, a); //purchasing cost
             	   
-            	   scenario[i][a] = countScenario(inventory[i], ((t==0) ? 0 : instance.maxQuantity), demandProbabilities[t], instance.maxInventory, instance.minInventory);
-            	   /*if(i ==0) {            	   
+            	   scenario[i][a] = countScenario(t, inventory[i], ((t==0) ? 0 : instance.maxQuantity), demandProbabilities[t], instance.maxInventory, instance.minInventory);
+            	   /*
+            	   if(i ==0) {            	   
             		   System.out.println("t = "+t+": inventoryLevel = "+inventory[i]+", a = "+ a+ ", scenario = "+scenario[i][a]);
             	   }*/
             	   if(scenario[i][a]==0) {
-            		   System.out.println("t = "+t+", scenario = 0 when inventoryLevel = "+inventory[i]+" and action = "+a);
+            		   System.out.println("t = "+t+", scenario = 0 when i = "+i+" and action = "+a);
             	   }
             	   
                   for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
@@ -206,7 +215,7 @@ public class SDP {
                      }else {
                         immediateCost = Double.POSITIVE_INFINITY; /** WRONG **/
                      }
-                     totalCost[i][a] = totalCost[i][a] + immediateCost;//*(1/scenario);
+                     totalCost[i][a] = totalCost[i][a] + immediateCost*(1/scenario[i][a]);
                   }
                }
                
