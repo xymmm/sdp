@@ -57,6 +57,10 @@ public class SDP {
 		   }
 	   }
 	   
+	   static double computePurchaseCost() {
+	      return Double.NaN;
+	   }
+	   
 	   /** get optimal cost
 	    * 
 	    * **/
@@ -151,25 +155,26 @@ public class SDP {
          double totalCost[][] = null;
          double optimalCost[][] = new double [inventory.length][Stages]; 
          
-         double immediateCost;
-         
          /** Compute Expected Cost **/
          
          for(int t=Stages-1;t>=0;t--) { // Time
            totalCost = new double [inventory.length][t == 0 ? 1 : instance.maxQuantity+1];
             for(int i=0;i<inventory.length;i++) { // Inventory
                for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
+                  double cumulative = 0;
                   for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+                     double immediateCost = 0;
                      if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
                         // Careful with purchasing cost, see Scarf!!
                         immediateCost = demandProbabilities[t][d]*(
                               computeImmediateCost(inventory,i, a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
                               + ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
                         // Perhaps cumulate probability masses and if < 1 then normalise
+                        cumulative += demandProbabilities[t][d];
                      }else {
-                        immediateCost = Double.POSITIVE_INFINITY; /** WRONG **/
+                        cumulative += 0;
                      }
-                     totalCost[i][a] = totalCost[i][a] + immediateCost;
+                     totalCost[i][a] = totalCost[i][a] + immediateCost/cumulative;
                   }
                }
                
