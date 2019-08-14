@@ -65,24 +65,14 @@ public class SDP {
 		   }
 	   }
 	   
-	   static int countScenario(int currentStage, int inventory, int actionLength,  double[] demandProbabilities, int maxInventory, int minInventory) {
-		   int count = 0;
-		   if(currentStage>0) {
-			   for(int a=0; a<actionLength;a++) {
-				   for(int demand=0;demand<demandProbabilities.length;demand++) {
-					   if((inventory + a - demand <= maxInventory) && (inventory + a - demand >= minInventory)) {
-						   count++;
-					   }
-				   }
-			   }
-		   }else {
-			   for(int demand=0;demand<demandProbabilities.length;demand++) {
-				   if((inventory  - demand <= maxInventory) && (inventory  - demand >= minInventory)) {
-					   count++;
-				   }
+	   static double computeCumulativeProb(int inventory, int action,  double[] demandProbabilities, int maxInventory, int minInventory) {
+		   double cumulativeProb = 0;
+		   for(int d=0;d<demandProbabilities.length;d++) {
+			   if((inventory + action - d <= maxInventory) && (inventory + action - d >= minInventory)) {
+				   cumulativeProb = cumulativeProb + demandProbabilities[d];
 			   }
 		   }
-		   return count;
+		   return cumulativeProb;
 	   }
 	   
 	   
@@ -179,43 +169,33 @@ public class SDP {
           * **/
          double totalCost[][] = null;
          double optimalCost[][] = new double [inventory.length][Stages]; 
+         double cumulativeProb[][] = null;
          
-         int[][] scenario = null;
-         
-         double immediateCost;
+         double immediateCost = 0;
          
          /** Compute Expected Cost **/
          
          for(int t=Stages-1;t>=0;t--) { // Time
            totalCost = new double [inventory.length][t == 0 ? 1 : instance.maxQuantity+1];
-           scenario = new int [inventory.length][t == 0 ? 1 : instance.maxQuantity+1];
+           cumulativeProb = new double[inventory.length][t == 0? 1:instance.maxQuantity+1];
            
             for(int i=0;i<inventory.length;i++) { // Inventory
                for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
             	   
             	   totalCost[i][a] = computePurchasingCost(instance.fixedOrderingCost, instance.unitCost, a); //purchasing cost
-            	   
-            	   scenario[i][a] = countScenario(t, inventory[i], ((t==0) ? 0 : instance.maxQuantity), demandProbabilities[t], instance.maxInventory, instance.minInventory);
-            	   /*
-            	   if(i ==0) {            	   
-            		   System.out.println("t = "+t+": inventoryLevel = "+inventory[i]+", a = "+ a+ ", scenario = "+scenario[i][a]);
-            	   }*/
-            	   if(scenario[i][a]==0) {
-            		   System.out.println("t = "+t+", scenario = 0 when i = "+i+" and action = "+a);
-            	   }
-            	   
-                  for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
-                	  
+            	   cumulativeProb[i][a] = computeCumulativeProb(inventory[i], a, demandProbabilities[t], instance.maxInventory, instance.minInventory);
+                  
+            	   for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
                      if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
                         // immediate cost
                         immediateCost = demandProbabilities[t][d]*(
                               computeImmediateCost(inventory,i, a, d, instance.holdingCost, instance.penaltyCost)
                               + ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
                         // Perhaps cumulate probability masses and if < 1 then normalise
-                     }else {
-                        immediateCost = Double.POSITIVE_INFINITY; /** WRONG **/
+                        immediateCost = immediateCost * (demandProbabilities[t][d]/cumulativeProb[i][a]);
+                        totalCost[i][a] = totalCost[i][a] + immediateCost;
                      }
-                     totalCost[i][a] = totalCost[i][a] + immediateCost*(1/scenario[i][a]);
+                     //totalCost[i][a] = totalCost[i][a] + immediateCost;
                   }
                }
                
