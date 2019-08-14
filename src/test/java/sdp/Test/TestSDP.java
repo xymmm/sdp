@@ -120,8 +120,6 @@ public class TestSDP {
             0.001);
    }
    
-   
-   
    @Test
    public void testInstanceB() {
       Instance instance = getInstanceB();
@@ -135,8 +133,6 @@ public class TestSDP {
             0.001);
    }
    
-   
-   
    @Test
    public void testInstanceC() {
       Instance instance = getInstanceC();
@@ -149,6 +145,5 @@ public class TestSDP {
             solution.optimalCost[-instance.minInventory][0],
             0.001);
    }
-   
 
 }
