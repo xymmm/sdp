@@ -46,16 +46,37 @@ public class SDP {
 	         int Actions, 
 	         int demand,
 	         double holdingCost, 
-	         double penaltyCost, 
-	         double fixedOrderingCost, 
-	         double unitCost) {
-		   if(Actions == 0) {
-			   return holdingCost*Math.max(0, inventory[i] + Actions - demand) + penaltyCost *Math.max(0, demand - inventory[i] - Actions);
+	         double penaltyCost
+			   ) {
+		   
+		   return holdingCost*Math.max(0, inventory[i] + Actions - demand) + penaltyCost *Math.max(0, demand - inventory[i] - Actions);
+		  
+	   }
+	   
+	   static double computePurchasingCost(
+			   double fixedOrderingCost,
+			   double unitCost,
+			   int quantity) {
+		   
+		   if(quantity == 0) {
+			   return 0;
 		   }else {
-			   return fixedOrderingCost + unitCost * Actions 
-					   + holdingCost*Math.max(0, inventory[i] + Actions - demand) + penaltyCost *Math.max(0, demand - inventory[i] - Actions);
+			   return fixedOrderingCost + quantity*unitCost;
 		   }
 	   }
+	   
+	   static int countScenario(int inventory, int actionLength,  double[] demandProbabilities, int maxInventory, int minInventory) {
+		   int count = 0;
+		   for(int a=0; a<actionLength;a++) {
+			   for(int demand=0;demand<demandProbabilities.length;demand++) {
+				   if((inventory + a - demand <= maxInventory) && (inventory + a - demand >= minInventory)) {
+					   count++;
+				   }
+			   }
+		   }
+		   return count;
+	   }
+	   
 	   
 	   /** get optimal cost
 	    * 
@@ -151,25 +172,41 @@ public class SDP {
          double totalCost[][] = null;
          double optimalCost[][] = new double [inventory.length][Stages]; 
          
+         int[][] scenario = null;
+         
          double immediateCost;
          
          /** Compute Expected Cost **/
          
          for(int t=Stages-1;t>=0;t--) { // Time
            totalCost = new double [inventory.length][t == 0 ? 1 : instance.maxQuantity+1];
+           scenario = new int [inventory.length][t == 0 ? 1 : instance.maxQuantity+1];
+           
             for(int i=0;i<inventory.length;i++) { // Inventory
                for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
+            	   
+            	   totalCost[i][a] = computePurchasingCost(instance.fixedOrderingCost, instance.unitCost, a); //purchasing cost
+            	   
+            	   scenario[i][a] = countScenario(inventory[i], ((t==0) ? 0 : instance.maxQuantity), demandProbabilities[t], instance.maxInventory, instance.minInventory);
+            	   /*if(i ==0) {            	   
+            		   System.out.println("t = "+t+": inventoryLevel = "+inventory[i]+", a = "+ a+ ", scenario = "+scenario[i][a]);
+            	   }*/
+            	   if(scenario[i][a]==0) {
+            		   System.out.println("t = "+t+", scenario = 0 when inventoryLevel = "+inventory[i]+" and action = "+a);
+            	   }
+            	   
                   for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+                	  
                      if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
-                        // Careful with purchasing cost, see Scarf!!
+                        // immediate cost
                         immediateCost = demandProbabilities[t][d]*(
-                              computeImmediateCost(inventory,i, a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+                              computeImmediateCost(inventory,i, a, d, instance.holdingCost, instance.penaltyCost)
                               + ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
                         // Perhaps cumulate probability masses and if < 1 then normalise
                      }else {
                         immediateCost = Double.POSITIVE_INFINITY; /** WRONG **/
                      }
-                     totalCost[i][a] = totalCost[i][a] + immediateCost;
+                     totalCost[i][a] = totalCost[i][a] + immediateCost;//*(1/scenario);
                   }
                }
                
@@ -183,7 +220,7 @@ public class SDP {
 	   }
 	   
 	   public static void printSolution(Instance instance, Solution solution) {
-         /** print optimal costs **/
+         /** print optimal costs **
          for(int i=0;i<solution.inventory.length;i++) {
             System.out.print((i+instance.minInventory)+" ");
             for(int t=0;t<instance.getStages();t++) {
@@ -192,7 +229,7 @@ public class SDP {
          }
          System.out.println();
          
-         /** print optimal actions **/
+         /** print optimal actions **
          for(int i=0;i<solution.inventory.length;i++) {
              System.out.print((i+instance.minInventory)+" ");
              for(int t=0;t<instance.getStages();t++) {
@@ -200,7 +237,7 @@ public class SDP {
              }System.out.println();
            }
          System.out.println();
-         
+         */
          
        /** Plot the expected optimal cost **/
        XYSeries series = new XYSeries("SDP Plot");
@@ -231,7 +268,7 @@ public class SDP {
 		   
 		   int minInventory = -250;
 		   int maxInventory = 250;
-		   int maxQuantity = 1000;
+		   int maxQuantity = 250;
 
 
 		   Instance instance = new Instance(
