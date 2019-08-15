@@ -67,22 +67,6 @@ public class SDP {
 		   return totalCost;
 	   }
 	   
-	   /** compute cumulative probability for scenario normalization**/
-	   static double computeCumulativeProb(int currentStage, 
-			   							   int inventoryLevel, 
-			   							   int action, 
-			   							   int maxInventory, 
-			   							   int minInventory, 
-			   							   double[][] demandProbabilities) {
-		   double cumulativeProb = 0;
-		   for(int d=0;d<demandProbabilities[currentStage].length;d++) {
-			   if((inventoryLevel + action - d <= maxInventory) && (inventoryLevel + action - d >= minInventory)) {
-				   cumulativeProb = cumulativeProb + demandProbabilities[currentStage][d];
-			   }
-		   }
-		   return cumulativeProb;
-	   }
-	   
 	   /** get optimal cost
 	    * 
 	    * **/
@@ -189,25 +173,24 @@ public class SDP {
         		 for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
 
         			 //initialize cumulative probability for scenario normalization
-        			 double scenarioProb = computeCumulativeProb(t, inventory[i], a, instance.maxInventory, instance.minInventory,demandProbabilities);
-
+        			 double scenarioProb = 0;
+        			 
         			 for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
         				 double immediateCost;
         				 
         				 if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
-        					 //compute immdediate cost
+        					 //compute immediate cost
         					 immediateCost = demandProbabilities[t][d]*(
         							 			computeImmediateCost(inventory[i], a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
         							 			+ ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
+        					 //update cumulative scenario probability
+        					 scenarioProb = scenarioProb + demandProbabilities[t][d];
         					 //update total cost for feasible demand value
             				 totalCost[i][a] = totalCost[i][a] + immediateCost;
         				 }//else, we do nothing.
         			 }
         			 //normalization on scenarios
         			 totalCost[i][a] = totalCost[i][a]/scenarioProb;
-        			 
-        			 //if((t==3)&&(i==0)&&(a==0)) {System.out.println(scenarioProb);}
-        			 //if((t==3)&&(i==251)&&(a==0)) {System.out.println(scenarioProb);}
         		 }
         		 optimalCost[i][t] = getOptimalCost(totalCost[i]);
         		 optimalAction[i][t] = getOptimalAction(totalCost[i]);

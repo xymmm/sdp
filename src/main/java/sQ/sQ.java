@@ -236,7 +236,7 @@ public class sQ {
 
     	  int minInventory = -250;
     	  int maxInventory = 250;
-    	  int maxQuantity = 250;
+    	  int maxQuantity = 1000;
 
 
     	  Instance instance = new Instance(
