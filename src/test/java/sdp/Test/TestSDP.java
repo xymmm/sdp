@@ -113,7 +113,7 @@ public class TestSDP {
       
       Solution solution = SDP.solveInstance(instance);
       
-      double expectedTotalCost = 1105.5255071806534;
+      double expectedTotalCost = 1100.4741964293196;
       assertEquals(
             expectedTotalCost,
             solution.optimalCost[-instance.minInventory][0],
@@ -126,7 +126,7 @@ public class TestSDP {
       
       Solution solution = SDP.solveInstance(instance);
       
-      double expectedTotalCost = 1655.7690149390155;
+      double expectedTotalCost = 1765.903451217189;
       assertEquals(
             expectedTotalCost,
             solution.optimalCost[-instance.minInventory][0],
@@ -139,7 +139,7 @@ public class TestSDP {
       
       Solution solution = SDP.solveInstance(instance);
       
-      double expectedTotalCost = 809.4084508969598;
+      double expectedTotalCost = 724.244847692616;
       assertEquals(
             expectedTotalCost,
             solution.optimalCost[-instance.minInventory][0],

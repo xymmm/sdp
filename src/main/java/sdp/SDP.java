@@ -54,17 +54,8 @@ public class SDP {
 	   }
 	   
 	   /** compute purchasing cost according to order quantity (action) **/
-	   static double[][] computePurchasingCost(double[][] totalCost, double fixedOrderingCost, double unitCost) {
-		   for(int i=0;i<totalCost.length;i++) {
-			   for(int a=0;a<totalCost[0].length;a++) {
-				   if(a==0) {
-					   totalCost[i][a] = 0;
-				   }else {
-					   totalCost[i][a] = fixedOrderingCost + a*unitCost;
-				   }
-			   }
-		   }
-		   return totalCost;
+	   static double computePurchasingCost(int a, double fixedOrderingCost, double unitCost) {
+		   return a > 0 ? fixedOrderingCost + a*unitCost : 0;
 	   }
 	   
 	   static double computePurchaseCost() {
@@ -170,14 +161,13 @@ public class SDP {
          
          for(int t=Stages-1;t>=0;t--) { // Time
         	 totalCost = new double [inventory.length][t == 0 ? 1 : instance.maxQuantity+1];
-			 //compute purchasing cost
-			 totalCost = computePurchasingCost(totalCost, instance.fixedOrderingCost, instance.unitCost);
         	 
         	 for(int i=0;i<inventory.length;i++) { // Inventory
         		 for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
 
         			 //initialize cumulative probability for scenario normalization
         			 double scenarioProb = 0;
+        			 totalCost[i][a] = computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost);
         			 
         			 for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
         				 double immediateCost;
@@ -188,9 +178,9 @@ public class SDP {
         							 			computeImmediateCost(inventory[i], a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
         							 			+ ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
         					 //update cumulative scenario probability
-        					 scenarioProb = scenarioProb + demandProbabilities[t][d];
+        					 scenarioProb += demandProbabilities[t][d];
         					 //update total cost for feasible demand value
-            				 totalCost[i][a] = totalCost[i][a] + immediateCost;
+            			 totalCost[i][a] += immediateCost;
         				 }//else, we do nothing.
         			 }
         			 //normalization on scenarios
@@ -251,7 +241,7 @@ public class SDP {
 		   
 		   
 		   /** SDP boundary conditions **/
-		   double tail = 0.00000001;
+		   double tail = 0.0001;
 		   
 		   int minInventory = -250;
 		   int maxInventory = 250;
