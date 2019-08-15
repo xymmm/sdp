@@ -67,6 +67,10 @@ public class SDP {
 		   return totalCost;
 	   }
 	   
+	   static double computePurchaseCost() {
+	      return Double.NaN;
+	   }
+	   
 	   /** get optimal cost
 	    * 
 	    * **/
@@ -161,7 +165,7 @@ public class SDP {
          double totalCost[][] = null;
          double optimalCost[][] = new double [inventory.length][Stages]; 
          
-         
+
          /** Compute Expected Cost **/
          
          for(int t=Stages-1;t>=0;t--) { // Time
