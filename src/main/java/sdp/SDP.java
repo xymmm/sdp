@@ -186,12 +186,14 @@ public class SDP {
         			 //initialize cumulative probability for scenario normalization
         			 double cumulativeProb = computeCumulativeProb(t, inventory[i], a, instance.maxInventory, instance.minInventory,demandProbabilities);
 
+    				 //double testProb = 0;
         			 for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
         				 double immediateCost;
         				 if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
         					 immediateCost = demandProbabilities[t][d]*(
         							 computeImmediateCost(inventory[i], a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
         							 + ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
+        					 //testProb = testProb + demandProbabilities[t][d]/cumulativeProb;
         					 immediateCost = immediateCost*(demandProbabilities[t][d]/cumulativeProb);
         					 // Perhaps cumulative probability masses and if < 1 then normalize
         				 }else {
@@ -199,6 +201,7 @@ public class SDP {
         				 }
         				 totalCost[i][a] = totalCost[i][a] + immediateCost;
         			 }
+    				 //if((t==3)&&(a==0)&&(i==0)) {System.out.println(testProb);}
         		 }
 
         		 optimalCost[i][t] = getOptimalCost(totalCost[i]);
