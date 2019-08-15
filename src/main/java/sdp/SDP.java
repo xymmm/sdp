@@ -54,12 +54,17 @@ public class SDP {
 	   }
 	   
 	   /** compute purchasing cost according to order quantity (action) **/
-	   static double computePurchasingCost(int Action, double fixedOrderingCost, double unitCost) {
-		   if(Action == 0) {
-			   return 0;
-		   }else {
-			   return fixedOrderingCost + Action*unitCost;
+	   static double[][] computePurchasingCost(double[][] totalCost, double fixedOrderingCost, double unitCost) {
+		   for(int i=0;i<totalCost.length;i++) {
+			   for(int a=0;a<totalCost[0].length;a++) {
+				   if(a==0) {
+					   totalCost[i][a] = 0;
+				   }else {
+					   totalCost[i][a] = fixedOrderingCost + a*unitCost;
+				   }
+			   }
 		   }
+		   return totalCost;
 	   }
 	   
 	   /** compute cumulative probability for scenario normalization**/
@@ -177,37 +182,34 @@ public class SDP {
          
          for(int t=Stages-1;t>=0;t--) { // Time
         	 totalCost = new double [inventory.length][t == 0 ? 1 : instance.maxQuantity+1];
-
+			 //compute purchasing cost
+			 totalCost = computePurchasingCost(totalCost, instance.fixedOrderingCost, instance.unitCost);
+        	 
         	 for(int i=0;i<inventory.length;i++) { // Inventory
         		 for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
 
-        			 //compute purchasing cost
-        			 totalCost[i][a] = computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost);
         			 //initialize cumulative probability for scenario normalization
         			 double cumulativeProb = computeCumulativeProb(t, inventory[i], a, instance.maxInventory, instance.minInventory,demandProbabilities);
 
-    				 //double testProb = 0;
         			 for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
         				 double immediateCost;
+        				 
         				 if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
         					 immediateCost = demandProbabilities[t][d]*(
         							 computeImmediateCost(inventory[i], a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
         							 + ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
-        					 //testProb = testProb + demandProbabilities[t][d]/cumulativeProb;
         					 immediateCost = immediateCost*(demandProbabilities[t][d]/cumulativeProb);
-        					 // Perhaps cumulative probability masses and if < 1 then normalize
         				 }else {
         					 immediateCost = Double.POSITIVE_INFINITY; /** WRONG **/
         				 }
         				 totalCost[i][a] = totalCost[i][a] + immediateCost;
         			 }
-    				 //if((t==3)&&(a==0)&&(i==0)) {System.out.println(testProb);}
         		 }
-
         		 optimalCost[i][t] = getOptimalCost(totalCost[i]);
         		 optimalAction[i][t] = getOptimalAction(totalCost[i]);
         	 }
          }
+ 
          
          return new Solution(optimalAction, optimalCost, inventory);
 
