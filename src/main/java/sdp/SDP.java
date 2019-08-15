@@ -41,20 +41,41 @@ public class SDP {
 	    * The immediate cost will be multiplied by the (transition) demand probability to obtain a expected cost.
 	    * **/
 	   static double computeImmediateCost(
-	         int [] inventory, 
-	         int i, 
+	         int inventoryLevel, 
 	         int Actions, 
 	         int demand,
 	         double holdingCost, 
 	         double penaltyCost, 
 	         double fixedOrderingCost, 
 	         double unitCost) {
-		   if(Actions == 0) {
-			   return holdingCost*Math.max(0, inventory[i] + Actions - demand) + penaltyCost *Math.max(0, demand - inventory[i] - Actions);
+
+		   return holdingCost*Math.max(0, inventoryLevel + Actions - demand) + penaltyCost *Math.max(0, demand - inventoryLevel - Actions);
+	   
+	   }
+	   
+	   /** compute purchasing cost according to order quantity (action) **/
+	   static double computePurchasingCost(int Action, double fixedOrderingCost, double unitCost) {
+		   if(Action == 0) {
+			   return 0;
 		   }else {
-			   return fixedOrderingCost + unitCost * Actions 
-					   + holdingCost*Math.max(0, inventory[i] + Actions - demand) + penaltyCost *Math.max(0, demand - inventory[i] - Actions);
+			   return fixedOrderingCost + Action*unitCost;
 		   }
+	   }
+	   
+	   /** compute cumulative probability for scenario normalization**/
+	   static double computeCumulativeProb(int currentStage, 
+			   							   int inventoryLevel, 
+			   							   int action, 
+			   							   int maxInventory, 
+			   							   int minInventory, 
+			   							   double[][] demandProbabilities) {
+		   double cumulativeProb = 0;
+		   for(int d=0;d<demandProbabilities[currentStage].length;d++) {
+			   if((inventoryLevel + action - d <= maxInventory) && (inventoryLevel + action - d >= minInventory)) {
+				   cumulativeProb = cumulativeProb + demandProbabilities[currentStage][d];
+			   }
+		   }
+		   return cumulativeProb;
 	   }
 	   
 	   /** get optimal cost
@@ -151,31 +172,38 @@ public class SDP {
          double totalCost[][] = null;
          double optimalCost[][] = new double [inventory.length][Stages]; 
          
-         double immediateCost;
          
          /** Compute Expected Cost **/
          
          for(int t=Stages-1;t>=0;t--) { // Time
-           totalCost = new double [inventory.length][t == 0 ? 1 : instance.maxQuantity+1];
-            for(int i=0;i<inventory.length;i++) { // Inventory
-               for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
-                  for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
-                     if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
-                        // Careful with purchasing cost, see Scarf!!
-                        immediateCost = demandProbabilities[t][d]*(
-                              computeImmediateCost(inventory,i, a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
-                              + ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
-                        // Perhaps cumulate probability masses and if < 1 then normalise
-                     }else {
-                        immediateCost = Double.POSITIVE_INFINITY; /** WRONG **/
-                     }
-                     totalCost[i][a] = totalCost[i][a] + immediateCost;
-                  }
-               }
-               
-               optimalCost[i][t] = getOptimalCost(totalCost[i]);
-               optimalAction[i][t] = getOptimalAction(totalCost[i]);
-            }
+        	 totalCost = new double [inventory.length][t == 0 ? 1 : instance.maxQuantity+1];
+
+        	 for(int i=0;i<inventory.length;i++) { // Inventory
+        		 for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
+
+        			 //compute purchasing cost
+        			 totalCost[i][a] = computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost);
+        			 //initialize cumulative probability for scenario normalization
+        			 double cumulativeProb = computeCumulativeProb(t, inventory[i], a, instance.maxInventory, instance.minInventory,demandProbabilities);
+
+        			 for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+        				 double immediateCost;
+        				 if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
+        					 immediateCost = demandProbabilities[t][d]*(
+        							 computeImmediateCost(inventory[i], a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+        							 + ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
+        					 immediateCost = immediateCost*(demandProbabilities[t][d]/cumulativeProb);
+        					 // Perhaps cumulative probability masses and if < 1 then normalize
+        				 }else {
+        					 immediateCost = Double.POSITIVE_INFINITY; /** WRONG **/
+        				 }
+        				 totalCost[i][a] = totalCost[i][a] + immediateCost;
+        			 }
+        		 }
+
+        		 optimalCost[i][t] = getOptimalCost(totalCost[i]);
+        		 optimalAction[i][t] = getOptimalAction(totalCost[i]);
+        	 }
          }
          
          return new Solution(optimalAction, optimalCost, inventory);
@@ -192,7 +220,7 @@ public class SDP {
          }
          System.out.println();
          
-         /** print optimal actions **/
+         /** print optimal actions *
          for(int i=0;i<solution.inventory.length;i++) {
              System.out.print((i+instance.minInventory)+" ");
              for(int t=0;t<instance.getStages();t++) {
@@ -200,7 +228,7 @@ public class SDP {
              }System.out.println();
            }
          System.out.println();
-         
+         */
          
        /** Plot the expected optimal cost **/
        XYSeries series = new XYSeries("SDP Plot");
