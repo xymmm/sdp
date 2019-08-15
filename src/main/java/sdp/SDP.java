@@ -189,21 +189,25 @@ public class SDP {
         		 for(int a = 0; a <= ((t==0) ? 0 : instance.maxQuantity);a++) { //Actions
 
         			 //initialize cumulative probability for scenario normalization
-        			 double cumulativeProb = computeCumulativeProb(t, inventory[i], a, instance.maxInventory, instance.minInventory,demandProbabilities);
+        			 double scenarioProb = computeCumulativeProb(t, inventory[i], a, instance.maxInventory, instance.minInventory,demandProbabilities);
 
         			 for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
         				 double immediateCost;
         				 
         				 if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
+        					 //compute immdediate cost
         					 immediateCost = demandProbabilities[t][d]*(
-        							 computeImmediateCost(inventory[i], a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
-        							 + ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
-        					 immediateCost = immediateCost*(demandProbabilities[t][d]/cumulativeProb);
-        				 }else {
-        					 immediateCost = Double.POSITIVE_INFINITY; /** WRONG **/
-        				 }
-        				 totalCost[i][a] = totalCost[i][a] + immediateCost;
+        							 			computeImmediateCost(inventory[i], a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+        							 			+ ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
+        					 //update total cost for feasible demand value
+            				 totalCost[i][a] = totalCost[i][a] + immediateCost;
+        				 }//else, we do nothing.
         			 }
+        			 //normalization on scenarios
+        			 totalCost[i][a] = totalCost[i][a]/scenarioProb;
+        			 
+        			 //if((t==3)&&(i==0)&&(a==0)) {System.out.println(scenarioProb);}
+        			 //if((t==3)&&(i==251)&&(a==0)) {System.out.println(scenarioProb);}
         		 }
         		 optimalCost[i][t] = getOptimalCost(totalCost[i]);
         		 optimalAction[i][t] = getOptimalAction(totalCost[i]);
