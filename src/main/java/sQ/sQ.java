@@ -43,21 +43,23 @@ public class sQ {
 	    * The immediate cost will be multiplied by the (transition) demand probability to obtain a expected cost.
 	    * **/
 	   static double computeImmediateCost(
-	         int [] inventory, 
-	         int i, 
-	         int Actions, 
-	         int demand,
-	         double holdingCost, 
-	         double penaltyCost, 
-	         double fixedOrderingCost, 
-	         double unitCost) {
-		   if(Actions == 0) {
-			   return holdingCost*Math.max(0, inventory[i] + Actions - demand) + penaltyCost *Math.max(0, demand - inventory[i] - Actions);
-		   }else {
-			   return fixedOrderingCost + unitCost * Actions 
-					   + holdingCost*Math.max(0, inventory[i] + Actions - demand) + penaltyCost *Math.max(0, demand - inventory[i] - Actions);
+		         int inventoryLevel, 
+		         int Actions, 
+		         int demand,
+		         double holdingCost, 
+		         double penaltyCost, 
+		         double fixedOrderingCost, 
+		         double unitCost) {
+
+			   return holdingCost*Math.max(0, inventoryLevel + Actions - demand) + penaltyCost *Math.max(0, demand - inventoryLevel - Actions);
+		   
 		   }
+	   
+	   /** compute purchasing cost according to order quantity (action) **/
+	   static double computePurchasingCost(int a, double fixedOrderingCost, double unitCost) {
+		   return a > 0 ? fixedOrderingCost + a*unitCost : 0;
 	   }
+	   
 	   
 	   
 	   /** get optimal cost **/
@@ -160,21 +162,23 @@ public class sQ {
           double CostNoAction [][] = new double [inventory.length][Stages];
           
           /** Cost Computation a=0 **/
-          double immediateCost;
           for(int t=instance.getStages()-1;t>=0;t--) { // Time       	                
-        	  for(int i=0;i<inventory.length;i++) { // Inventory 	   
+        	  for(int i=0;i<inventory.length;i++) { // Inventory
+        		  double scenarioProb = 0;
         		  for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+        	          double immediateCost;
         			  if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {// no action taken
         				  immediateCost = demandProbabilities[t][d]*(
-        						  computeImmediateCost(inventory,i, 0, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+        						  computeImmediateCost(inventory[i], 0, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
         						  + ((t==Stages-1) ? 0 : CostNoAction[i-d][t+1]) );// no previous cost for the last stage
-        			  }else {
-        				  immediateCost = Double.POSITIVE_INFINITY;
-        			  }
-        			  CostNoAction[i][t] = CostNoAction[i][t] + immediateCost;
+        				  scenarioProb += demandProbabilities[t][d];
+            			  CostNoAction[i][t] = CostNoAction[i][t] + immediateCost;
+        			  }//else
         		  }
+        		  CostNoAction[i][t] = CostNoAction[i][t]/scenarioProb;
         	  }
           }
+
           
           
           /** when a=Q **/
@@ -187,34 +191,79 @@ public class sQ {
            *  
            *  This result will be stored in OptimalActon[][][] as integer, 1 for placing orders, 0 if otherwise.
            * **/
-          double totalCost[][][] = null;
-          int OptimalAction[][][] = new int[inventory.length][instance.maxQuantity][instance.getStages()];
-          
-          
-          /** Cost Computation a = Q, single Q for all periods *
-          for(int a=1; a<=instance.maxQuantity;a++) { //for a possible quantity, start from Q=1 to maxQuantity
-              for(int t=instance.getStages()-1;t>=0;t--) { // Time       	                
-        		  for(int i=0;i<inventory.length;i++) { // Inventory
-        			  
-        			  totalCost = new double [inventory.length][t == 0 ? 1 : instance.maxQuantity+1][instance.getStages()];
-        			  
+          double totalCost[][][] = new double[inventory.length][instance.maxQuantity][instance.getStages()-1]; 
+          //no action in the first period, so only consider costs with action for period 2, 3 and 4.
+
+          int OptimalAction[][][] = new int [inventory.length][instance.maxQuantity][instance.getStages()-1];
+
+
+          /** Cost Computation a = Q, single Q for all periods **/
+          for(int a=0; a<instance.maxQuantity;a++) { //"a" represents the action index, so the actual action volume is a+1
+
+        	  for(int i=0;i<inventory.length;i++) { // Inventory
+        		  for(int t=instance.getStages()-2;t>=0;t--) { // Time       	                
+
+        			  totalCost[i][a][t]= computePurchasingCost(a+1, instance.fixedOrderingCost, instance.unitCost);
+        			  //first "a" is used as index, second "a+1" is used as action volume
+        			  double scenarioProb = 0;
+
         			  for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
-        				  if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
+        				  double immediateCost;
+
+        				  if((inventory[i] + (a+1) - d <= instance.maxInventory) && (inventory[i] + (a+1) - d >= instance.minInventory)) {//"a+1" as action volumn
         					  immediateCost = demandProbabilities[t][d]*(
-        							  computeImmediateCost(inventory,i, a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
-        							  + ((t==Stages-1) ? 0 : totalCost[i+a-d][a-1][t+1]) );
-        				  }else {
-        					  immediateCost = Double.POSITIVE_INFINITY;
+        							  computeImmediateCost(inventory[i], (a+1), d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+        							  + ((t==instance.getStages()-2) ? 0 : totalCost[i+(a+1)-d][a][t+1]) );//computation on the index, so (a+1) is not used.
+
+        					  scenarioProb += demandProbabilities[t][d];
+        					  totalCost[i][a][t] = totalCost[i][a][t] + immediateCost;
+
         				  }
-        				  totalCost[i][a-1][t] = totalCost[i][a-1][t] + immediateCost;
         			  }
-        			  /** get optimal actions *
-        			  OptimalAction[i][a][t] = getOptimalAction(CostNoAction[i][t], totalCost[i][a][t]);
+        			  totalCost[i][a][t] = totalCost[i][a][t]/scenarioProb;
+        			  
         		  }
         	  }
-              System.out.println("Q = "+a+" Done.");
           }
-          */
+
+          
+          for(int a=0;a<instance.maxQuantity;a++) {
+        	  for (int i=0;i<inventory.length;i++) {
+        		  for(int t = 0;t<=instance.getStages()-2;t++) {
+        			  if(CostNoAction[i][t]<=totalCost[i][a][t]) {
+        				  OptimalAction[i][a][t] = 0;
+        			  }else {
+        				  OptimalAction[i][a][t] = 1;
+        			  }
+        		  }
+        	  }
+          }
+          
+
+          int[][] reorderPoint = new int [instance.maxQuantity][instance.getStages()-1];
+          for(int a=0; a<instance.maxQuantity;a++) {
+        	  for(int t = 0;t<=instance.getStages()-2;t++) {
+        		  for (int i=0;i<inventory.length;i++) {
+        			  if(OptimalAction[i][a][t]==1) {
+        				  reorderPoint[a][t] = i;
+        				  break;
+        			  }
+        		  }
+        	  }
+          }
+          
+          
+          for(int a=0; a<instance.maxQuantity;a++) {
+        	  System.out.print((a+1)+" ");
+        	  for(int t = 0;t<=instance.getStages()-2;t++) {
+        		  System.out.print(reorderPoint[a][t]+" ");
+        	  }System.out.println();
+          }
+          
+          
+
+          
+
 
     	  return new sQsolution(totalCost, CostNoAction, inventory, OptimalAction);
     	  
@@ -253,13 +302,13 @@ public class sQ {
 
     	  sQsolution sQsolution = solvesQInstance(instance);
     	  
-    	  
+    	  /*
           for(int i=0;i<sQsolution.inventory.length;i++) {
         	  System.out.print((i+instance.minInventory)+" ");
         	  for(int t=0;t<instance.getStages();t++) {
         		  System.out.print(sQsolution.CostNoAction[i][t]+" ");
         	  }System.out.println();
-          }
+          }*/
 
       }
       
