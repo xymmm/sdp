@@ -173,18 +173,16 @@ public class SDP {
         				 double immediateCost;
 
         				 if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
-        					 //compute immediate cost
         					 immediateCost = demandProbabilities[t][d]*(
-        							 computeImmediateCost(inventory[i], a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
-        							 + ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
-        					 //update cumulative scenario probability
+        							 			computeImmediateCost(inventory[i], a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+        							 			+ ((t==Stages-1) ? 0 : optimalCost[i+a-d][t+1]) );
         					 scenarioProb += demandProbabilities[t][d];
-        					 //update total cost for feasible demand value
         					 totalCost[i][a] += immediateCost;
         				 }//else, we do nothing.
         			 }
         			 //normalization on scenarios
         			 totalCost[i][a] = totalCost[i][a]/scenarioProb;
+        			 if((t==3)&&(i==250)&&(a==1)) {System.out.println("Normalized total cost = "+totalCost[0][1]);}
         		 }
         		 optimalCost[i][t] = getOptimalCost(totalCost[i]);
         		 optimalAction[i][t] = getOptimalAction(totalCost[i]);
@@ -241,7 +239,7 @@ public class SDP {
 		   
 		   
 		   /** SDP boundary conditions **/
-		   double tail = 0.0001;
+		   double tail = 0.00000001;
 		   
 		   int minInventory = -250;
 		   int maxInventory = 250;
@@ -262,7 +260,7 @@ public class SDP {
 		   
 		   Solution solution = solveInstance(instance);
 		   
-		   printSolution(instance, solution);
+		   //printSolution(instance, solution);
 		}
 
 }
