@@ -95,6 +95,40 @@ public class sQ {
 			}System.out.println();
 		}
 	}
+	
+	/** plot cost - with no action for all stages**/
+	public static void plotCostNoAction(Instance instance, sQsolution sQsolution, int stageIndex) {
+	      XYSeries series1 = new XYSeries("Optimal policy");
+	      for(int i=0;i<sQsolution.inventory.length;i++) {
+	    	  series1.add(i+instance.minInventory,sQsolution.CostNoAction[i][stageIndex]);
+	      }
+	      XYDataset xyDataset = new XYSeriesCollection(series1);
+	      JFreeChart chart = ChartFactory.createXYLineChart("ETC for Period "+ (stageIndex+1)+" with no action", "Opening inventory level", "Expected total cost",
+	    		  xyDataset, PlotOrientation.VERTICAL, true, true, false);
+	      ChartFrame frame = new ChartFrame("Period "+(stageIndex+1),chart);
+	      frame.setVisible(true);
+	      frame.setSize(1500,1200);
+	}
+	
+	/** Plot costs - cost with no action and with a given Q for a given stage**/
+	public static void plotComparedCosts(Instance instance, sQsolution sQsolution, int Q, int stageIndex) {
+	      XYSeries series1 = new XYSeries("No action");
+	      for(int i=-instance.minInventory;i<sQsolution.inventory.length;i++) {
+	    	  series1.add(i+instance.minInventory,sQsolution.CostNoAction[i][stageIndex+1]);
+	      }
+	      XYSeries series2 = new XYSeries("Action of "+Q);
+	      for(int i=-instance.minInventory;i<sQsolution.inventory.length;i++) {
+	    	  series2.add(i+instance.minInventory,sQsolution.totalCost[i][Q-1][stageIndex]);
+	      }
+		  XYSeriesCollection collection = new XYSeriesCollection();
+		  collection.addSeries(series1);
+		  collection.addSeries(series2);
+	      JFreeChart chart = ChartFactory.createXYLineChart("Expected Total Cost for Period "+ (stageIndex+2), "Opening inventory level", "Expected total cost",
+	            collection, PlotOrientation.VERTICAL, true, true, false);
+	      ChartFrame frame = new ChartFrame("Period "+(stageIndex+2),chart);
+	      frame.setVisible(true);
+	      frame.setSize(1500,1200);
+	}
 
 	/** main computation **/
 	public static sQsolution solvesQInstance(Instance instance) {
@@ -168,6 +202,7 @@ public class sQ {
 						}
 					}
 					totalCost[i][a][t] = totalCost[i][a][t]/scenarioProb;
+					if((i==500)&&(a==249)&&(t==2)) {System.out.println(scenarioProb);System.out.println(totalCost[i][a][t]);}
 					OptimalAction[i][a][t] = getOptimalAction(CostNoAction[i][t], totalCost[i][a][t]);
 				}
 			}
@@ -198,7 +233,7 @@ public class sQ {
 
 		int minInventory = -250;
 		int maxInventory = 250;
-		int maxQuantity = 1000;
+		int maxQuantity = 250;
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -214,7 +249,22 @@ public class sQ {
 
 		sQsolution sQsolution = solvesQInstance(instance);
 
-		printReorderPoints(instance, sQsolution);
+		//printReorderPoints(instance, sQsolution);
+		
+		plotComparedCosts(instance, sQsolution, 50, 0);
+		System.out.println(sQsolution.totalCost[500][249][2]);
+		
+		plotComparedCosts(instance, sQsolution, 38, 1);
+		System.out.println(sQsolution.totalCost[500][99][2]);
+		
+		//plotComparedCosts(instance, sQsolution, 100, 2);
+		
+		/*
+		for(int t=0;t<instance.getStages();t++) {
+			plotCostNoAction(instance, sQsolution, t);
+		}
+		*/
+		
 	}
 
 
