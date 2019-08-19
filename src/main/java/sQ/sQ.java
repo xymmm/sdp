@@ -263,7 +263,7 @@ public class sQ {
 		
 		/** problematic instance plotting**/
 		//action = 50, stage = 1 - multiple intersections
-		//plotComparedCosts(instance, sQsolution, 50, 0,true);
+		plotComparedCosts(instance, sQsolution, 50, 0,true);
 		plotComparedCosts(instance, sQsolution, 50, 0, false);
 		
 		//action = 38, stage = 2 - multiple intersections at inventory level < 0
@@ -271,7 +271,7 @@ public class sQ {
 		plotComparedCosts(instance, sQsolution, 38, 1, false);
 		
 		//action = 100, stage = 3 - infinity total cost - plot and print - solved by NaN
-		//plotComparedCosts(instance, sQsolution, 100, 2, false);
+		plotComparedCosts(instance, sQsolution, 100, 2, false);
 		//for(int i=0;i<sQsolution.inventory.length;i++) {
 			//System.out.println(sQsolution.totalCost[i][99][2]);
 		//}
