@@ -111,13 +111,13 @@ public class sQ {
 	}
 	
 	/** Plot costs - cost with no action and with a given Q for a given stage**/
-	public static void plotComparedCosts(Instance instance, sQsolution sQsolution, int Q, int stageIndex) {
+	public static void plotComparedCosts(Instance instance, sQsolution sQsolution, int Q, int stageIndex, boolean seeAll) {
 	      XYSeries series1 = new XYSeries("No action");
-	      for(int i=-instance.minInventory;i<sQsolution.inventory.length;i++) {
+	      for(int i=(seeAll?0:-instance.minInventory);i<sQsolution.inventory.length;i++) {
 	    	  series1.add(i+instance.minInventory,sQsolution.CostNoAction[i][stageIndex+1]);
 	      }
 	      XYSeries series2 = new XYSeries("Action of "+Q);
-	      for(int i=-instance.minInventory;i<sQsolution.inventory.length;i++) {
+	      for(int i=(seeAll?0:-instance.minInventory);i<sQsolution.inventory.length;i++) {
 	    	  series2.add(i+instance.minInventory,sQsolution.totalCost[i][Q-1][stageIndex]);
 	      }
 		  XYSeriesCollection collection = new XYSeriesCollection();
@@ -194,6 +194,8 @@ public class sQ {
 					for(int d=0;d<demandProbabilities[t+1].length;d++) { // Demand
 						double immediateCost;
 						if((inventory[i] + (a+1) - d <= instance.maxInventory) && (inventory[i] + (a+1) - d >= instance.minInventory)) {//"a+1" as action volumn
+							if((i==500)&&(a==249)&&(t==2)) {System.out.println("feasible demand value");}
+							if((i==500)&&(a==249)&&(t==2)) {System.out.println(d);}
 							immediateCost = demandProbabilities[t+1][d]*(
 									computeImmediateCost(inventory[i], (a+1), d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
 									+ ((t==instance.getStages()-2) ? 0 : totalCost[i+(a+1)-d][a][t+1]) );//computation on the index, so (a+1) is not used.
@@ -202,8 +204,12 @@ public class sQ {
 						}
 					}
 					totalCost[i][a][t] = totalCost[i][a][t]/scenarioProb;
-					if((i==500)&&(a==249)&&(t==2)) {System.out.println(scenarioProb);System.out.println(totalCost[i][a][t]);}
-					OptimalAction[i][a][t] = getOptimalAction(CostNoAction[i][t], totalCost[i][a][t]);
+					if((i==500)&&(a==249)&&(t==2)) {
+						System.out.println("inventory leve = "+(i+instance.minInventory)+", a = "+(a+1)+", stage = "+(t+2));
+						System.out.println("scenarioProb = "+scenarioProb);
+						System.out.println("cost with action " +(a+1) +" = "+totalCost[i][a][t]);
+						}
+					OptimalAction[i][a][t] = getOptimalAction(CostNoAction[i][t+1], totalCost[i][a][t]);
 				}
 			}
 		}
@@ -233,7 +239,7 @@ public class sQ {
 
 		int minInventory = -250;
 		int maxInventory = 250;
-		int maxQuantity = 250;
+		int maxQuantity = 1000;
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -247,24 +253,38 @@ public class sQ {
 				maxQuantity
 				);
 
+		/** Solve the classic instance **/
 		sQsolution sQsolution = solvesQInstance(instance);
 
+		/** Plot ETC without action for all stages **/
+		//for(int t=0;t<instance.getStages();t++) {
+			//plotCostNoAction(instance, sQsolution, t);
+		//}
+		
+		/** problematic instance plotting**/
+		//action = 50, stage = 1 - multiple intersections
+		//plotComparedCosts(instance, sQsolution, 50, 0,true);
+		//plotComparedCosts(instance, sQsolution, 50, 0, false);
+		
+		//action = 38, stage = 2 - multiple intersections at inventory level < 0
+		//plotComparedCosts(instance, sQsolution, 38, 1, true);
+		//plotComparedCosts(instance, sQsolution, 38, 1, false);
+		
+		//action = 100, stage = 3 - infinity total cost - plot and print
+		//plotComparedCosts(instance, sQsolution, 100, 2, false);
+		//for(int i=0;i<sQsolution.inventory.length;i++) {
+			//System.out.println(sQsolution.totalCost[i][99][2]);
+		//}
+		
+		//action = 1, stage = 3 - no intersection
+		//plotComparedCosts(instance, sQsolution, 1, 2, false);
+		//for(int i=0;i<sQsolution.inventory.length;i++) {
+			//System.out.println(sQsolution.totalCost[i][0][2] - sQsolution.CostNoAction[i][3]);
+		//}
+		
+
 		//printReorderPoints(instance, sQsolution);
-		
-		plotComparedCosts(instance, sQsolution, 50, 0);
-		System.out.println(sQsolution.totalCost[500][249][2]);
-		
-		plotComparedCosts(instance, sQsolution, 38, 1);
-		System.out.println(sQsolution.totalCost[500][99][2]);
-		
-		//plotComparedCosts(instance, sQsolution, 100, 2);
-		
-		/*
-		for(int t=0;t<instance.getStages();t++) {
-			plotCostNoAction(instance, sQsolution, t);
-		}
-		*/
-		
+
 	}
 
 

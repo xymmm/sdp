@@ -35,7 +35,6 @@ public class sQtest_singleQ {
 	      int maxInventory = 250;
 	      int maxQuantity = 1000;
 
-
 	      return new Instance(
 	            fixedOrderingCost,
 	            unitCost,
@@ -70,10 +69,8 @@ public class sQtest_singleQ {
 	    		  );
 	   }
 	   
+/************************************* Instance A **********************************************************/	
 	   
-	   
-	   
-	/*
 	public static Instance getInstanceA() {
 	      // Problem instance
 	      double fixedOrderingCost = 178;
@@ -81,14 +78,12 @@ public class sQtest_singleQ {
 	      double holdingCost = 1;
 	      double penaltyCost = 4;
 	      int[] demandMean = {20, 10, 93, 29, 49, 97, 37, 60, 38, 47};
-	      
-	      
+	      	      
 	      // SDP boundary conditions
 	      double tail = 0.0001;
 	      int minInventory = -1000;
 	      int maxInventory = 1000;
 	      int maxQuantity = 1000;
-
 
 	      return new Instance(
 	            fixedOrderingCost,
@@ -106,17 +101,17 @@ public class sQtest_singleQ {
 	   public void testInstanceA() {
 	      Instance instance = getInstanceA();
 	      
-	      Solution solution = SDP.solveInstance(instance);
+	      sQsolution sQsolution = sQ.solvesQInstance(instance);
 	      
-	      double expectedTotalCost = 1100.4741964293196;
+	      double expectedTotalCost = 9.571778965387995E20;
 	      assertEquals(
 	            expectedTotalCost,
-	            solution.optimalCost[-instance.minInventory][0],
+	            sQsolution.totalCost[0][0][8],
 	            0.001);
 	   }
-	   */
-	   
-	   /*
+	   	   
+	   /************************************* Instance B **********************************************************/	
+	   	   
 	   public static Instance getInstanceB() {
 	      // Problem instance
 	      double fixedOrderingCost = 336;
@@ -124,14 +119,12 @@ public class sQtest_singleQ {
 	      double holdingCost = 1;
 	      double penaltyCost = 5;
 	      int[] demandMean = {50, 12, 97, 27, 74, 59, 7, 46, 78, 63};
-	      
-	      
-	      //SDP boundary conditions
+	    
+   	      //SDP boundary conditions
 	      double tail = 0.0001;
 	      int minInventory = -1000;
 	      int maxInventory = 1000;
 	      int maxQuantity = 1000;
-
 
 	      return new Instance(
 	            fixedOrderingCost,
@@ -149,17 +142,17 @@ public class sQtest_singleQ {
 	   public void testInstanceB() {
 	      Instance instance = getInstanceB();
 	      
-	      Solution solution = SDP.solveInstance(instance);
+	      sQsolution sQsolution = sQ.solvesQInstance(instance);
 	      
-	      double expectedTotalCost = 1765.903451217189;
+	      double expectedTotalCost = 1.2041562679020247E28;
 	      assertEquals(
 	            expectedTotalCost,
-	            solution.optimalCost[-instance.minInventory][0],
+	            sQsolution.totalCost[0][0][8],
 	            0.001);
 	   }
-	   */
 	   
-	   /*
+	   /************************************* Instance C **********************************************************/	
+ 
 	   public static Instance getInstanceC() {
 	      // Problem instance 
 	      double fixedOrderingCost = 122;
@@ -167,14 +160,12 @@ public class sQtest_singleQ {
 	      double holdingCost = 1;
 	      double penaltyCost = 2;
 	      int[] demandMean = {6, 18, 44, 54, 26, 50, 54, 73, 18, 53};
-	      
-	      
+	            
 	      // SDP boundary conditions
 	      double tail = 0.0001;
 	      int minInventory = -1000;
 	      int maxInventory = 1000;
 	      int maxQuantity = 1000;
-
 
 	      return new Instance(
 	            fixedOrderingCost,
@@ -192,14 +183,13 @@ public class sQtest_singleQ {
 	   public void testInstanceC() {
 	      Instance instance = getInstanceC();
 	      
-	      Solution solution = SDP.solveInstance(instance);
+	      sQsolution sQsolution = sQ.solvesQInstance(instance);
 	      
-	      double expectedTotalCost = 724.244847692616;
+	      double expectedTotalCost = 2.3525420541466773E23;
 	      assertEquals(
 	            expectedTotalCost,
-	            solution.optimalCost[-instance.minInventory][0],
+	            sQsolution.totalCost[0][0][8],
 	            0.001);
 	   }
-	   */
-
+	   
 }
