@@ -186,16 +186,20 @@ public class sQ {
 
 			for(int i=0;i<inventory.length;i++) { // Inventory
 				for(int t=instance.getStages()-2;t>=0;t--) { // Time       	                
-
-					totalCost[i][a][t]= computePurchasingCost(a+1, instance.fixedOrderingCost, instance.unitCost);
-					//first "a" is used as index, second "a+1" is used as action volume
+					
+					for(int d=0;d<demandProbabilities[t+1].length;d++) {
+						if((inventory[i] + (a+1) - d <= instance.maxInventory) && (inventory[i] + (a+1) - d >= instance.minInventory)) {
+							totalCost[i][a][t]= computePurchasingCost(a+1, instance.fixedOrderingCost, instance.unitCost);
+							//first "a" is used as index, second "a+1" is used as action volume
+						}
+					}
+					
 					double scenarioProb = 0;
 
 					for(int d=0;d<demandProbabilities[t+1].length;d++) { // Demand
 						double immediateCost;
 						if((inventory[i] + (a+1) - d <= instance.maxInventory) && (inventory[i] + (a+1) - d >= instance.minInventory)) {//"a+1" as action volumn
-							if((i==500)&&(a==249)&&(t==2)) {System.out.println("feasible demand value");}
-							if((i==500)&&(a==249)&&(t==2)) {System.out.println(d);}
+
 							immediateCost = demandProbabilities[t+1][d]*(
 									computeImmediateCost(inventory[i], (a+1), d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
 									+ ((t==instance.getStages()-2) ? 0 : totalCost[i+(a+1)-d][a][t+1]) );//computation on the index, so (a+1) is not used.
@@ -204,11 +208,7 @@ public class sQ {
 						}
 					}
 					totalCost[i][a][t] = totalCost[i][a][t]/scenarioProb;
-					if((i==500)&&(a==249)&&(t==2)) {
-						System.out.println("inventory leve = "+(i+instance.minInventory)+", a = "+(a+1)+", stage = "+(t+2));
-						System.out.println("scenarioProb = "+scenarioProb);
-						System.out.println("cost with action " +(a+1) +" = "+totalCost[i][a][t]);
-						}
+
 					OptimalAction[i][a][t] = getOptimalAction(CostNoAction[i][t+1], totalCost[i][a][t]);
 				}
 			}
@@ -264,13 +264,13 @@ public class sQ {
 		/** problematic instance plotting**/
 		//action = 50, stage = 1 - multiple intersections
 		//plotComparedCosts(instance, sQsolution, 50, 0,true);
-		//plotComparedCosts(instance, sQsolution, 50, 0, false);
+		plotComparedCosts(instance, sQsolution, 50, 0, false);
 		
 		//action = 38, stage = 2 - multiple intersections at inventory level < 0
-		//plotComparedCosts(instance, sQsolution, 38, 1, true);
-		//plotComparedCosts(instance, sQsolution, 38, 1, false);
+		plotComparedCosts(instance, sQsolution, 38, 1, true);
+		plotComparedCosts(instance, sQsolution, 38, 1, false);
 		
-		//action = 100, stage = 3 - infinity total cost - plot and print
+		//action = 100, stage = 3 - infinity total cost - plot and print - solved by NaN
 		//plotComparedCosts(instance, sQsolution, 100, 2, false);
 		//for(int i=0;i<sQsolution.inventory.length;i++) {
 			//System.out.println(sQsolution.totalCost[i][99][2]);
