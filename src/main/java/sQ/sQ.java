@@ -1,5 +1,7 @@
 package sQ;
 
+import java.util.Arrays;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
@@ -44,14 +46,14 @@ public class sQ {
 	 * **/
 	static double computeImmediateCost(
 			int inventoryLevel, 
-			int Actions, 
+			int a, 
 			int demand,
 			double holdingCost, 
 			double penaltyCost, 
 			double fixedOrderingCost, 
 			double unitCost) {
 
-		return holdingCost*Math.max(0, inventoryLevel + Actions - demand) + penaltyCost *Math.max(0, demand - inventoryLevel - Actions);
+		return holdingCost*Math.max(0, inventoryLevel + a - demand) + penaltyCost *Math.max(0, demand - inventoryLevel - a);
 
 	}
 
@@ -60,72 +62,37 @@ public class sQ {
 		return a > 0 ? fixedOrderingCost + a*unitCost : 0;
 	}
 
-	/** get action option by comparing two costs**/
-	public static int getOptimalAction(double CostNoAction, double totalCost) {
-		if(CostNoAction <= totalCost) {
-			return 0;
-		}else {
-			return 1;			  
-		}
-	}
-
 	/** get reorder points **/
-	public static int[][] getReorderPoints(Instance instance, int[] inventory, int[][][]OptimalAction) {
-		int[][] reorderPoint = new int [instance.maxQuantity][instance.getStages()-1];
-		for(int a=0; a<instance.maxQuantity;a++) {
-			for(int t = 0;t<=instance.getStages()-2;t++) {
-				for (int i=0;i<inventory.length;i++) {
-					if(OptimalAction[i][a][t]==1) {
-						reorderPoint[a][t] = i;
-						break;
-					}
-				}
-			}
-		}
-		return reorderPoint;
+	public static int[][] getReorderPoints(Instance instance, int[] inventory, boolean[][][]optimalAction) {
+		// TODO
+	   return null;
 	}
 
 
 	/** print reorder points**/
 	public static void printReorderPoints(Instance instance, sQsolution sQsolution) {
-		for(int a=0; a<instance.maxQuantity;a++) {
-			System.out.print((a+1)+" ");
-			for(int t = 0;t<=instance.getStages()-2;t++) {
-				System.out.print(sQsolution.reorderPoint[a][t]+" ");
-			}System.out.println();
-		}
-	}
-	
-	/** plot cost - with no action for all stages**/
-	public static void plotCostNoAction(Instance instance, sQsolution sQsolution, int stageIndex) {
-	      XYSeries series1 = new XYSeries("Optimal policy");
-	      for(int i=0;i<sQsolution.inventory.length;i++) {
-	    	  series1.add(i+instance.minInventory,sQsolution.CostNoAction[i][stageIndex]);
-	      }
-	      XYDataset xyDataset = new XYSeriesCollection(series1);
-	      JFreeChart chart = ChartFactory.createXYLineChart("ETC for Period "+ (stageIndex+1)+" with no action", "Opening inventory level", "Expected total cost",
-	    		  xyDataset, PlotOrientation.VERTICAL, true, true, false);
-	      ChartFrame frame = new ChartFrame("Period "+(stageIndex+1),chart);
-	      frame.setVisible(true);
-	      frame.setSize(1500,1200);
+	   for(int t = 0;t<instance.getStages();t++) {
+         System.out.print(sQsolution.s[t]+" ");
+      }System.out.println();
 	}
 	
 	/** Plot costs - cost with no action and with a given Q for a given stage**/
-	public static void plotComparedCosts(Instance instance, sQsolution sQsolution, int Q, int stageIndex, boolean seeAll) {
+	public static void plotComparedCosts(Instance instance, sQsolution sQsolution, int t) {
+	      
 	      XYSeries series1 = new XYSeries("No action");
-	      for(int i=(seeAll?0:-instance.minInventory);i<sQsolution.inventory.length;i++) {
-	    	  series1.add(i+instance.minInventory,sQsolution.CostNoAction[i][stageIndex+1]);
+	      for(int a=0;a<instance.maxQuantity;a++) {
+	    	  series1.add(a,sQsolution.totalCost[instance.initialInventory - instance.minInventory][a][t]);
 	      }
-	      XYSeries series2 = new XYSeries("Action of "+Q);
+	      /*XYSeries series2 = new XYSeries("Action of "+Q);
 	      for(int i=(seeAll?0:-instance.minInventory);i<sQsolution.inventory.length;i++) {
-	    	  series2.add(i+instance.minInventory,sQsolution.totalCost[i][Q-1][stageIndex]);
-	      }
+	    	  series2.add(i+instance.minInventory,sQsolution.totalCost[i][sQsolution.opt_a][stageIndex]);
+	      }*/
 		  XYSeriesCollection collection = new XYSeriesCollection();
 		  collection.addSeries(series1);
-		  collection.addSeries(series2);
-	      JFreeChart chart = ChartFactory.createXYLineChart("Expected Total Cost for Period "+ (stageIndex+2), "Opening inventory level", "Expected total cost",
+		  //collection.addSeries(series2);
+	      JFreeChart chart = ChartFactory.createXYLineChart("Expected Total Cost for Period "+ (t+1), "Opening inventory level", "Expected total cost",
 	            collection, PlotOrientation.VERTICAL, true, true, false);
-	      ChartFrame frame = new ChartFrame("Period "+(stageIndex+2),chart);
+	      ChartFrame frame = new ChartFrame("Period "+(t+1),chart);
 	      frame.setVisible(true);
 	      frame.setSize(1500,1200);
 	}
@@ -133,38 +100,11 @@ public class sQ {
 	/** main computation **/
 	public static sQsolution solvesQInstance(Instance instance) {
 
-		int Stages = instance.getStages();
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
 		}
 		double demandProbabilities [][] = computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
-
-
-		/** when a=0 
-		 * 
-		 * This array stores the cost for an inventory level at one stage, when no replenishment order is placed.
-		 * The first index represents the inventory level, and the second index represents the stages.
-		 * **/
-		double CostNoAction [][] = new double [inventory.length][Stages];
-
-		/** Cost Computation a=0 **/
-		for(int t=instance.getStages()-1;t>=0;t--) { // Time       	                
-			for(int i=0;i<inventory.length;i++) { // Inventory
-				double scenarioProb = 0;
-				for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
-					double immediateCost;
-					if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {// no action taken
-						immediateCost = demandProbabilities[t][d]*(
-								computeImmediateCost(inventory[i], 0, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
-								+ ((t==Stages-1) ? 0 : CostNoAction[i-d][t+1]) );// no previous cost for the last stage
-						scenarioProb += demandProbabilities[t][d];
-						CostNoAction[i][t] = CostNoAction[i][t] + immediateCost;
-					}//else
-				}
-				CostNoAction[i][t] = CostNoAction[i][t]/scenarioProb;
-			}
-		}
 
 		/** when a=Q 
 		 * 
@@ -176,52 +116,77 @@ public class sQ {
 		 * 
 		 *no action in the first period, so only consider costs with action for period 2, 3 and 4.
 		 ***/
-		double totalCost[][][] = new double[inventory.length][instance.maxQuantity][instance.getStages()-1];
+		double totalCost[][][] = new double[inventory.length][instance.maxQuantity+1][instance.getStages()];
 		
 		/** This array stores the comparison between cost with no action and cost with action Q, for period 2,3 and 4**/
-		int OptimalAction[][][] = new int [inventory.length][instance.maxQuantity][instance.getStages()-1];
+		boolean optimalAction[][][] = new boolean [inventory.length][instance.maxQuantity + 1][instance.getStages()];
 
 		/** Cost Computation a = Q, single Q for all periods **/
-		for(int a=0; a<instance.maxQuantity;a++) { //"a" represents the action index, so the actual action volume is a+1
-
-			for(int i=0;i<inventory.length;i++) { // Inventory
-				for(int t=instance.getStages()-2;t>=0;t--) { // Time       	                
-					
-					for(int d=0;d<demandProbabilities[t+1].length;d++) {
-						if((inventory[i] + (a+1) - d <= instance.maxInventory) && (inventory[i] + (a+1) - d >= instance.minInventory)) {
-							totalCost[i][a][t]= computePurchasingCost(a+1, instance.fixedOrderingCost, instance.unitCost);
-							//first "a" is used as index, second "a+1" is used as action volume
-						}
-					}
+		for(int a=0; a<instance.maxQuantity+1;a++) { //"a" represents the action index, so the actual action volume is a+1
+			for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
+			   for(int i=0;i<inventory.length;i++) { // Inventory   
+			      
+			      double totalCostOrder = computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost);
 					
 					double scenarioProb = 0;
 
-					for(int d=0;d<demandProbabilities[t+1].length;d++) { // Demand
-						double immediateCost;
-						if((inventory[i] + (a+1) - d <= instance.maxInventory) && (inventory[i] + (a+1) - d >= instance.minInventory)) {//"a+1" as action volumn
-
-							immediateCost = demandProbabilities[t+1][d]*(
-									computeImmediateCost(inventory[i], (a+1), d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
-									+ ((t==instance.getStages()-2) ? 0 : totalCost[i+(a+1)-d][a][t+1]) );//computation on the index, so (a+1) is not used.
-							scenarioProb += demandProbabilities[t+1][d];
-							totalCost[i][a][t] = totalCost[i][a][t] + immediateCost;
+					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+						if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {//"a+1" as action volumn
+						   totalCostOrder += demandProbabilities[t][d]*(
+									computeImmediateCost(inventory[i], a, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+									+ ((t==instance.getStages()-1) ? 0 : totalCost[i+a-d][a][t+1]) );//computation on the index, so (a+1) is not used.
+							scenarioProb += demandProbabilities[t][d];
 						}
 					}
-					totalCost[i][a][t] = totalCost[i][a][t]/scenarioProb;
+					totalCostOrder /= scenarioProb;
+					
+					
+					double totalCostNoOrder = 0;
+					scenarioProb = 0;
+					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+                  if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {//"a+1" as action volumn
+                     totalCostNoOrder += demandProbabilities[t][d]*(
+                           computeImmediateCost(inventory[i], 0, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+                           + ((t==instance.getStages()-1) ? 0 : totalCost[i-d][a][t+1]) );//computation on the index, so (a+1) is not used.
+                     scenarioProb += demandProbabilities[t][d];
+                  }
+               }
+               totalCostNoOrder /= scenarioProb;
+					
+					totalCost[i][a][t] = Math.min(totalCostNoOrder, totalCostOrder);
 
-					OptimalAction[i][a][t] = getOptimalAction(CostNoAction[i][t+1], totalCost[i][a][t]);
+					optimalAction[i][a][t] = totalCostNoOrder < totalCostOrder ? false : true;
 				}
 			}
 		}
 		
+		// Determine the optimal a. What is the optimal a?
+		
+   	int a = 1;
+      int minIndex = a;
+      double minCost = totalCost[instance.initialInventory - instance.minInventory][minIndex][0]; //Time zero
+      do {
+         if(minCost > totalCost[instance.initialInventory - instance.minInventory][++a][0]) {
+            minCost = totalCost[instance.initialInventory - instance.minInventory][++a][0];
+            minIndex = a - 1;
+         }
+      }while(a < instance.maxQuantity - 1);
+      int opt_a = minIndex;
+		
+      int[] s = new int[instance.getStages()];
+		// Get the reorder points.
+      for(int t=0;t<instance.getStages();t++) { // Time
+         for(int i=0;i<inventory.length;i++) {  // Inventory   
+            if(optimalAction[i][opt_a][t] == false) {
+               s[t] = i + instance.minInventory;
+               break;
+            }
+         }
+      }
+      
+		// Build a solution.
 
-		/** This array stores the reorder points, 
-		 * for a single value of quantity at every stage except the first, 
-		 * where the quantity is used for all stages with actions.**/
-		int[][] reorderPoint = new int [instance.maxQuantity][instance.getStages()-1];
-		reorderPoint = getReorderPoints(instance, inventory, OptimalAction);
-
-		return new sQsolution(totalCost, CostNoAction, inventory, reorderPoint);
+		return new sQsolution(totalCost, optimalAction, inventory, s, opt_a);
 	}
 
 	public static void main(String[] args) {
@@ -237,9 +202,9 @@ public class sQ {
 		/** SDP boundary conditions **/
 		double tail = 0.00000001;
 
-		int minInventory = -250;
-		int maxInventory = 250;
-		int maxQuantity = 1000;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -255,35 +220,27 @@ public class sQ {
 
 		/** Solve the classic instance **/
 		sQsolution sQsolution = solvesQInstance(instance);
-
+		
+		System.out.println("Optimal solution cost: "+sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.opt_a][0]);
+		System.out.println("Optimal Q: "+(sQsolution.opt_a+1));
+		
+		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];
+		for(int i = 0; i < optActPeriod0.length; i++) {
+		   for(int a = 0; a < optActPeriod0[i].length; a++) {
+		      optActPeriod0[i][a] = sQsolution.optimalAction[i][a][0];
+		   }
+		}
+		
+		//System.out.println(Arrays.deepToString(optActPeriod0)); //Careful, BIG MATRIX
+		
 		/** Plot ETC without action for all stages **/
 		//for(int t=0;t<instance.getStages();t++) {
 			//plotCostNoAction(instance, sQsolution, t);
 		//}
 		
-		/** problematic instance plotting**/
-		//action = 50, stage = 1 - multiple intersections
-		plotComparedCosts(instance, sQsolution, 50, 0,true);
-		plotComparedCosts(instance, sQsolution, 50, 0, false);
+		plotComparedCosts(instance, sQsolution, 0);
 		
-		//action = 38, stage = 2 - multiple intersections at inventory level < 0
-		plotComparedCosts(instance, sQsolution, 38, 1, true);
-		plotComparedCosts(instance, sQsolution, 38, 1, false);
-		
-		//action = 100, stage = 3 - infinity total cost - plot and print - solved by NaN
-		plotComparedCosts(instance, sQsolution, 100, 2, false);
-		//for(int i=0;i<sQsolution.inventory.length;i++) {
-			//System.out.println(sQsolution.totalCost[i][99][2]);
-		//}
-		
-		//action = 1, stage = 3 - no intersection
-		//plotComparedCosts(instance, sQsolution, 1, 2, false);
-		//for(int i=0;i<sQsolution.inventory.length;i++) {
-			//System.out.println(sQsolution.totalCost[i][0][2] - sQsolution.CostNoAction[i][3]);
-		//}
-		
-
-		//printReorderPoints(instance, sQsolution);
+		printReorderPoints(instance, sQsolution);
 
 	}
 

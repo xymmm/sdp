@@ -3,21 +3,21 @@ package sQ.data;
 public class sQsolution {
 	
 	   public int[] inventory;
-	   
 	   public double totalCost[][][];
-	   public double CostNoAction[][];
-       public int reorderPoint[][]; 
-
-
+	   public boolean optimalAction[][][];
+	   public int[] s;
+	   public int opt_a;
 	   
 	   public sQsolution(double[][][] totalCost, 
-			   			 double[][] CostNoAction, 
+			   			 boolean[][][] optimalAction, 
 			   			 int[] inventory, 
-			   			 int[][] reorderPoint) {
+			   			 int[] s,
+			   			 int opt_a) {
 		   this.totalCost = totalCost;
-		   this.CostNoAction = CostNoAction;
+		   this.optimalAction = optimalAction;
 		   this.inventory = inventory;
-		   this.reorderPoint = reorderPoint;
+		   this.s = s;
+		   this.opt_a = opt_a; 
 	   }
 
 }

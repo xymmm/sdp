@@ -7,6 +7,7 @@ public class Instance {
    public double holdingCost;
    public double penaltyCost;
    public int[] demandMean;
+   public int initialInventory = 0;
    
    
    /** SDP boundary conditions **/
