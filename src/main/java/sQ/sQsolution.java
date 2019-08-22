@@ -1,4 +1,4 @@
-package sQ.data;
+package sQ;
 
 public class sQsolution {
 	

@@ -7,9 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import sQ.sQ;
-import sQ.data.sQsolution;
+import sQ.sQsolution;
+import sdp.sdpSolution;
 import sdp.data.Instance;
-import sdp.data.Solution;
 
 public class sQtest_singleQ {
 

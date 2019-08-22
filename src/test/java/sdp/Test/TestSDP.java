@@ -7,8 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import sdp.SDP;
+import sdp.sdpSolution;
 import sdp.data.Instance;
-import sdp.data.Solution;
 
 public class TestSDP {
 
@@ -111,7 +111,7 @@ public class TestSDP {
    public void testInstanceA() {
       Instance instance = getInstanceA();
       
-      Solution solution = SDP.solveInstance(instance);
+      sdpSolution solution = SDP.solveInstance(instance);
       
       double expectedTotalCost = 1100.4741964293196;
       assertEquals(
@@ -124,7 +124,7 @@ public class TestSDP {
    public void testInstanceB() {
       Instance instance = getInstanceB();
       
-      Solution solution = SDP.solveInstance(instance);
+      sdpSolution solution = SDP.solveInstance(instance);
       
       double expectedTotalCost = 1765.903451217189;
       assertEquals(
@@ -137,7 +137,7 @@ public class TestSDP {
    public void testInstanceC() {
       Instance instance = getInstanceC();
       
-      Solution solution = SDP.solveInstance(instance);
+      sdpSolution solution = SDP.solveInstance(instance);
       
       double expectedTotalCost = 724.244847692616;
       assertEquals(

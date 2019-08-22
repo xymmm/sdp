@@ -1,6 +1,6 @@
-package sdp.data;
+package sdp;
 
-public class Solution {
+public class sdpSolution {
 
    public int[] inventory;
    
@@ -8,7 +8,7 @@ public class Solution {
    public double optimalAction[][];
    public double optimalCost[][];
    
-   public Solution(double optimalAction[][], double optimalCost[][], int[] inventory) {
+   public sdpSolution(double optimalAction[][], double optimalCost[][], int[] inventory) {
       this.optimalAction = optimalAction;
       this.optimalCost = optimalCost;
       this.inventory = inventory;
