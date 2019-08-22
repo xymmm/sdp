@@ -1,7 +1,7 @@
 package simulation;
 
 
-public class sim_sQ {
+public class sQsim {
 	/**
 	 * Simulating an (s,Q) inventory system consists of the following serial events in one period:
 	 * 
