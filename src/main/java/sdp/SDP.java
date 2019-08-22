@@ -210,9 +210,9 @@ public class SDP {
 
 		double tail = 0.00000001;
 
-		int minInventory = -250;
-		int maxInventory = 250;
-		int maxQuantity = 1000;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 
 		Instance instance = new Instance(
 										fixedOrderingCost,

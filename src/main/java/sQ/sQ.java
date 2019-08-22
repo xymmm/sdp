@@ -162,7 +162,7 @@ public class sQ {
 		/** Solve the classic instance **/
 		sQsolution sQsolution = solvesQInstance(instance);
 
-		System.out.println("Optimal solution cost: "+sQsolution.totalCost[instance.initialInventory][sQsolution.opt_a][0]);
+		System.out.println("Optimal solution cost: "+sQsolution.totalCost[instance.initialInventory-instance.minInventory][sQsolution.opt_a+1][0]);
 
 		System.out.println("Optimal Q: "+(sQsolution.opt_a+1));
 
@@ -171,6 +171,8 @@ public class sQ {
 			for(int a = 0; a < optActPeriod0[i].length; a++) {
 				optActPeriod0[i][a] = sQsolution.optimalAction[i][a][0];
 			}
+			
+			
 		}
 
 		//System.out.println(Arrays.deepToString(optActPeriod0)); //Careful, BIG MATRIX
