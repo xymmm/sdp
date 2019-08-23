@@ -1,4 +1,6 @@
-package simulation;
+package sQsimulation;
+
+import umontreal.ssj.stat.Tally;
 
 public class sQsimInstance {
 	/*** Problem instance ***/
@@ -20,6 +22,8 @@ public class sQsimInstance {
 	/** sQ replenishment quantity **/
 	public int[] actionQuantity;
 	public int[] reorderPoint;
+	
+	Tally statCost = new Tally("stats on cost");
 
 	public sQsimInstance(
 			double fixedOrderingCost,

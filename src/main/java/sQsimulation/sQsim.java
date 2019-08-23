@@ -1,5 +1,11 @@
-package simulation;
+package sQsimulation;
 
+import umontreal.ssj.probdist.PoissonDist;
+import umontreal.ssj.randvar.PoissonGen;
+import umontreal.ssj.randvar.RandomVariateGenInt;
+import umontreal.ssj.rng.MRG32k3a;
+import umontreal.ssj.rng.RandomStream;
+import umontreal.ssj.util.Chrono;
 
 public class sQsim {
 	/**
@@ -36,11 +42,22 @@ public class sQsim {
 	
 	/** 6. generate Poisson random number as demand **/
 	static int generateDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int currentStageIndex) {
-		int demand = getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));
+		RandomVariateGenInt genDemand;
+		RandomStream streamDemand = new MRG32k3a();
+		genDemand = new PoissonGen(streamDemand, new PoissonDist(sQsimInstance.demandMean[currentStageIndex]));
+		int demand = genDemand.nextInt();
+
 		while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand, currentStageIndex) == false) {
-			demand = getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));
+			demand = genDemand.nextInt();
 		}
 		return -demand;
+		/* without ssj:
+		 * 
+		 * int demand = getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));
+		 * while(check... == false){
+		 * 		demand = getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));}
+		 * return -demand
+		 * **/
 		//return -getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));
 	}
 	static boolean checkDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int demand, int currentStageIndex) {
@@ -52,6 +69,7 @@ public class sQsim {
 			return false;
 		}
 	}
+	/*
 	private static int getPoissonVariable(double lamda) {
 		int x = 0;
 		double y = Math.random(), cdf = getPoissonProbability(x, lamda);
@@ -68,6 +86,7 @@ public class sQsim {
 		}
 		return sum * c;
 	}
+	*/
 	
 	/** 5. compute holding or penalty cost **/
 	static double computeClosingCost(int inventoryLevel, sQsimInstance sQsimInstance) {
@@ -78,7 +97,7 @@ public class sQsim {
 		}
 	}
 	
-	public static double simulatesQinstance(sQsimInstance sQsimInstance) {
+	public static double simulatesQinstanceOneRun(sQsimInstance sQsimInstance) {
 
 		int inventoryLevel = sQsimInstance.getInitialInventory();
 		double cost = 0;
@@ -117,8 +136,14 @@ public class sQsim {
 		}while(
 				currentStageIndex < sQsimInstance.getStages()
 				);
-		
 		return cost;
+	}
+	
+	/** multiple run times **/
+	public static void simulationsQinstanceRuns(sQsimInstance sQsimInstance, int count) {
+		for(int i=0; i<count; i++) {
+			sQsimInstance.statCost.add(simulatesQinstanceOneRun(sQsimInstance));
+		}
 	}
 	
 	/** print simulation results **/
@@ -138,27 +163,24 @@ public class sQsim {
 		return sum/cost.length;
 	}
 
-
 	public static void main(String[] args) {
 
-		/*** Problem instance ***/
+		/** declare instance parameters **/
 		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 		int[] demandMean = {20,40,60,40};
 
-		/** SDP boundary conditions **/
 		double tail = 0.00000001;
 
 		int minInventory = -500;
 		int maxInventory = 500;
 		
-		/** Given s and Q **/
 		int[] reorderPoint = {13,33,54,24};
 		int[] actionQuantity = {83, 83, 83, 83};
 
-		sQsimInstance sQsimInstance = new sQsimInstance(
+		sQsimInstance sQsystem = new sQsimInstance(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
@@ -171,20 +193,30 @@ public class sQsim {
 				reorderPoint
 				);	
 		
+		Chrono timer = new Chrono();
+		
+		int count = 500;
+		sQsim.simulatesQinstanceOneRun(sQsystem);
+		sQsim.simulationsQinstanceRuns(sQsystem, count);
+		
+		sQsystem.statCost.setConfidenceIntervalStudent();
+		System.out.println(sQsystem.statCost.report(0.9, 3));
+		System.out.println("Total CPU time: "+timer.format());
+
+		/*
 		//simulation times
-		int count = 3;
+		int count = 500;
 		double[] cost = new double [count];
 
-		/** implement simulation **/
-		for(int c = 0; c<count; c++) {
-			System.out.println("========== Run time = "+(c+1)+" ==========");
-			cost[c] = simulatesQinstance(sQsimInstance);
+		for(int i = 0; i<count; i++) {
+			System.out.println("========== Run time = "+(i+1)+" ==========");
+			cost[i] = simulatesQinstanceOneRun(sQsystem);
 		}
 		
-		//printSimResults(cost, count);
+		printSimResults(cost, count);
 		double average = getAverage(cost);
 		System.out.println("Average cost of "+count+" times simulations is "+average);
-
+		**/
 
 	}
 

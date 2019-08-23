@@ -108,7 +108,7 @@ public class SDP {
 				xyDataset, PlotOrientation.VERTICAL, false, true, false);
 		ChartFrame frame = new ChartFrame("SDP Plot",chart);
 		frame.setVisible(true);
-		frame.setSize(500,400);
+		frame.setSize(1500,1200);
 	}
 
 	/** compute the expected total cost and get optimal actions **/
