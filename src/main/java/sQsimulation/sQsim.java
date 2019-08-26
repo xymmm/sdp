@@ -136,6 +136,7 @@ public class sQsim {
 		}while(
 				currentStageIndex < sQsimInstance.getStages()
 				);
+		System.out.println("=============================");
 		return cost;
 	}
 	
@@ -146,7 +147,7 @@ public class sQsim {
 		}
 	}
 	
-	/** print simulation results **/
+	/* print simulation results *
 	static void printSimResults(double[] cost, int count) {
 		System.out.println("count    total cost");
 		System.out.println("-------------------");
@@ -162,6 +163,7 @@ public class sQsim {
 		}
 		return sum/cost.length;
 	}
+	*/
 
 	public static void main(String[] args) {
 
