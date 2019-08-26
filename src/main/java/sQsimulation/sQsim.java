@@ -100,7 +100,6 @@ public class sQsim {
 	public static double simulatesQinstanceOneRun(sQsimInstance sQsimInstance) {
 
 		int inventoryLevel = sQsimInstance.getInitialInventory();
-		
 		double cost = 0;
 		int actionDecision;
 		
@@ -199,7 +198,7 @@ public class sQsim {
 		Chrono timer = new Chrono();
 		
 		int count = 500;
-		//sQsim.simulatesQinstanceOneRun(sQsystem);
+		sQsim.simulatesQinstanceOneRun(sQsystem);
 		sQsim.simulationsQinstanceRuns(sQsystem, count);
 		
 		sQsystem.statCost.setConfidenceIntervalStudent();
