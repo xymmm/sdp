@@ -168,9 +168,9 @@ public class SDP {
 		double optimalCost[][] = new double [inventory.length][Stages]; 
 
 		for(int t=Stages-1;t>=0;t--) { // Time
-			totalCost = new double [inventory.length][(t==0)?( (initialOrder) ? instance.maxQuantity+1 : 0) : instance.maxQuantity+1 ];
+			totalCost = new double [inventory.length][((t==0)&&(!initialOrder)) ?  1 : instance.maxQuantity+1];
 			for(int i=0;i<inventory.length;i++) { // Inventory
-				for(int a = 0; a <= ( (t==0)?( (initialOrder) ? instance.maxQuantity : 0) : instance.maxQuantity ); a++) { //Actions
+				for(int a=0; a<=( ((t==0)&&(!initialOrder))? 0 : instance.maxQuantity);a++) {
 					double scenarioProb = 0;
 					totalCost[i][a] = computePurchasingCost(a, 
 															instance.fixedOrderingCost, 
@@ -226,7 +226,8 @@ public class SDP {
 										maxQuantity
 										);
 
-		sdpSolution solution = solveInstance(instance, true);
+		//sdpSolution solution = solveInstance(instance, false);		// without initial order
+		sdpSolution solution = solveInstance(instance, true);	//with initial order 
 
 		printOptimalCost(instance, solution);
 		plotOptimalCost(instance, solution);
