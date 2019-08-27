@@ -97,7 +97,7 @@ public class sQsim {
 		}
 	}
 	
-	public static double simulatesQinstanceOneRun(sQsimInstance sQsimInstance) {
+	public static double simulatesQinstanceOneRun(sQsimInstance sQsimInstance, boolean print) {
 
 		int inventoryLevel = sQsimInstance.getInitialInventory();
 		double cost = 0;
@@ -105,65 +105,47 @@ public class sQsim {
 		
 		int currentStageIndex = 0;
 		do {
-			System.out.println("At stage "+(currentStageIndex + 1));
-			System.out.println("Current inventory level is "+inventoryLevel);
+			if(print == true) System.out.println("At stage "+(currentStageIndex + 1));
+			if(print == true) System.out.println("Current inventory level is "+inventoryLevel);
 			
 			//1 & 2 check inventory
 			actionDecision = checkInventory(sQsimInstance.reorderPoint[currentStageIndex], inventoryLevel);
-			System.out.println((actionDecision == 1) ? "Replenishment order placed. ":"No order placed. ");
+			if(print == true) System.out.println((actionDecision == 1) ? "Replenishment order placed. ":"No order placed. ");
 			
 			//2. compute purchasing cost
 			cost += computePurchasingCost(actionDecision, currentStageIndex, sQsimInstance);
 			
 			//3. update inventory level
 			inventoryLevel = updateInventoryLevel(inventoryLevel, actionDecision*sQsimInstance.getActionQuantity(currentStageIndex));
-			System.out.println("Updated inventory level is "+inventoryLevel);
+			if(print == true) System.out.println("Updated inventory level is "+inventoryLevel);
 			
 			//4. generate, check and meet demand
 			int demand = generateDemand(inventoryLevel, actionDecision, sQsimInstance, currentStageIndex); // as a negative
-			System.out.println("Demand in this stage is "+(-demand));
+			if(print == true) System.out.println("Demand in this stage is "+(-demand));
 			
 			//update inventory level
 			inventoryLevel = updateInventoryLevel(inventoryLevel, demand);
-			System.out.println("Inventory level after meeting demand is "+inventoryLevel);
+			if(print == true) System.out.println("Inventory level after meeting demand is "+inventoryLevel);
 			
 			//5. compute closing cost
 			cost += computeClosingCost(inventoryLevel, sQsimInstance);
-			System.out.println("Cumulative cost is "+cost);
+			if(print == true) System.out.println("Cumulative cost is "+cost);
 			
 			currentStageIndex++;
-			System.out.println();
+			if(print == true) System.out.println();
 		}while(
 				currentStageIndex < sQsimInstance.getStages()
 				);
-		System.out.println("=============================");
+		if(print == true) System.out.println("=============================");
 		return cost;
 	}
 	
 	/** multiple run times **/
 	public static void simulationsQinstanceRuns(sQsimInstance sQsimInstance, int count) {
 		for(int i=0; i<count; i++) {
-			sQsimInstance.statCost.add(simulatesQinstanceOneRun(sQsimInstance));
+			sQsimInstance.statCost.add(simulatesQinstanceOneRun(sQsimInstance,false));
 		}
 	}
-	
-	/* print simulation results *
-	static void printSimResults(double[] cost, int count) {
-		System.out.println("count    total cost");
-		System.out.println("-------------------");
-		for(int c = 0; c<count; c++) {
-			System.out.println((c+1)+"    "+cost[c]);
-		}
-	}
-	
-	static double getAverage(double[] cost) {
-		double sum = 0;
-		for(int i=0;i<cost.length;i++) {
-			sum += cost[i];
-		}
-		return sum/cost.length;
-	}
-	*/
 
 	public static void main(String[] args) {
 
@@ -198,27 +180,11 @@ public class sQsim {
 		Chrono timer = new Chrono();
 		
 		int count = 500;
-		sQsim.simulatesQinstanceOneRun(sQsystem);
 		sQsim.simulationsQinstanceRuns(sQsystem, count);
 		
 		sQsystem.statCost.setConfidenceIntervalStudent();
 		System.out.println(sQsystem.statCost.report(0.9, 3));
 		System.out.println("Total CPU time: "+timer.format());
-
-		/*
-		//simulation times
-		int count = 500;
-		double[] cost = new double [count];
-
-		for(int i = 0; i<count; i++) {
-			System.out.println("========== Run time = "+(i+1)+" ==========");
-			cost[i] = simulatesQinstanceOneRun(sQsystem);
-		}
-		
-		printSimResults(cost, count);
-		double average = getAverage(cost);
-		System.out.println("Average cost of "+count+" times simulations is "+average);
-		**/
 
 	}
 
