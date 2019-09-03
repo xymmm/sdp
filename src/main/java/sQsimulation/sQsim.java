@@ -42,9 +42,9 @@ public class sQsim {
 	
 	/** 6. generate Poisson random number as demand **/
 	static int generateDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int currentStageIndex) {
-		int demand = getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));
+		int demand = getPoissonVariable(sQsimInstance.demandMean[currentStageIndex]);
 		while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand,currentStageIndex) == false) {
-			demand = getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));
+			demand = getPoissonVariable(sQsimInstance.demandMean[currentStageIndex]);
 		}
 		return -demand;
 		/*

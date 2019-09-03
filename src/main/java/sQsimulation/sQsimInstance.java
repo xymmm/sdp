@@ -52,10 +52,6 @@ public class sQsimInstance {
 		return this.demandMean.length;
 	}
 
-	public int getDemandMean(int currentStageIndex) {
-		return this.demandMean[currentStageIndex];
-	}
-
 	public int getActionQuantity(int currentStageIndex) {
 		return this.actionQuantity[currentStageIndex];
 	}
