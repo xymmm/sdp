@@ -180,14 +180,12 @@ public class sQ {
 				reorderPoint
 				);
 
-
 		int count = 50000;
 		sQsim.simulationsQinstanceRuns(sQsystem, count);
 
 		sQsystem.statCost.setConfidenceIntervalStudent();
 		System.out.println(sQsystem.statCost.report(0.9, 3));
 		System.out.println("Total CPU time: "+timer.format());
-
 
 	}
 
