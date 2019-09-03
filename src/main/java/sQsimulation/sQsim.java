@@ -42,34 +42,29 @@ public class sQsim {
 	
 	/** 6. generate Poisson random number as demand **/
 	static int generateDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int currentStageIndex) {
-		RandomVariateGenInt genDemand;
-		RandomStream streamDemand = new MRG32k3a();
-		genDemand = new PoissonGen(streamDemand, new PoissonDist(sQsimInstance.demandMean[currentStageIndex]));
-		int demand = genDemand.nextInt();
-
-		while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand, currentStageIndex) == false) {
-			demand = genDemand.nextInt();
+		int demand = getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));
+		while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand,currentStageIndex) == false) {
+			demand = getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));
 		}
 		return -demand;
-		/* without ssj:
+		/*
+		 * RandomVariateGenInt genDemand; RandomStream streamDemand = new MRG32k3a();
+		 * genDemand = new PoissonGen(streamDemand, new
+		 * PoissonDist(sQsimInstance.demandMean[currentStageIndex])); int demand =
+		 * genDemand.nextInt();
 		 * 
-		 * int demand = getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));
-		 * while(check... == false){
-		 * 		demand = getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));}
-		 * return -demand
-		 * **/
-		//return -getPoissonVariable(sQsimInstance.getDemandMean(currentStageIndex));
+		 * while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand,
+		 * currentStageIndex) == false) { demand = genDemand.nextInt(); } return
+		 * -demand;
+		 */
 	}
 	static boolean checkDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int demand, int currentStageIndex) {
-		if((inventoryLevel + actionDecision*sQsimInstance.getActionQuantity(currentStageIndex)-demand >= sQsimInstance.minInventory)
-			&& (inventoryLevel + actionDecision*sQsimInstance.getActionQuantity(currentStageIndex)-demand <= sQsimInstance.maxInventory)
-		  ){
+		if(inventoryLevel -demand >= sQsimInstance.minInventory){
 			return true;
 		}else {
 			return false;
 		}
 	}
-	/*
 	private static int getPoissonVariable(double lamda) {
 		int x = 0;
 		double y = Math.random(), cdf = getPoissonProbability(x, lamda);
@@ -86,7 +81,7 @@ public class sQsim {
 		}
 		return sum * c;
 	}
-	*/
+	
 	
 	/** 5. compute holding or penalty cost **/
 	static double computeClosingCost(int inventoryLevel, sQsimInstance sQsimInstance) {
@@ -179,7 +174,7 @@ public class sQsim {
 		
 		Chrono timer = new Chrono();
 		
-		int count = 500;
+		int count = 50000;
 		sQsim.simulationsQinstanceRuns(sQsystem, count);
 		
 		sQsystem.statCost.setConfidenceIntervalStudent();

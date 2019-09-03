@@ -240,7 +240,7 @@ public class SDP {
 
 		//printOptimalCost(instance, solution);
 		plotOptimalCost(instance, solution);
-		//printOptimalActions(instance, solution);
+		printOptimalActions(instance, solution);
 		
 		printsS(solution, instance);
 		
