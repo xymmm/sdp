@@ -110,6 +110,15 @@ public class SDP {
 		frame.setVisible(true);
 		frame.setSize(1500,1200);
 	}
+	
+	static void printsS(sdpSolution solution, Instance instance) {
+		System.out.println("s (reorder point) = "+solution.gets(solution.optimalAction, solution.optimalCost, solution.inventory, instance));
+		System.out.println("S = ");
+		for(int t=0; t<instance.getStages(); t++) {
+			System.out.print(solution.getS(solution.optimalAction, solution.optimalCost, solution.inventory, instance)[t]+" ");
+		}
+
+	}
 
 	/** compute the expected total cost and get optimal actions **/
 	public static sdpSolution solveInstance(Instance instance, boolean initialOrder) {
@@ -229,9 +238,12 @@ public class SDP {
 		//sdpSolution solution = solveInstance(instance, false);		// without initial order
 		sdpSolution solution = solveInstance(instance, true);	//with initial order 
 
-		printOptimalCost(instance, solution);
+		//printOptimalCost(instance, solution);
 		plotOptimalCost(instance, solution);
-		printOptimalActions(instance, solution);
+		//printOptimalActions(instance, solution);
+		
+		printsS(solution, instance);
+		
 	}
 
 }
