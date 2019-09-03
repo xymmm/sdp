@@ -112,12 +112,10 @@ public class SDP {
 	}
 	
 	static void printsS(sdpSolution solution, Instance instance) {
-		System.out.println("s (reorder point) = "+solution.gets(solution.optimalAction, solution.optimalCost, solution.inventory, instance));
-		System.out.println("S = ");
+		System.out.println("reorder points: ");
 		for(int t=0; t<instance.getStages(); t++) {
-			System.out.print(solution.getS(solution.optimalAction, solution.optimalCost, solution.inventory, instance)[t]+" ");
+			System.out.println(sdpSolution.gets(solution.optimalAction)[t]);
 		}
-
 	}
 
 	/** compute the expected total cost and get optimal actions **/

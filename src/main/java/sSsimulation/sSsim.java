@@ -6,9 +6,9 @@ import umontreal.ssj.util.Chrono;
 public class sSsim {
 	
 	/** 1. check inventory and return action decision **/
-	static int checkInventory(int reorderPoint, int inventoryLevel) {
+	static int checkInventory(int[] reorderPoint, int inventoryLevel, int currentStageIndex) {
 		//compare the current inventory level and reorder point, 1 represents reorder 
-		return (inventoryLevel<reorderPoint)? 1 : 0;
+		return (inventoryLevel<reorderPoint[currentStageIndex])? 1 : 0;
 	}
 	
 	/** 2. compute purchasing cost according to action decision **/
@@ -84,7 +84,7 @@ public class sSsim {
 			if(print == true) System.out.println("Current inventory level is "+inventoryLevel);
 			
 			//1 & 2 check inventory
-			actionDecision = checkInventory(sSsimInstance.reorderPoint, inventoryLevel);
+			actionDecision = checkInventory(sSsimInstance.reorderPoint, inventoryLevel, currentStageIndex);
 			if(print == true) System.out.println((actionDecision == 1) ? "Replenishment order placed. ":"No order placed. ");
 			
 			//2. compute purchasing cost
@@ -135,7 +135,7 @@ public class sSsim {
 		int minInventory = -500;
 		int maxInventory = 500;
 		
-		int reorderPoint = 15;
+		int[] reorderPoint = {15, 28, 55, 28};
 		int[] actionS = {67, 49, 109, 49};
 
 		sSsimInstance sSsystem = new sSsimInstance(

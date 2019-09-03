@@ -21,7 +21,7 @@ public class sSsimInstance {
 
 	/** sS replenishment quantity **/
 	public int[] actionS;
-	public int reorderPoint;
+	public int[] reorderPoint;
 	
 	Tally statCost = new Tally("stats on cost");
 
@@ -34,7 +34,7 @@ public class sSsimInstance {
 			int minInventory,
 			int maxInventory,
 			int[] actionS,
-			int reorderPoint) {
+			int[] reorderPoint) {
 		this.fixedOrderingCost = fixedOrderingCost;
 		this.unitCost = unitCost;
 		this.holdingCost = holdingCost;
