@@ -23,7 +23,7 @@ public class sQsimInstance {
 	public int[] actionQuantity;
 	public int[] reorderPoint;
 	
-	Tally statCost = new Tally("stats on cost");
+	public Tally statCost = new Tally("stats on cost");
 
 	public sQsimInstance(
 			double fixedOrderingCost,

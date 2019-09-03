@@ -15,7 +15,7 @@ public class sdpSolution {
       this.inventory = inventory;
    }
    
-   public static int[] gets(double optimalAction[][]) {
+   public static int[] getsSDP(double optimalAction[][]) {
 	   int[] s = new int [optimalAction[0].length];
 	   optimalAction = transpose(optimalAction);
 	   for(int t=0; t<optimalAction.length; t++) {
