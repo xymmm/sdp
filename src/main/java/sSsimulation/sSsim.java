@@ -111,7 +111,7 @@ public class sSsim {
 		}while(
 				currentStageIndex < sSsimInstance.getStages()
 				);
-		System.out.println(cost);
+		//System.out.println(cost);
 		if(print == true) System.out.println("=============================");
 		return cost;
 	}

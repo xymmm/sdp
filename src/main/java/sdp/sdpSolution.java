@@ -28,6 +28,20 @@ public class sdpSolution {
 	   }
 	   return s;
    }
+   public static int[] getSSDP(double optimalAction[][]) {
+	   int[] S = new int [optimalAction[0].length];
+	   optimalAction = transpose(optimalAction);
+	   for(int t=0; t<optimalAction.length; t++) {
+		   for(int i=0; i<optimalAction[0].length-1;i++) {
+			   if(optimalAction[t][i+1] == 0) {
+				   S[t] = (int) (i + optimalAction[t][i]) - (optimalAction[0].length - 1)/2;
+				   break;
+			   }
+		   }
+	   }
+	   return S;
+   }
+   
    private static double[][] transpose(double[][] arr){
 	   double[][] arrT = new double[arr[0].length][arr.length];
 	   for(int i=0; i<arrT.length; i++) {

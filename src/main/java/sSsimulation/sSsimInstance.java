@@ -23,7 +23,7 @@ public class sSsimInstance {
 	public int[] actionS;
 	public int[] reorderPoint;
 	
-	Tally statCost = new Tally("stats on cost");
+	public Tally statCost = new Tally("stats on cost");
 
 	public sSsimInstance(
 			double fixedOrderingCost,
