@@ -168,8 +168,8 @@ public class sQt {
 		/** simulations **/
 		System.out.println();
 		System.out.println("Simulations:");
-		int[] reorderPoint = {13, 27,51, 27};//sQtsolution.getssQt(instance, sQtsolution);
-		int[] actionQuantity = {83, 147, 109, 49};//sQtsolution.getQt(instance);
+		int[] reorderPoint = sQtsolution.getssQt(instance, sQtsolution);
+		int[] actionQuantity = sQtsolution.getQt(instance);
 		sQsimInstance sQsystem = new sQsimInstance(
 				fixedOrderingCost,
 				unitCost,
@@ -183,7 +183,7 @@ public class sQt {
 				reorderPoint
 				);
 
-		int count = 50000;
+		int count = 2;
 		sQsim.simulationsQinstanceRuns(sQsystem, count);
 
 		sQsystem.statCost.setConfidenceIntervalStudent();

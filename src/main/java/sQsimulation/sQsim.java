@@ -1,10 +1,5 @@
 package sQsimulation;
 
-import umontreal.ssj.probdist.PoissonDist;
-import umontreal.ssj.randvar.PoissonGen;
-import umontreal.ssj.randvar.RandomVariateGenInt;
-import umontreal.ssj.rng.MRG32k3a;
-import umontreal.ssj.rng.RandomStream;
 import umontreal.ssj.util.Chrono;
 
 public class sQsim {
