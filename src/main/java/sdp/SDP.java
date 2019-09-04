@@ -111,6 +111,7 @@ public class SDP {
 		frame.setSize(1500,1200);
 	}
 	
+	/** Print reorder points **/
 	static void prints(sdpSolution solution, Instance instance) {
 		System.out.println("reorder points: ");
 		for(int t=0; t<instance.getStages(); t++) {
@@ -118,6 +119,7 @@ public class SDP {
 		}
 	}
 
+	/** Print order-up-to levels **/
 	static void printS(sdpSolution solution, Instance instance) {
 		System.out.println("Order-up-to levels: ");
 		for(int t=0; t<instance.getStages(); t++) {
