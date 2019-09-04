@@ -1,5 +1,7 @@
 package sQ;
 
+import sQsimulation.sQsim;
+import sQsimulation.sQsimInstance;
 import sdp.SDP;
 import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;
@@ -134,7 +136,7 @@ public class sQt {
 		Chrono timer = new Chrono();
 
 		/*** Problem instance ***/
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 10;//100;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
@@ -143,9 +145,9 @@ public class sQt {
 		/** SDP boundary conditions **/
 		double tail = 0.00000001;
 
-		int minInventory = -40;//-500;
-		int maxInventory = 40;//500;
-		int maxQuantity = 20;//500;
+		int minInventory = -20;//-500;
+		int maxInventory = 20;//500;
+		int maxQuantity = 4;//500;
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -165,9 +167,33 @@ public class sQt {
 		printOptimalCost((-instance.minInventory), instance, sQtsolution);
 		printOptimalAction((-instance.minInventory), instance, sQtsolution);
 		
+		/** simulations **/
+		/*
+		System.out.println();
+		System.out.println("Simulations:");
+		int[] reorderPoint = sQtsolution.getssQt(instance);
+		int[] actionQuantity = sQtsolution.getQt(instance);
+		sQsimInstance sQsystem = new sQsimInstance(
+				fixedOrderingCost,
+				unitCost,
+				holdingCost,
+				penaltyCost,
+				demandMean,
+				tail,
+				minInventory,
+				maxInventory,
+				actionQuantity,
+				reorderPoint
+				);
+
+		int count = 50000;
+		sQsim.simulationsQinstanceRuns(sQsystem, count);
+
+		sQsystem.statCost.setConfidenceIntervalStudent();
+		System.out.println(sQsystem.statCost.report(0.9, 3));
+		*/
 		System.out.println("Total CPU time: "+timer.format());
 
-		
-	}//main
+		}//main
 	
 }//class
