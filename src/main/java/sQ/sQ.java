@@ -58,7 +58,6 @@ public class sQ {
 		double totalCost[][][] = new double[inventory.length][instance.maxQuantity+1][instance.getStages()];
 		boolean optimalAction[][][] = new boolean [inventory.length][instance.maxQuantity + 1][instance.getStages()];
 
-		/** Cost Computation a = Q, single Q for all periods **/
 		for(int a=0; a<instance.maxQuantity+1;a++) { //"a" represents the action index, so the actual action volume is a+1
 			for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 				for(int i=0;i<inventory.length;i++) { // Inventory   
@@ -103,6 +102,7 @@ public class sQ {
 						}
 					}
 					totalCostNoOrder /= scenarioProb;
+					
 					totalCost[i][a][t] = Math.min(totalCostNoOrder, totalCostOrder);
 					optimalAction[i][a][t] = totalCostNoOrder < totalCostOrder ? false : true;
 				}
@@ -163,10 +163,12 @@ public class sQ {
 		System.out.println();
 		System.out.println("Simulations:");
 		int[] reorderPoint = sQsolution.getsSQ(instance, sQsolution);
-		int[] actionQuantity = {sQsolution.getOpt_aSQ(instance), 
-				sQsolution.getOpt_aSQ(instance), 
-				sQsolution.getOpt_aSQ(instance), 
-				sQsolution.getOpt_aSQ(instance)};
+		int[] actionQuantity = {
+								sQsolution.getOpt_aSQ(instance), 
+								sQsolution.getOpt_aSQ(instance), 
+								sQsolution.getOpt_aSQ(instance), 
+								sQsolution.getOpt_aSQ(instance)
+								};
 		sQsimInstance sQsystem = new sQsimInstance(
 				fixedOrderingCost,
 				unitCost,
