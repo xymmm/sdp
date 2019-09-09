@@ -62,7 +62,7 @@ public class sQsim {
 	}
 	private static int getPoissonVariable(double lamda) {
 		int x = 0;
-		double y = Math.random(), cdf = getPoissonProbability(x, lamda);
+		double y = Math.random(), cdf = getPoissonProbability(x, lamda); // USE SSJ RANDOM NUMBER GENERATOR AND SET SEED!
 		while (cdf < y) {
 			x++;
 			cdf += getPoissonProbability(x, lamda);

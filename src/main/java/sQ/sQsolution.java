@@ -23,10 +23,11 @@ public class sQsolution {
 		int minIndex = a;
 		double minCost = totalCost[instance.initialInventory - instance.minInventory][minIndex][0]; //Time zero
 		do {
-			if(minCost > totalCost[instance.initialInventory - instance.minInventory][++a][0]) {
-				minCost = totalCost[instance.initialInventory - instance.minInventory][++a][0];
-				minIndex = a - 1;
+			if(minCost > totalCost[instance.initialInventory - instance.minInventory][a+1][0]) {
+				minCost = totalCost[instance.initialInventory - instance.minInventory][a+1][0];
+				minIndex = a+1;
 			}
+			a = a + 1;
 		}while(a < instance.maxQuantity - 1);
 		int opt_a = minIndex;
 		return opt_a;

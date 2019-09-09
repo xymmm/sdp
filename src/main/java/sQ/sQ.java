@@ -182,7 +182,7 @@ public class sQ {
 				reorderPoint
 				);
 
-		int count = 50000;
+		int count = 500000;
 		sQsim.simulationsQinstanceRuns(sQsystem, count);
 
 		sQsystem.statCost.setConfidenceIntervalStudent();
