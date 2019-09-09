@@ -31,21 +31,18 @@ public class sQt {
 		System.out.println();
 		System.out.println("Order quantities:");
 		for(int t=0; t<instance.getStages(); t++) {
-			System.out.println(sQtsolution.getQt(instance)[t]);
+			System.out.println(sQtsolution.getQt(instance, sQtsolution)[t]);
 		}
 	}	
 	
 	/** print optimal costs **/
 	static void printOptimalCost(int inventoryIndex, Instance instance, sQtsolution sQtsolution) {
+		int[] Qt = sQtsolution.getQt(instance, sQtsolution);
 		System.out.println("Optimal Cost: ");
-		System.out.println(sQtsolution.totalCost[0][instance.initialInventory - instance.minInventory][sQtsolution.getQt(instance)[0]]);
+		System.out.println(sQtsolution.totalCost1[instance.initialInventory - instance.minInventory][Qt[0]][Qt[1]][Qt[2]][Qt[3]]);
 	}
 	
-	/** print optimal costs **/
-	static void printOptimalAction(int inventoryIndex, Instance instance, sQtsolution sQtsolution) {
-	}
-	
-	/** plot costs**/
+	/** plot costs*
 	static void plotCost(Instance instance, sQtsolution sQtsolution, int t) {
 		XYSeries series = new XYSeries("No action");
 		for(int a=0;a<instance.maxQuantity+1;a++) {
@@ -58,10 +55,10 @@ public class sQt {
 		ChartFrame frame = new ChartFrame("Period "+(t+1),chart);
 		frame.setVisible(true);
 		frame.setSize(1500,1200);
-	}
+	}*/
 	
 	/***** main computation *****/
-	public static sQtsolution solvesQt(Instance instance) {
+	public static sQtsolution solvesQcombinations(Instance instance) {
 		
 		//working matrix
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
@@ -71,61 +68,103 @@ public class sQt {
 		double demandProbabilities [][] = SDP.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
 		
 		//different dimension index from sdp or sQ, as period takes the first.
-		double totalCost[][][] = new double[instance.getStages()][inventory.length][instance.maxQuantity+1];
-		boolean optimalAction[][][] = new boolean [instance.getStages()][inventory.length][instance.maxQuantity+1];
-
-		for(int t=instance.getStages()-1;t>=0;t--) {//periods
-			for(int a=0; a<instance.maxQuantity+1;a++) {//a
-				for(int i=0; i<inventory.length;i++) {//inventory
-					/** a>0 **/
-					double totalCostOrder = SDP.computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost);
+		double totalCost4[][] = new double[inventory.length][instance.maxQuantity+1];
+		//boolean optimalAction[][][] = new boolean [instance.getStages()][inventory.length][instance.maxQuantity+1];
+		//to construct Q-combinations
+		int[] Q = new int [instance.maxQuantity+1];
+		
+		//for last period t=4
+		for(int q4 = 0; q4 < Q.length; q4++) {
+			for(int i=0; i<inventory.length; i++) {
+				totalCost4[i][q4] = SDP.computePurchasingCost(q4, instance.fixedOrderingCost, instance.unitCost);
+				double scenarioProb = 0;
+				for(int d=0;d<demandProbabilities[3].length;d++) {
+					if((inventory[i] + q4 - d <= instance.maxInventory) && (inventory[i] + q4 - d >= instance.minInventory)) {
+						totalCost4[i][q4] += demandProbabilities[3][d]*(
+								SDP.computeImmediateCost(
+										inventory[i], 
+										q4, 
+										d, 
+										instance.holdingCost, 
+										instance.penaltyCost, 
+										instance.fixedOrderingCost, 
+										instance.unitCost) 
+										);
+						scenarioProb += demandProbabilities[3][d];
+					}
+				}
+				totalCost4[i][q4] /= scenarioProb;
+			}
+		}System.out.println("First loop - totalCost4");
+		
+		double[][][] totalCost3 = new double [inventory.length][Q.length][Q.length];
+		for(int q3 = 0; q3<Q.length; q3++) {
+			for(int q4 = 0; q4<Q.length; q4++) {
+				for(int i=0; i<inventory.length; i++) {
+					totalCost3[i][q3][q4] = SDP.computePurchasingCost(q3, instance.fixedOrderingCost, instance.unitCost);
 					double scenarioProb = 0;
-					for(int d=0; d<demandProbabilities[t].length;d++) {
-						if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
-							totalCostOrder += demandProbabilities[t][d] * (
-									SDP.computeImmediateCost(inventory[i], 
-															 a, 
-															 d, 
-															 instance.holdingCost, 
-															 instance.penaltyCost, 
-															 instance.fixedOrderingCost, 
-															 instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : totalCost[t+1][i+a-d][a]) 
-									);
-							scenarioProb += demandProbabilities[t][d];
+					for(int d=0; d<demandProbabilities[2].length;d++) {
+						if((inventory[i] + q3 - d <= instance.maxInventory)&&(inventory[i] + q3 - d >= instance.minInventory)) {
+							totalCost3[i][q3][q4] += demandProbabilities[2][d]*(
+									SDP.computeImmediateCost(inventory[i], q3, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+									+totalCost4[i+q3-d][q4]);
+							scenarioProb += demandProbabilities[2][d];
 						}
 					}
-					totalCostOrder /= scenarioProb;
-					
-					/** a=0 **/
-					double totalCostNoOrder = 0;
-					scenarioProb = 0;
-					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
-						if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {
-							totalCostNoOrder += demandProbabilities[t][d]*(
-													SDP.computeImmediateCost(
-															inventory[i], 
-															0, 
-															d, 
-															instance.holdingCost, 
-															instance.penaltyCost, 
-															instance.fixedOrderingCost, 
-															instance.unitCost)
-													+ ((t==instance.getStages()-1) ? 0 : totalCost[t+1][i-d][a]) 
-													);
-							scenarioProb += demandProbabilities[t][d];
-						}								
-					}
-					totalCostNoOrder /= scenarioProb;
-					//System.out.println(totalCostNoOrder + " "+ totalCostOrder);
-					totalCost[t][i][a] = Math.min(totalCostNoOrder, totalCostOrder);
-					optimalAction[t][i][a] = (totalCostNoOrder < totalCostOrder) ? false:true;
+					totalCost3[i][q3][q4] /= scenarioProb;
 				}
 			}
-		}
+		}System.out.println("Second loop - totalCost3");
 		
-		return new sQtsolution(totalCost, optimalAction, inventory);
+		double[][][][] totalCost2 = new double [inventory.length][Q.length][Q.length][Q.length];
+		for(int q2 = 0; q2<Q.length; q2++) {
+			for(int q3=0; q3<Q.length; q3++) {
+				for(int q4=0; q4<Q.length; q4++) {
+					for(int i=0; i<inventory.length;i++) {
+						totalCost2[i][q2][q3][q4] = SDP.computePurchasingCost(q2, instance.fixedOrderingCost, instance.unitCost);
+						double scenarioProb = 0;
+						for(int d=0; d<demandProbabilities[1].length;d++) {
+							if((inventory[i] + q2 - d <= instance.maxInventory)&&(inventory[i] + q2 - d >= instance.minInventory)) {
+								totalCost2[i][q2][q3][q4] += demandProbabilities[1][d]*(
+										SDP.computeImmediateCost(inventory[i], q2, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+										+totalCost3[i+q2-d][q3][q4]);
+								scenarioProb += demandProbabilities[1][d];
+							}
+						}
+						totalCost2[i][q2][q3][q4] /= scenarioProb;
+					}
+				}
+			}
+		}System.out.println("Third loop - totalCost2");
+		
+		double[][][][][] totalCost1 = new double [inventory.length][Q.length][Q.length][Q.length][Q.length];
+		for(int q1=0; q1<Q.length; q1++) {
+			for(int q2 = 0; q2<Q.length; q2++) {
+				for(int q3=0; q3<Q.length; q3++) {
+					for(int q4=0; q4<Q.length; q4++) {
+						for(int i=0; i<inventory.length;i++) {
+							totalCost1[i][q1][q2][q3][q4] = SDP.computePurchasingCost(q1, instance.fixedOrderingCost, instance.unitCost);
+							double scenarioProb = 0;
+							for(int d=0; d<demandProbabilities[0].length;d++) {
+								if((inventory[i] + q1 - d <= instance.maxInventory)&&(inventory[i] + q1 - d >= instance.minInventory)) {
+									totalCost1[i][q1][q2][q3][q4] += demandProbabilities[0][d]*(
+											SDP.computeImmediateCost(inventory[i], q1, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+											+totalCost2[i+q1-d][q2][q3][q4]);
+									scenarioProb += demandProbabilities[0][d];
+								}
+							}
+							totalCost1[i][q1][q2][q3][q4] /= scenarioProb;
+						}
+					}
+				}
+			}
+		}System.out.println("Forth loop - totalCost1");
+
+		
+		return new sQtsolution(totalCost1, totalCost2, totalCost3, totalCost4, inventory);
 	}
+	
+
 	
 	public static void main(String[] args) {
 		
@@ -158,7 +197,7 @@ public class sQt {
 				);
 
 		/** Solve the classic instance **/
-		sQtsolution sQtsolution = solvesQt(instance);
+		sQtsolution sQtsolution = solvesQcombinations(instance);
 
 		printOptimalCost(instance.initialInventory-instance.minInventory, instance, sQtsolution);
 
@@ -169,7 +208,7 @@ public class sQt {
 		System.out.println();
 		System.out.println("Simulations:");
 		int[] reorderPoint = sQtsolution.getssQt(instance, sQtsolution);
-		int[] actionQuantity = sQtsolution.getQt(instance);
+		int[] actionQuantity = sQtsolution.getQt(instance, sQtsolution);
 		sQsimInstance sQsystem = new sQsimInstance(
 				fixedOrderingCost,
 				unitCost,
@@ -183,7 +222,7 @@ public class sQt {
 				reorderPoint
 				);
 
-		int count = 2;
+		int count = 100000;
 		sQsim.simulationsQinstanceRuns(sQsystem, count);
 
 		sQsystem.statCost.setConfidenceIntervalStudent();

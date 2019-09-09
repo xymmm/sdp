@@ -1,5 +1,10 @@
 package sQsimulation;
 
+import umontreal.ssj.probdist.PoissonDist;
+import umontreal.ssj.randvar.PoissonGen;
+import umontreal.ssj.randvar.RandomVariateGenInt;
+import umontreal.ssj.rng.MRG32k3a;
+import umontreal.ssj.rng.RandomStream;
 import umontreal.ssj.util.Chrono;
 
 public class sQsim {
@@ -37,21 +42,23 @@ public class sQsim {
 	
 	/** 6. generate Poisson random number as demand **/
 	static int generateDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int currentStageIndex) {
+		/*
 		int demand = getPoissonVariable(sQsimInstance.demandMean[currentStageIndex]);
 		while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand,currentStageIndex) == false) {
 			demand = getPoissonVariable(sQsimInstance.demandMean[currentStageIndex]);
 		}
 		return -demand;
-		/*
-		 * RandomVariateGenInt genDemand; RandomStream streamDemand = new MRG32k3a();
-		 * genDemand = new PoissonGen(streamDemand, new
-		 * PoissonDist(sQsimInstance.demandMean[currentStageIndex])); int demand =
-		 * genDemand.nextInt();
-		 * 
-		 * while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand,
-		 * currentStageIndex) == false) { demand = genDemand.nextInt(); } return
-		 * -demand;
-		 */
+		*/
+		  RandomVariateGenInt genDemand;
+		  RandomStream streamDemand = new MRG32k3a();
+		  genDemand = new PoissonGen(streamDemand, new PoissonDist(sQsimInstance.demandMean[currentStageIndex])); 
+		  int demand = genDemand.nextInt();
+		  
+		  while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand, currentStageIndex) == false) { 
+			  demand = genDemand.nextInt(); 
+		  } 
+		  return -demand;
+		 
 	}
 	static boolean checkDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int demand, int currentStageIndex) {
 		if(inventoryLevel -demand >= sQsimInstance.minInventory){
@@ -60,6 +67,7 @@ public class sQsim {
 			return false;
 		}
 	}
+	/*
 	private static int getPoissonVariable(double lamda) {
 		int x = 0;
 		double y = Math.random(), cdf = getPoissonProbability(x, lamda); // USE SSJ RANDOM NUMBER GENERATOR AND SET SEED!
@@ -76,6 +84,7 @@ public class sQsim {
 		}
 		return sum * c;
 	}
+	*/
 	
 	
 	/** 5. compute holding or penalty cost **/

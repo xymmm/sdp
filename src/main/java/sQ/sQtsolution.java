@@ -5,39 +5,93 @@ import sdp.data.Instance;
 public class sQtsolution {
 
 	public int[] inventory;
-	public double totalCost[][][];
-	public boolean optimalAction[][][];
+	public double totalCost1[][][][][];
+	public double totalCost2[][][][];
+	public double totalCost3[][][];
+	public double totalCost4[][];
+	//public boolean optimalAction[][][];
 	
-	public sQtsolution(double[][][] totalCost, 
-			boolean[][][] optimalAction, 
+	public sQtsolution(double totalCost1[][][][][], 
+			double totalCost2[][][][],
+			double totalCost3[][][],
+			double totalCost4[][],
+			//boolean[][][] optimalAction, 
 			int[] inventory) {
-		this.totalCost = totalCost;
-		this.optimalAction = optimalAction;
+		this.totalCost1 = totalCost1;
+		this.totalCost2 = totalCost2;
+		this.totalCost3 = totalCost3;
+		this.totalCost4 = totalCost4;
+		//this.optimalAction = optimalAction;
 		this.inventory = inventory;
 	}
 	
-	public int[] getQt(Instance instance) {
+	public double[] getCostBenchmark(sQtsolution sQtsolution, Instance instance) {
+		double [] costBenchmark = new double[instance.getStages()];
+		costBenchmark[0] = sQtsolution.totalCost1[instance.initialInventory-instance.minInventory][0][0][0][0];
+		costBenchmark[1] = sQtsolution.totalCost2[instance.initialInventory-instance.minInventory][0][0][0];
+		costBenchmark[2] = sQtsolution.totalCost3[instance.initialInventory-instance.minInventory][0][0];
+		costBenchmark[3] = sQtsolution.totalCost4[instance.initialInventory-instance.minInventory][0];
+		return costBenchmark;
+	}
+	
+	
+	public int[] getQt(Instance instance, sQtsolution sQtsolution) {
 		int[] Qt = new int[instance.getStages()];
-		for(int t=0; t<instance.getStages(); t++) {
-			Qt[t] = getMinimumIndex(totalCost[t][instance.initialInventory - instance.minInventory]);
+		double min=totalCost1[instance.initialInventory-instance.minInventory][1][0][0][0];
+		for(int q1=1; q1<=instance.maxQuantity; q1++) {
+			for(int q2=0; q2<=instance.maxQuantity;q2++) {
+				for(int q3=0; q3<=instance.maxQuantity;q3++) {
+					for(int q4=0; q4<= instance.maxQuantity;q4++) {
+						if(totalCost1[instance.initialInventory-instance.minInventory][q1][q2][q3][q4]<min) {
+							min = totalCost1[instance.initialInventory-instance.minInventory][q1][q2][q3][q4];
+						}
+					}
+				}
+			}
+		}
+		for(int q1=0; q1<=instance.maxQuantity; q1++) {
+			for(int q2=0; q2<=instance.maxQuantity;q2++) {
+				for(int q3=0; q3<=instance.maxQuantity;q3++) {
+					for(int q4=0; q4<= instance.maxQuantity;q4++) {
+						if(totalCost1[instance.initialInventory-instance.minInventory][q1][q2][q3][q4] == min) {
+							Qt[0] = q1;
+							Qt[1] = q2;
+							Qt[2] = q3;
+							Qt[3] = q4;
+						}
+					}
+				}
+			}
 		}
 		return Qt;
 	}
 	
+	
 	public int[] getssQt(Instance instance, sQtsolution sQtsolution) {
 		int[] st = new int[instance.getStages()];
-			// Get the reorder points.
-			for(int t=0;t<instance.getStages();t++) { // Time
-				for(int i=0;i<inventory.length-1;i++) {  // Inventory   
-					if(sQtsolution.optimalAction[t][i+1][sQtsolution.getQt(instance)[t]] == false) {
-						st[t] = i+1 + instance.minInventory;
-						break;
-					}
-				}
+		double[] costBenchmark = sQtsolution.getCostBenchmark(sQtsolution, instance);
+		int[] Qt = sQtsolution.getQt(instance, sQtsolution);
+		for(int i=0;i<inventory.length-1;i++) {  // Inventory   
+			//period 4
+			if(sQtsolution.totalCost4[i+1][Qt[3]] < costBenchmark[3]) {
+				st[3] = i+1 + instance.minInventory;
 			}
+			if(sQtsolution.totalCost3[i+1][Qt[2]][Qt[3]] < costBenchmark[2]) {
+				st[2] = i+1 + instance.minInventory;
+			}
+			if(sQtsolution.totalCost2[i+1][Qt[1]][Qt[2]][Qt[3]] < costBenchmark[1]) {
+				st[1] = i+1 + instance.minInventory;
+			}
+			if(sQtsolution.totalCost1[i+1][Qt[0]][Qt[1]][Qt[2]][Qt[3]] < costBenchmark[0]) {
+				st[0] = i+1 + instance.minInventory;
+			}
+		}
+
+
 		return st;
 	}
 	
+	/*
 	private int getMinimumIndex(double[] arr) {
 		int index = 0;
 		double min = arr[0];
@@ -49,5 +103,6 @@ public class sQtsolution {
 		}
 		return index;
 	}
+	*/
 	
 }
