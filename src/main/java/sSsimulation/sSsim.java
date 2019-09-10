@@ -1,6 +1,11 @@
 package sSsimulation;
 
 
+import umontreal.ssj.probdist.PoissonDist;
+import umontreal.ssj.randvar.PoissonGen;
+import umontreal.ssj.randvar.RandomVariateGenInt;
+import umontreal.ssj.rng.MRG32k3a;
+import umontreal.ssj.rng.RandomStream;
 import umontreal.ssj.util.Chrono;
 
 public class sSsim {
@@ -31,11 +36,22 @@ public class sSsim {
 	
 	/** 5. generate Poisson random number as demand **/
 	static int generateDemand(int inventoryLevel, int actionDecision, sSsimInstance sSsimInstance, int currentStageIndex) {
+		/*
 		int demand = getPoissonVariable(sSsimInstance.demandMean[currentStageIndex]);
 		while(checkDemand(inventoryLevel, sSsimInstance, demand) == false) {
 			demand = getPoissonVariable(sSsimInstance.demandMean[currentStageIndex]);
 		}
 		return -demand;
+		*/
+		  RandomVariateGenInt genDemand;
+		  RandomStream streamDemand = new MRG32k3a();
+		  genDemand = new PoissonGen(streamDemand, new PoissonDist(sSsimInstance.demandMean[currentStageIndex])); 
+		  int demand = genDemand.nextInt();
+		  
+		  while(checkDemand(inventoryLevel, sSsimInstance, demand) == false) { 
+			  demand = genDemand.nextInt(); 
+		  } 
+		  return -demand;
 	}
 	static boolean checkDemand(int inventoryLevel, sSsimInstance sSsimInstance, int demand) {
 		if(inventoryLevel - demand >= sSsimInstance.minInventory) {
@@ -44,6 +60,7 @@ public class sSsim {
 			return false;
 		}
 	}
+	/*
 	private static int getPoissonVariable(double lamda) {
 		int x = 0;
 		double y = Math.random(), cdf = getPoissonProbability(x, lamda);
@@ -60,6 +77,7 @@ public class sSsim {
 		}
 		return sum * c;
 	}
+	*/
 	
 	
 	/** 6. compute holding or penalty cost **/

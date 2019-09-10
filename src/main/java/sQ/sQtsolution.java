@@ -34,10 +34,31 @@ public class sQtsolution {
 		return costBenchmark;
 	}
 	
+	public double[] getMinimumCost(sQtsolution sQtsolution, Instance instance) {
+		double[] minimumCost = new double[sQtsolution.inventory.length];
+		for(int i=0; i<minimumCost.length;i++) {
+			double min = sQtsolution.totalCost1[i][0][0][0][0];
+			for(int q1=1; q1<=instance.maxQuantity; q1++) {
+				for(int q2=0; q2<=instance.maxQuantity;q2++) {
+					for(int q3=0; q3<=instance.maxQuantity;q3++) {
+						for(int q4=0; q4<= instance.maxQuantity;q4++) {
+							if(sQtsolution.totalCost1[instance.initialInventory-instance.minInventory][q1][q2][q3][q4]<min) {
+								min = sQtsolution.totalCost1[instance.initialInventory-instance.minInventory][q1][q2][q3][q4];
+							}
+						}
+					}
+				}
+			}
+		}
+		return minimumCost;
+	}
+	
 	
 	public int[] getQt(Instance instance, sQtsolution sQtsolution) {
 		int[] Qt = new int[instance.getStages()];
+		
 		double min=totalCost1[instance.initialInventory-instance.minInventory][1][0][0][0];
+		//find the minimum cost among all feasible combinations of Q of all periods
 		for(int q1=1; q1<=instance.maxQuantity; q1++) {
 			for(int q2=0; q2<=instance.maxQuantity;q2++) {
 				for(int q3=0; q3<=instance.maxQuantity;q3++) {
@@ -49,6 +70,7 @@ public class sQtsolution {
 				}
 			}
 		}
+		//locate the minimum cost to obtain the index - Q1,...,Q4
 		for(int q1=0; q1<=instance.maxQuantity; q1++) {
 			for(int q2=0; q2<=instance.maxQuantity;q2++) {
 				for(int q3=0; q3<=instance.maxQuantity;q3++) {

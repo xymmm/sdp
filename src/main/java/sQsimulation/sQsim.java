@@ -51,6 +51,7 @@ public class sQsim {
 		*/
 		  RandomVariateGenInt genDemand;
 		  RandomStream streamDemand = new MRG32k3a();
+		  
 		  genDemand = new PoissonGen(streamDemand, new PoissonDist(sQsimInstance.demandMean[currentStageIndex])); 
 		  int demand = genDemand.nextInt();
 		  
