@@ -36,6 +36,7 @@ public class sQtsolution {
 	
 	public double[] getMinimumCost(sQtsolution sQtsolution, Instance instance) {
 		double[] minimumCost = new double[sQtsolution.inventory.length];
+		//check the initial index, should satisfy q1!=0, q2!=0, q3!=0, q4!=0
 		for(int i=0; i<minimumCost.length;i++) {
 			double min = sQtsolution.totalCost1[i][0][0][0][0];
 			for(int q1=1; q1<=instance.maxQuantity; q1++) {
@@ -49,6 +50,7 @@ public class sQtsolution {
 					}
 				}
 			}
+			minimumCost[i] = min;
 		}
 		return minimumCost;
 	}
