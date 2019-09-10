@@ -124,8 +124,8 @@ public class sQ {
 		double tail = 0.00000001;
 
 		int minInventory = -25;//-500;
-		int maxInventory = 25;//500;
-		int maxQuantity = 25;//500;
+		int maxInventory = 250;//500;
+		int maxQuantity = 50;//500;
 
 		Instance instance = new Instance(
 				fixedOrderingCost,

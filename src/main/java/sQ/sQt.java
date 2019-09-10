@@ -171,8 +171,8 @@ public class sQt {
 
 		double tail = 0.00000001;
 
-		int minInventory = -25;//-500;
-		int maxInventory = 25;//500;
+		int minInventory = -35;//-500;
+		int maxInventory = 35;//500;
 		int maxQuantity = 25;//500;
 
 		Instance instance = new Instance(

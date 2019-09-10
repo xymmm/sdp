@@ -59,23 +59,12 @@ public class sQtsolution {
 		
 		double min=totalCost1[instance.initialInventory-instance.minInventory][1][0][0][0];
 		//find the minimum cost among all feasible combinations of Q of all periods
-		for(int q1=1; q1<=instance.maxQuantity; q1++) {
+		for(int q1=0; q1<=instance.maxQuantity; q1++) {
 			for(int q2=0; q2<=instance.maxQuantity;q2++) {
 				for(int q3=0; q3<=instance.maxQuantity;q3++) {
 					for(int q4=0; q4<= instance.maxQuantity;q4++) {
 						if(totalCost1[instance.initialInventory-instance.minInventory][q1][q2][q3][q4]<min) {
 							min = totalCost1[instance.initialInventory-instance.minInventory][q1][q2][q3][q4];
-						}
-					}
-				}
-			}
-		}
-		//locate the minimum cost to obtain the index - Q1,...,Q4
-		for(int q1=0; q1<=instance.maxQuantity; q1++) {
-			for(int q2=0; q2<=instance.maxQuantity;q2++) {
-				for(int q3=0; q3<=instance.maxQuantity;q3++) {
-					for(int q4=0; q4<= instance.maxQuantity;q4++) {
-						if(totalCost1[instance.initialInventory-instance.minInventory][q1][q2][q3][q4] == min) {
 							Qt[0] = q1;
 							Qt[1] = q2;
 							Qt[2] = q3;
@@ -96,16 +85,28 @@ public class sQtsolution {
 		for(int i=0;i<inventory.length-1;i++) {  // Inventory   
 			//period 4
 			if(sQtsolution.totalCost4[i+1][Qt[3]] < costBenchmark[3]) {
-				st[3] = i+1 + instance.minInventory;
+			   if(Qt[3] > 0)
+			      st[3] = i+1 + instance.minInventory;
+			   else
+			      st[3] = Integer.MIN_VALUE;
 			}
 			if(sQtsolution.totalCost3[i+1][Qt[2]][Qt[3]] < costBenchmark[2]) {
-				st[2] = i+1 + instance.minInventory;
+			   if(Qt[2] > 0)
+			      st[2] = i+1 + instance.minInventory;
+			   else
+               st[2] = Integer.MIN_VALUE;
 			}
 			if(sQtsolution.totalCost2[i+1][Qt[1]][Qt[2]][Qt[3]] < costBenchmark[1]) {
-				st[1] = i+1 + instance.minInventory;
+			   if(Qt[1] > 0)
+			      st[1] = i+1 + instance.minInventory;
+			   else
+               st[1] = Integer.MIN_VALUE;
 			}
 			if(sQtsolution.totalCost1[i+1][Qt[0]][Qt[1]][Qt[2]][Qt[3]] < costBenchmark[0]) {
-				st[0] = i+1 + instance.minInventory;
+			   if(Qt[0] > 0)
+			      st[0] = i+1 + instance.minInventory;
+			   else
+               st[0] = Integer.MIN_VALUE;
 			}
 		}
 
