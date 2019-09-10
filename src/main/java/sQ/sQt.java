@@ -1,12 +1,5 @@
 package sQ;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartFrame;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-
 import sQsimulation.sQsim;
 import sQsimulation.sQsimInstance;
 import sdp.SDP;
@@ -170,19 +163,17 @@ public class sQt {
 		
 		Chrono timer = new Chrono();
 
-		/*** Problem instance ***/
 		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {5,10,15,10};//{20,40,60,40};
 
-		/** SDP boundary conditions **/
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
-		int maxQuantity = 500;
+		int minInventory = -25;//-500;
+		int maxInventory = 25;//500;
+		int maxQuantity = 25;//500;
 
 		Instance instance = new Instance(
 				fixedOrderingCost,

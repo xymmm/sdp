@@ -115,19 +115,17 @@ public class sQ {
 
 		Chrono timer = new Chrono();
 
-		/*** Problem instance ***/
 		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {5,10,15,10};//{20,40,60,40};
 
-		/** SDP boundary conditions **/
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
-		int maxQuantity = 500;
+		int minInventory = -25;//-500;
+		int maxInventory = 25;//500;
+		int maxQuantity = 25;//500;
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
