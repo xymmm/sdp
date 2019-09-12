@@ -1,15 +1,16 @@
-package sQ;
+package sQ.sdp;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import sQsimulation.sQsim;
-import sQsimulation.sQsimInstance;
-import sdp.SDP;
+import sQ.simulation.sQsim;
+import sQ.simulation.sQsimInstance;
+import sS.sdp.sS;
 import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;
 
@@ -17,6 +18,7 @@ public class sQ {
 
 	/** print reorder points **/
 	public static void printReorderPoints(Instance instance, sQsolution sQsolution) {
+		System.out.println("reorder points (s) under (s,Q) policy: ");
 		for(int t = 0;t<instance.getStages();t++){
 			System.out.print(sQsolution.getsSQ(instance, sQsolution)[t]+" ");
 		}System.out.println();
@@ -24,27 +26,37 @@ public class sQ {
 	
 	/** print optimal quantity **/
 	public static void printOptimalQuantity(Instance instance, sQsolution sQsolution) {
-		System.out.println("Optimal Q: "+(sQsolution.getOpt_aSQ(instance)+1));
+		System.out.println("Optimal Q for all periods is: ");
+		System.out.println(sQsolution.getOpt_aSQ(instance)+1);
 	}
 	
 	/** print cost of optimal quantity **/
 	public static void printOpitmalCost(Instance instance, sQsolution sQsolution){
-		System.out.println("Optimal solution cost: "+sQsolution.totalCost[instance.initialInventory-instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][0]);
+		System.out.println("Optimal cost with initial inventory level " +(instance.initialInventory)+" is: ");
+		System.out.println(sQsolution.totalCost[instance.initialInventory-instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][0]);
 	}
 
 	/** Plot costs - cost with no action and with a given Q for a given stage**/
 	static void plotComparedCosts(Instance instance, sQsolution sQsolution, int t) {
-		XYSeries series1 = new XYSeries("No action");
+		XYSeries series = new XYSeries("sQ plot");
 		for(int a=0;a<instance.maxQuantity;a++) {
-			series1.add(a,sQsolution.totalCost[instance.initialInventory - instance.minInventory][a][t]);
+			series.add(a,sQsolution.totalCost[instance.initialInventory - instance.minInventory][a][t]);
 		}
-		XYSeriesCollection collection = new XYSeriesCollection();
-		collection.addSeries(series1);
-		JFreeChart chart = ChartFactory.createXYLineChart("Expected Total Cost for Period "+ (t+1), "Feasible Replenishment Quantity", "Expected total cost",
-				collection, PlotOrientation.VERTICAL, true, true, false);
-		ChartFrame frame = new ChartFrame("Period "+(t+1),chart);
+		XYDataset xyDataset = new XYSeriesCollection(series);
+		JFreeChart chart = ChartFactory.createXYLineChart("SDP with (s,Q) policy", "Feasible Replenishment Quantity", "Expected total cost",
+				xyDataset, PlotOrientation.VERTICAL, true, true, false);
+		ChartFrame frame = new ChartFrame("sQ plot",chart);
 		frame.setVisible(true);
 		frame.setSize(1500,1200);
+	}
+	
+	public static void presentsQresults(Instance instance, sQsolution sQsolution) {
+		plotComparedCosts(instance, sQsolution, 0);
+		printReorderPoints(instance, sQsolution);
+		System.out.println();
+		printOptimalQuantity(instance, sQsolution);
+		System.out.println();
+		printOpitmalCost(instance, sQsolution);
 	}
 
 	/** main computation **/
@@ -54,7 +66,7 @@ public class sQ {
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
 		}
-		double demandProbabilities [][] = SDP.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
 		double totalCost[][][] = new double[inventory.length][instance.maxQuantity+1][instance.getStages()];
 		boolean optimalAction[][][] = new boolean [inventory.length][instance.maxQuantity + 1][instance.getStages()];
 
@@ -62,12 +74,12 @@ public class sQ {
 			for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 				for(int i=0;i<inventory.length;i++) { // Inventory   
 					/** a > 0 **/
-					double totalCostOrder = SDP.computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost); 
+					double totalCostOrder = sS.computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost); 
 					double scenarioProb = 0;
 					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
 						if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
 							totalCostOrder += demandProbabilities[t][d]*(
-									SDP.computeImmediateCost(
+									sS.computeImmediateCost(
 											inventory[i], 
 											a, 
 											d, 
@@ -88,7 +100,7 @@ public class sQ {
 					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
 						if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {
 							totalCostNoOrder += demandProbabilities[t][d]*(
-									SDP.computeImmediateCost(
+									sS.computeImmediateCost(
 											inventory[i], 
 											0, 
 											d, 
@@ -119,13 +131,13 @@ public class sQ {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {5,10,15,10};//{20,40,60,40};
+		int[] demandMean = {20,40,60,40};
 
 		double tail = 0.00000001;
 
-		int minInventory = -25;//-500;
-		int maxInventory = 250;//500;
-		int maxQuantity = 50;//500;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -152,10 +164,7 @@ public class sQ {
 		System.out.println(Arrays.deepToString(optActPeriod0)); //Careful, BIG MATRIX
 		 */
 
-		plotComparedCosts(instance, sQsolution, 0);
-		printOpitmalCost(instance, sQsolution);
-		printOptimalQuantity(instance, sQsolution);
-		printReorderPoints(instance, sQsolution);
+		presentsQresults(instance, sQsolution);
 
 		/** Simulations **/
 		System.out.println();
@@ -186,7 +195,7 @@ public class sQ {
 		sQsystem.statCost.setConfidenceIntervalStudent();
 		System.out.println(sQsystem.statCost.report(0.9, 3));
 		System.out.println("Total CPU time: "+timer.format());
-
+		
 	}
 
 

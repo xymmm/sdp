@@ -1,7 +1,7 @@
-package sdp;
+package sS.sdp;
 
 
-public class sdpSolution {
+public class sSsolution {
 
    public int[] inventory;
    
@@ -9,7 +9,7 @@ public class sdpSolution {
    public double optimalAction[][];
    public double optimalCost[][];
    
-   public sdpSolution(double optimalAction[][], double optimalCost[][], int[] inventory) {
+   public sSsolution(double optimalAction[][], double optimalCost[][], int[] inventory) {
       this.optimalAction = optimalAction;
       this.optimalCost = optimalCost;
       this.inventory = inventory;

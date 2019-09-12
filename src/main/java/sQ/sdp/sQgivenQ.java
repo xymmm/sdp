@@ -1,0 +1,166 @@
+package sQ.sdp;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
+import sS.sdp.sS;
+import sdp.data.Instance;
+
+public class sQgivenQ extends sQ {
+
+	public static void plotCostGivenQGivenStage(double[][] costGivenQ, int Q, int stageIndex, Instance instance) {
+		XYSeries series = new XYSeries("Cost with Given Q");
+		for(int i = 0; i<instance.maxInventory - instance.minInventory + 1; i++) {
+			series.add((i+instance.minInventory),costGivenQ[stageIndex][i]);
+		}
+		XYDataset xyDataset = new XYSeriesCollection(series);
+		JFreeChart chart = ChartFactory.createXYLineChart("expected cost with given Q="+Q+" at period "+(stageIndex+1), "inventory level", "expected cost",
+				xyDataset, PlotOrientation.VERTICAL, true, true, false);
+		ChartFrame frame = new ChartFrame("Cost with Given Q",chart);
+		frame.setVisible(true);
+		frame.setSize(1800,1500);
+	}
+	
+	public static int[][] getsGivenQforAllQ(Instance instance){
+		int[][] s = new int [instance.maxQuantity][instance.getStages()];
+		for(int q=0; q<instance.maxQuantity;q++) {
+			sQgivenQsolution sQgivenQ = costVaryingWithInventory((q+1), instance);
+			for(int t=0; t<instance.getStages();t++) {
+				s[q][t] = sQgivenQ.getsGivenQ(instance, sQgivenQ)[t];
+			}
+		}
+		return s;
+	}
+	
+	public static void plotsGivenQforAllQ(int[][] s, Instance instance, int stageIndex) {
+		XYSeries series = new XYSeries("reorder point with Given Qs");
+		for(int q=0; q<instance.maxQuantity;q++) {
+			series.add((q+1),s[q][stageIndex]);
+		}
+		XYDataset xyDataset = new XYSeriesCollection(series);
+		JFreeChart chart = ChartFactory.createXYLineChart("reorder point s varying with given Qs ="+" at period "+(stageIndex+1), "feasible quantities", "reorder points",
+				xyDataset, PlotOrientation.VERTICAL, true, true, false);
+		ChartFrame frame = new ChartFrame("reorder point with Given Qs",chart);
+		frame.setVisible(true);
+		frame.setSize(1800,1500);
+	}
+
+	public static sQgivenQsolution costVaryingWithInventory(int Q, Instance instance){
+		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
+		for(int i=0;i<inventory.length;i++) {
+			inventory[i] = i + instance.minInventory;
+		}
+
+		double[][] costGivenQ = new double [instance.getStages()][inventory.length];
+		boolean[][] actionGivenQ = new boolean[instance.getStages()][inventory.length];
+
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
+			for(int i=0;i<inventory.length;i++) { // Inventory   
+				/** a = Q (given) **/
+				double totalCostOrder = sS.computePurchasingCost(Q, instance.fixedOrderingCost, instance.unitCost); 
+				double scenarioProb = 0;
+				for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+					if((inventory[i] + Q - d <= instance.maxInventory) && (inventory[i] + Q - d >= instance.minInventory)) {
+						totalCostOrder += demandProbabilities[t][d]*(
+								sS.computeImmediateCost(
+										inventory[i], 
+										Q, 
+										d, 
+										instance.holdingCost, 
+										instance.penaltyCost, 
+										instance.fixedOrderingCost, 
+										instance.unitCost)
+								+ ((t==instance.getStages()-1) ? 0 : costGivenQ[t+1][i+Q-d]) 
+								);
+						scenarioProb += demandProbabilities[t][d];
+					}
+				}
+				totalCostOrder /= scenarioProb;
+
+				/** a = 0**/
+				double totalCostNoOrder = 0;
+				scenarioProb = 0;
+				for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+					if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {
+						totalCostNoOrder += demandProbabilities[t][d]*(
+								sS.computeImmediateCost(
+										inventory[i], 
+										0, 
+										d, 
+										instance.holdingCost, 
+										instance.penaltyCost, 
+										instance.fixedOrderingCost, 
+										instance.unitCost)
+								+ ((t==instance.getStages()-1) ? 0 : costGivenQ[t+1][i-d]) 
+								);
+						scenarioProb += demandProbabilities[t][d];
+					}
+				}
+				totalCostNoOrder /= scenarioProb;
+
+				costGivenQ[t][i] = Math.min(totalCostNoOrder, totalCostOrder);
+				actionGivenQ[t][i] = totalCostNoOrder < totalCostOrder ? false : true;
+			}
+		}
+
+		return new sQgivenQsolution(costGivenQ, actionGivenQ);
+	}
+	
+	public static void main(String[] args) {
+
+		double fixedOrderingCost = 100;
+		double unitCost = 0;
+		double holdingCost = 1;
+		double penaltyCost = 10;
+		int[] demandMean = {20,40,60,40};
+
+		double tail = 0.00000001;
+
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
+
+		Instance instance = new Instance(
+				fixedOrderingCost,
+				unitCost,
+				holdingCost,
+				penaltyCost,
+				demandMean,
+				tail,
+				minInventory,
+				maxInventory,
+				maxQuantity
+				);
+		
+		int Q = 84;
+		
+		//int stageIndex = 3;
+		//plotCostGivenQGivenStage(costGivenQ, Q, stageIndex, instance);
+		
+		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance);
+		
+		double costGivenQ[][] = sQgivenQ.costGivenQ;
+		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
+		
+		for(int t=0; t<costGivenQ.length;t++) {
+			plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
+			System.out.println(sGivenQ[t]);
+		}
+		
+		int[][] s = getsGivenQforAllQ(instance);
+		for(int t=0; t<instance.getStages();t++) {
+			 plotsGivenQforAllQ(s, instance, t);
+		}
+		
+		
+		
+		
+	}
+
+}

@@ -1,8 +1,8 @@
-package sQ;
+package sQt.sdp;
 
-import sQsimulation.sQsim;
-import sQsimulation.sQsimInstance;
-import sdp.SDP;
+import sQ.simulation.sQsim;
+import sQ.simulation.sQsimInstance;
+import sS.sdp.sS;
 import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;
 
@@ -58,7 +58,7 @@ public class sQt {
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
 		}
-		double demandProbabilities [][] = SDP.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
 		
 		//different dimension index from sdp or sQ, as period takes the first.
 		double totalCost4[][] = new double[inventory.length][instance.maxQuantity+1];
@@ -69,12 +69,12 @@ public class sQt {
 		//for last period t=4
 		for(int q4 = 0; q4 < Q.length; q4++) {
 			for(int i=0; i<inventory.length; i++) {
-				totalCost4[i][q4] = SDP.computePurchasingCost(q4, instance.fixedOrderingCost, instance.unitCost);
+				totalCost4[i][q4] = sS.computePurchasingCost(q4, instance.fixedOrderingCost, instance.unitCost);
 				double scenarioProb = 0;
 				for(int d=0;d<demandProbabilities[3].length;d++) {
 					if((inventory[i] + q4 - d <= instance.maxInventory) && (inventory[i] + q4 - d >= instance.minInventory)) {
 						totalCost4[i][q4] += demandProbabilities[3][d]*(
-								SDP.computeImmediateCost(
+								sS.computeImmediateCost(
 										inventory[i], 
 										q4, 
 										d, 
@@ -94,12 +94,12 @@ public class sQt {
 		for(int q3 = 0; q3<Q.length; q3++) {
 			for(int q4 = 0; q4<Q.length; q4++) {
 				for(int i=0; i<inventory.length; i++) {
-					totalCost3[i][q3][q4] = SDP.computePurchasingCost(q3, instance.fixedOrderingCost, instance.unitCost);
+					totalCost3[i][q3][q4] = sS.computePurchasingCost(q3, instance.fixedOrderingCost, instance.unitCost);
 					double scenarioProb = 0;
 					for(int d=0; d<demandProbabilities[2].length;d++) {
 						if((inventory[i] + q3 - d <= instance.maxInventory)&&(inventory[i] + q3 - d >= instance.minInventory)) {
 							totalCost3[i][q3][q4] += demandProbabilities[2][d]*(
-									SDP.computeImmediateCost(inventory[i], q3, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+									sS.computeImmediateCost(inventory[i], q3, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
 									+totalCost4[i+q3-d][q4]);
 							scenarioProb += demandProbabilities[2][d];
 						}
@@ -114,12 +114,12 @@ public class sQt {
 			for(int q3=0; q3<Q.length; q3++) {
 				for(int q4=0; q4<Q.length; q4++) {
 					for(int i=0; i<inventory.length;i++) {
-						totalCost2[i][q2][q3][q4] = SDP.computePurchasingCost(q2, instance.fixedOrderingCost, instance.unitCost);
+						totalCost2[i][q2][q3][q4] = sS.computePurchasingCost(q2, instance.fixedOrderingCost, instance.unitCost);
 						double scenarioProb = 0;
 						for(int d=0; d<demandProbabilities[1].length;d++) {
 							if((inventory[i] + q2 - d <= instance.maxInventory)&&(inventory[i] + q2 - d >= instance.minInventory)) {
 								totalCost2[i][q2][q3][q4] += demandProbabilities[1][d]*(
-										SDP.computeImmediateCost(inventory[i], q2, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+										sS.computeImmediateCost(inventory[i], q2, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
 										+totalCost3[i+q2-d][q3][q4]);
 								scenarioProb += demandProbabilities[1][d];
 							}
@@ -136,12 +136,12 @@ public class sQt {
 				for(int q3=0; q3<Q.length; q3++) {
 					for(int q4=0; q4<Q.length; q4++) {
 						for(int i=0; i<inventory.length;i++) {
-							totalCost1[i][q1][q2][q3][q4] = SDP.computePurchasingCost(q1, instance.fixedOrderingCost, instance.unitCost);
+							totalCost1[i][q1][q2][q3][q4] = sS.computePurchasingCost(q1, instance.fixedOrderingCost, instance.unitCost);
 							double scenarioProb = 0;
 							for(int d=0; d<demandProbabilities[0].length;d++) {
 								if((inventory[i] + q1 - d <= instance.maxInventory)&&(inventory[i] + q1 - d >= instance.minInventory)) {
 									totalCost1[i][q1][q2][q3][q4] += demandProbabilities[0][d]*(
-											SDP.computeImmediateCost(inventory[i], q1, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
+											sS.computeImmediateCost(inventory[i], q1, d, instance.holdingCost, instance.penaltyCost, instance.fixedOrderingCost, instance.unitCost)
 											+totalCost2[i+q1-d][q2][q3][q4]);
 									scenarioProb += demandProbabilities[0][d];
 								}

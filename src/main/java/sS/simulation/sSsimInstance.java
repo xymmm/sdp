@@ -1,4 +1,4 @@
-package sSsimulation;
+package sS.simulation;
 
 import umontreal.ssj.stat.Tally;
 

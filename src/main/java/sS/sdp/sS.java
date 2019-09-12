@@ -1,4 +1,4 @@
-package sdp;
+package sS.sdp;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
@@ -8,13 +8,13 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import sSsimulation.sSsim;
-import sSsimulation.sSsimInstance;
+import sS.simulation.sSsim;
+import sS.simulation.sSsimInstance;
 import sdp.data.Instance;
 import sdp.util.Demand;
 import umontreal.ssj.util.Chrono;
 
-public class SDP {
+public class sS {
 
 	/** Static methods **/
 
@@ -75,8 +75,8 @@ public class SDP {
 		return action;
 	}
 	
-	/** print the optimal costs **/
-	static void printOptimalCost(Instance instance, sdpSolution solution) {
+	/** print the optimal costs 
+	static void printOptimalCost(Instance instance, sSsolution solution) {
 		for(int i=0;i<solution.inventory.length;i++) {
 			System.out.print((i+instance.minInventory)+" ");
 			for(int t=0;t<instance.getStages();t++) {
@@ -84,10 +84,10 @@ public class SDP {
 			}System.out.println();
 		}
 		System.out.println();
-	}
+	}**/
 
-	/** print the optimal actions **/
-	static void printOptimalActions(Instance instance, sdpSolution solution) {
+	/** print the optimal actions 
+	static void printOptimalActions(Instance instance, sSsolution solution) {
 		for(int i=0;i<solution.inventory.length;i++) {
 			System.out.print((i+instance.minInventory)+" ");
 			for(int t=0;t<instance.getStages();t++) {
@@ -95,39 +95,55 @@ public class SDP {
 			}System.out.println();
 		}
 		System.out.println();
-	}
+	}**/
 
 	/** Plot the expected optimal cost **/
-	static void plotOptimalCost(Instance instance, sdpSolution solution) {
-		XYSeries series = new XYSeries("SDP Plot");
+	public static void plotOptimalCost(Instance instance, sSsolution solution) {
+		XYSeries series = new XYSeries("sS Plot");
 		for(int i=0-instance.minInventory;i<solution.inventory.length;i++) {
 			series.add(i+instance.minInventory,solution.optimalCost[i][0]);
 		}
 		XYDataset xyDataset = new XYSeriesCollection(series);
-		JFreeChart chart = ChartFactory.createXYLineChart("SDP Model", "Opening inventory level", "Expected total cost",
+		JFreeChart chart = ChartFactory.createXYLineChart("SDP with (s,S) policy", "Opening inventory level", "Expected total cost",
 				xyDataset, PlotOrientation.VERTICAL, false, true, false);
-		ChartFrame frame = new ChartFrame("SDP Plot",chart);
+		ChartFrame frame = new ChartFrame("sS Plot",chart);
 		frame.setVisible(true);
 		frame.setSize(1500,1200);
 	}
 	
 	/** Print reorder points **/
-	static void prints(sdpSolution solution, Instance instance) {
-		System.out.println("reorder points: ");
+	public static void prints(sSsolution solution, Instance instance) {
+		System.out.println("reorder points (s) under (s,S) policy: ");
 		for(int t=0; t<instance.getStages(); t++) {
-			System.out.println(sdpSolution.getsSDP(solution.optimalAction)[t]);
+			System.out.print(sSsolution.getsSDP(solution.optimalAction)[t]+" ");
 		}
+		System.out.println();
 	}
 
 	/** Print order-up-to levels **/
-	static void printS(sdpSolution solution, Instance instance) {
-		System.out.println("Order-up-to levels: ");
+	public static void printS(sSsolution solution, Instance instance) {
+		System.out.println("Order-up-to levels (S) under (s,S) policy: ");
 		for(int t=0; t<instance.getStages(); t++) {
-			System.out.println(sdpSolution.getSSDP(solution.optimalAction)[t]);
+			System.out.print(sSsolution.getSSDP(solution.optimalAction)[t]+" ");
 		}
+		System.out.println();
 	}
+	
+	/** Present results **/
+	public static void presentsSresults(sSsolution solution, Instance instance) {
+		sS.plotOptimalCost(instance, solution);
+		sS.prints(solution, instance);
+		System.out.println();
+		sS.printS(solution, instance);
+		System.out.println();
+		System.out.println("Optimal total cost for i=0 is: ");
+		System.out.println(solution.optimalCost[-instance.minInventory][0]);
+		System.out.println();
+	}
+	
+	
 	/** compute the expected total cost and get optimal actions **/
-	public static sdpSolution solveInstance(Instance instance, boolean initialOrder) {
+	public static sSsolution solveInstance(Instance instance, boolean initialOrder) {
 		/** model stages? **/
 		int Stages = instance.getStages();
 
@@ -205,7 +221,7 @@ public class SDP {
 				optimalAction[i][t] = getOptimalAction(totalCost[i]);
 			}
 		}
-		return new sdpSolution(optimalAction, optimalCost, inventory);
+		return new sSsolution(optimalAction, optimalCost, inventory);
 	}
 
 	/** main computation **/
@@ -238,25 +254,13 @@ public class SDP {
 										);
 
 		//sdpSolution solution = solveInstance(instance, false);		// without initial order
-		sdpSolution solution = solveInstance(instance, true);	//with initial order 
+		sSsolution solution = solveInstance(instance, true);	//with initial order 
 
-		//printOptimalCost(instance, solution);
-		//printOptimalActions(instance, solution);
-
-		plotOptimalCost(instance, solution);
-		
-		prints(solution, instance);
-		System.out.println();
-		
-		printS(solution, instance);
-		System.out.println();
-		
-		System.out.println("Optimal total cost for i=0 is "+solution.optimalCost[-instance.minInventory][0]);
-		System.out.println();
+		presentsSresults(solution, instance);
 
 		/** Simulations **/
-		int [] actionS 		= sdpSolution.getSSDP(solution.optimalAction);
-		int [] reorderPoint = sdpSolution.getsSDP(solution.optimalAction);
+		int [] actionS 		= sSsolution.getSSDP(solution.optimalAction);
+		int [] reorderPoint = sSsolution.getsSDP(solution.optimalAction);
 		
 		sSsimInstance sSsystem = new sSsimInstance(
 				fixedOrderingCost,
