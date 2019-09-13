@@ -6,11 +6,17 @@ public class sQgivenQsolution {
 
 	public double[][] costGivenQ;
 	public  boolean[][] actionGivenQ;
+	public double[][] costOrder;
+	public double[][] costNoOrder;
 
 	public sQgivenQsolution(double[][] costGivenQ, 
-			boolean[][] actionGivenQ) {
+			boolean[][] actionGivenQ,
+			double[][] costOrder,
+			double[][] costNoOrder) {
 		this.costGivenQ = costGivenQ;
 		this.actionGivenQ = actionGivenQ;
+		this.costOrder = costOrder;
+		this.costNoOrder = costNoOrder;
 	}
 	
 	public int[] getsGivenQ(Instance instance, sQgivenQsolution sQgivenQsolution) {

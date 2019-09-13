@@ -11,10 +11,11 @@ import org.jfree.data.xy.XYSeriesCollection;
 import sS.sdp.sS;
 import sdp.data.Instance;
 
-public class sQgivenQ extends sQ {
+public class sQgivenQ {
 
+	/**plot OPTIMAL cost with a given Q**/
 	public static void plotCostGivenQGivenStage(double[][] costGivenQ, int Q, int stageIndex, Instance instance) {
-		XYSeries series = new XYSeries("Cost with Given Q");
+		XYSeries series = new XYSeries("Optimal Cost with Given Q");
 		for(int i = 0; i<instance.maxInventory - instance.minInventory + 1; i++) {
 			series.add((i+instance.minInventory),costGivenQ[stageIndex][i]);
 		}
@@ -25,7 +26,27 @@ public class sQgivenQ extends sQ {
 		frame.setVisible(true);
 		frame.setSize(1800,1500);
 	}
+	/**plot TWO costs with a given Q - Reorder & Non-reorder**/
+	public static void plotTwoCostGivenQ(double[][] costOrder, double[][] costNoOrder, int Q, int stageIndex, Instance instance, double costLimit) {
+		  XYSeries series1 = new XYSeries("Cost with Reorder");
+	      for(int i=0;i<costOrder[0].length;i++) {
+	    	  if(costOrder[stageIndex][i]<costLimit) series1.add((i+instance.minInventory),costOrder[stageIndex][i]);
+	      }
+	      XYSeries series2 = new XYSeries("Cost with No Reorder");
+	      for(int i=0;i<costOrder[0].length;i++) {
+	    	  if(costNoOrder[stageIndex][i]<costLimit) series2.add((i+instance.minInventory),costNoOrder[stageIndex][i]);
+	      }
+		  XYSeriesCollection collection = new XYSeriesCollection();
+		  collection.addSeries(series1);
+		  collection.addSeries(series2);
+	      JFreeChart chart = ChartFactory.createXYLineChart("Expected Cost of Reordering and No Reordering with Given Q="+Q+" at period "+(stageIndex+1), "inventory level", "expected cost",
+	            collection, PlotOrientation.VERTICAL, true, true, false);
+	      ChartFrame frame = new ChartFrame("ETC Comparison",chart);
+	      frame.setVisible(true);
+			frame.setSize(1800,1500);
+	}
 	
+	/**solve reorder points for all feasible Q**/
 	public static int[][] getsGivenQforAllQ(Instance instance){
 		int[][] s = new int [instance.maxQuantity][instance.getStages()];
 		for(int q=0; q<instance.maxQuantity;q++) {
@@ -36,7 +57,7 @@ public class sQgivenQ extends sQ {
 		}
 		return s;
 	}
-	
+	/**plot reorder points varying with Q**/
 	public static void plotsGivenQforAllQ(int[][] s, Instance instance, int stageIndex) {
 		XYSeries series = new XYSeries("reorder point with Given Qs");
 		for(int q=0; q<instance.maxQuantity;q++) {
@@ -50,6 +71,7 @@ public class sQgivenQ extends sQ {
 		frame.setSize(1800,1500);
 	}
 
+	/****compute cost function f(Q,t,i) with given t and Q****/
 	public static sQgivenQsolution costVaryingWithInventory(int Q, Instance instance){
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
@@ -58,6 +80,9 @@ public class sQgivenQ extends sQ {
 
 		double[][] costGivenQ = new double [instance.getStages()][inventory.length];
 		boolean[][] actionGivenQ = new boolean[instance.getStages()][inventory.length];
+		
+		double[][] costOrder = new double[instance.getStages()][inventory.length];
+		double[][] costNoOrder = new double[instance.getStages()][inventory.length];
 
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
 		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
@@ -82,6 +107,7 @@ public class sQgivenQ extends sQ {
 					}
 				}
 				totalCostOrder /= scenarioProb;
+				costOrder[t][i] = totalCostOrder;
 
 				/** a = 0**/
 				double totalCostNoOrder = 0;
@@ -103,13 +129,14 @@ public class sQgivenQ extends sQ {
 					}
 				}
 				totalCostNoOrder /= scenarioProb;
+				costNoOrder[t][i] = totalCostNoOrder;
 
 				costGivenQ[t][i] = Math.min(totalCostNoOrder, totalCostOrder);
 				actionGivenQ[t][i] = totalCostNoOrder < totalCostOrder ? false : true;
 			}
 		}
 
-		return new sQgivenQsolution(costGivenQ, actionGivenQ);
+		return new sQgivenQsolution(costGivenQ, actionGivenQ, costOrder, costNoOrder);
 	}
 	
 	public static void main(String[] args) {
@@ -147,10 +174,13 @@ public class sQgivenQ extends sQ {
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
+		double[] costLimit = {20000, 15000, 10000, 5200};
 		
+		System.out.println("Reorder points with Q="+Q+" is:");
 		for(int t=0; t<costGivenQ.length;t++) {
 			plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
-			System.out.println(sGivenQ[t]);
+			System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
+			plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
 		
 		int[][] s = getsGivenQforAllQ(instance);
