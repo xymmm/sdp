@@ -61,10 +61,10 @@ public class sQgivenQ {
 	public static void plotsGivenQforAllQ(int[][] s, Instance instance, int stageIndex) {
 		XYSeries series = new XYSeries("reorder point with Given Qs");
 		for(int q=0; q<instance.maxQuantity;q++) {
-			series.add((q+1),s[q][stageIndex]);
+			if(s[q][stageIndex]>=-30) series.add((q+1),s[q][stageIndex]);
 		}
 		XYDataset xyDataset = new XYSeriesCollection(series);
-		JFreeChart chart = ChartFactory.createXYLineChart("reorder point s varying with given Qs ="+" at period "+(stageIndex+1), "feasible quantities", "reorder points",
+		JFreeChart chart = ChartFactory.createXYLineChart("reorder point s varying with given Qs"+" at period "+(stageIndex+1), "feasible quantities", "reorder points",
 				xyDataset, PlotOrientation.VERTICAL, true, true, false);
 		ChartFrame frame = new ChartFrame("reorder point with Given Qs",chart);
 		frame.setVisible(true);
@@ -178,9 +178,9 @@ public class sQgivenQ {
 		
 		System.out.println("Reorder points with Q="+Q+" is:");
 		for(int t=0; t<costGivenQ.length;t++) {
-			plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
+			//plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
 			System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
-			plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
+			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
 		
 		int[][] s = getsGivenQforAllQ(instance);
