@@ -178,9 +178,9 @@ public class sQgivenQ {
 		
 		System.out.println("Reorder points with Q="+Q+" is:");
 		for(int t=0; t<costGivenQ.length;t++) {
-			//plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
+			plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
 			System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
-			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
+			plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
 		
 		int[][] s = getsGivenQforAllQ(instance);
