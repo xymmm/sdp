@@ -76,14 +76,21 @@ public class RS_MILP_costPlot {
     	int maxInventory = 500;
     	int inventoryLength = maxInventory-minInventory+1;
     	
-        double[][] read = getFile("F:/EclipseInstall/sdp/src/main/java/RS/milp/ofile1.txt");
-        double[] RScostMILP = new double[inventoryLength];
+        double[][] read = getFile("F:/EclipseInstall/sdp/src/main/java/RS/milp/ofile0.txt");//purchase[0] = 0
+        double[] RScostMILP = new double[inventoryLength];       
         for(int i=0; i<RScostMILP.length;i++) {
         	RScostMILP[i] = read[i][0];
         }
-        
         plotRScostMILP(RScostMILP, minInventory);
-
+        
+        /*
+        double[][] read1 = getFile("F:/EclipseInstall/sdp/src/main/java/RS/milp/ofile1.txt");
+        double[] RScostMILP1 = new double[inventoryLength];
+        for(int i=0; i<RScostMILP1.length;i++) {
+        	RScostMILP1[i] = read1[i][0];
+        }
+        plotRScostMILP(RScostMILP1, minInventory);
+    	 */
 
     }
     

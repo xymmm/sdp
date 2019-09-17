@@ -50,7 +50,7 @@ public class sQgivenQ {
 	public static int[][] getsGivenQforAllQ(Instance instance){
 		int[][] s = new int [instance.maxQuantity][instance.getStages()];
 		for(int q=0; q<instance.maxQuantity;q++) {
-			sQgivenQsolution sQgivenQ = costVaryingWithInventory((q+1), instance);
+			sQgivenQsolution sQgivenQ = costVaryingWithInventory((q+1), instance,false);
 			for(int t=0; t<instance.getStages();t++) {
 				s[q][t] = sQgivenQ.getsGivenQ(instance, sQgivenQ)[t];
 			}
@@ -72,7 +72,7 @@ public class sQgivenQ {
 	}
 
 	/****compute cost function f(Q,t,i) with given t and Q****/
-	public static sQgivenQsolution costVaryingWithInventory(int Q, Instance instance){
+	public static sQgivenQsolution costVaryingWithInventory(int Q, Instance instance, boolean initialOrder){
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
@@ -88,6 +88,7 @@ public class sQgivenQ {
 		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 			for(int i=0;i<inventory.length;i++) { // Inventory   
 				/** a = Q (given) **/
+				Q = ((t==0)&&(!initialOrder)) ?  0 : Q;
 				double totalCostOrder = sS.computePurchasingCost(Q, instance.fixedOrderingCost, instance.unitCost); 
 				double scenarioProb = 0;
 				for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
@@ -170,7 +171,7 @@ public class sQgivenQ {
 		//int stageIndex = 3;
 		//plotCostGivenQGivenStage(costGivenQ, Q, stageIndex, instance);
 		
-		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance);
+		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);

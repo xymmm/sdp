@@ -253,8 +253,8 @@ public class sS {
 										maxQuantity
 										);
 
-		//sdpSolution solution = solveInstance(instance, false);		// without initial order
-		sSsolution solution = solveInstance(instance, false);	//with initial order 
+		//sSsolution solution = solveInstance(instance, false);		// without initial order
+		sSsolution solution = solveInstance(instance, true);	//with initial order 
 
 		presentsSresults(solution, instance);
 
