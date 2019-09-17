@@ -100,7 +100,7 @@ public class sS {
 	/** Plot the expected optimal cost **/
 	public static void plotOptimalCost(Instance instance, sSsolution solution) {
 		XYSeries series = new XYSeries("sS Plot");
-		for(int i=0-instance.minInventory;i<solution.inventory.length;i++) {
+		for(int i=0;i<solution.inventory.length;i++) {
 			series.add(i+instance.minInventory,solution.optimalCost[i][0]);
 		}
 		XYDataset xyDataset = new XYSeriesCollection(series);
