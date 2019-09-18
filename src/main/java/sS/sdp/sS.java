@@ -33,6 +33,14 @@ public class sS {
 		}
 		return demandProbability;
 	}
+	
+	public static double[][] computeNormalDemandProbability(int[] demandMean, double stdParameter, int maxDemand, double tail){
+		double[][] demandProbability = new double [demandMean.length][maxDemand+1];
+		for(int t=0; t<demandMean.length;t++) {
+			demandProbability[t] = Demand.normalProbability(demandMean[t], stdParameter, tail);
+		}
+		return demandProbability;
+	}
 
 	/** compute immediate cost with actions **/
 	public static double computeImmediateCost(
@@ -75,28 +83,6 @@ public class sS {
 		return action;
 	}
 	
-	/** print the optimal costs 
-	static void printOptimalCost(Instance instance, sSsolution solution) {
-		for(int i=0;i<solution.inventory.length;i++) {
-			System.out.print((i+instance.minInventory)+" ");
-			for(int t=0;t<instance.getStages();t++) {
-				System.out.print(solution.optimalCost[i][t] + " ");
-			}System.out.println();
-		}
-		System.out.println();
-	}**/
-
-	/** print the optimal actions 
-	static void printOptimalActions(Instance instance, sSsolution solution) {
-		for(int i=0;i<solution.inventory.length;i++) {
-			System.out.print((i+instance.minInventory)+" ");
-			for(int t=0;t<instance.getStages();t++) {
-				System.out.print(solution.optimalAction[i][t] + " ");
-			}System.out.println();
-		}
-		System.out.println();
-	}**/
-
 	/** Plot the expected optimal cost **/
 	public static void plotOptimalCost(Instance instance, sSsolution solution) {
 		XYSeries series = new XYSeries("sS Plot");
@@ -141,7 +127,6 @@ public class sS {
 		System.out.println();
 	}
 	
-	
 	/** compute the expected total cost and get optimal actions **/
 	public static sSsolution solveInstance(Instance instance, boolean initialOrder) {
 		/** model stages? **/
@@ -173,7 +158,8 @@ public class sS {
 		 * The probability of each possible demand in each period is computed and stored in a 2D array, demandProbabilities[][].
 		 * The first index represents the possible demand value ranged from 0 to maxDemand, and the second index represents the time period.
 		 * **/
-		double demandProbabilities [][] = computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		//double demandProbabilities [][] = computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
 
 		/** Compute ETC 
 		 *
@@ -240,6 +226,8 @@ public class sS {
 		int minInventory = -500;
 		int maxInventory = 500;
 		int maxQuantity = 500;
+		
+		double stdParameter = 0.25;
 
 		Instance instance = new Instance(
 										fixedOrderingCost,
@@ -250,15 +238,16 @@ public class sS {
 										tail,
 										minInventory,
 										maxInventory,
-										maxQuantity
+										maxQuantity,
+										stdParameter
 										);
 
-		//sSsolution solution = solveInstance(instance, false);		// without initial order
-		sSsolution solution = solveInstance(instance, true);	//with initial order 
+		sSsolution solution = solveInstance(instance, false);	//with initial order 
 
 		presentsSresults(solution, instance);
 
 		/** Simulations **/
+		/*
 		int [] actionS 		= sSsolution.getSSDP(solution.optimalAction);
 		int [] reorderPoint = sSsolution.getsSDP(solution.optimalAction);
 		
@@ -273,13 +262,13 @@ public class sS {
 				actionS,
 				reorderPoint
 				);	
-		
 		int count = 50000;
 		sSsim.simulationsQinstanceRuns(sSsystem, count);
 		
 		sSsystem.statCost.setConfidenceIntervalStudent();
 		System.out.println(sSsystem.statCost.report(0.9, 3));
 		System.out.println("Total CPU time: "+timer.format());
+		*/
 	}
 
 }

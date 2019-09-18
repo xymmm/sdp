@@ -34,6 +34,8 @@ public class sQtest_singleQ {
 	      int minInventory = -250;
 	      int maxInventory = 250;
 	      int maxQuantity = 1000;
+	      
+		  double stdParameter = 0.25;
 
 	      return new Instance(
 	            fixedOrderingCost,
@@ -44,7 +46,8 @@ public class sQtest_singleQ {
 	            tail,
 	            minInventory,
 	            maxInventory,
-	            maxQuantity
+	            maxQuantity,
+	            stdParameter
 	            );
 	   }
 	   @Test
@@ -85,6 +88,8 @@ public class sQtest_singleQ {
 	      int maxInventory = 1000;
 	      int maxQuantity = 1000;
 
+	      double stdParameter = 0.25;
+	      
 	      return new Instance(
 	            fixedOrderingCost,
 	            unitCost,
@@ -94,7 +99,8 @@ public class sQtest_singleQ {
 	            tail,
 	            minInventory,
 	            maxInventory,
-	            maxQuantity
+	            maxQuantity,
+	            stdParameter
 	            );
 	   }
 	   @Test
@@ -126,6 +132,8 @@ public class sQtest_singleQ {
 	      int maxInventory = 1000;
 	      int maxQuantity = 1000;
 
+	      double stdParameter = 0.25;
+	      
 	      return new Instance(
 	            fixedOrderingCost,
 	            unitCost,
@@ -135,7 +143,8 @@ public class sQtest_singleQ {
 	            tail,
 	            minInventory,
 	            maxInventory,
-	            maxQuantity
+	            maxQuantity,
+	            stdParameter
 	            );
 	   }
 	   @Test
@@ -166,6 +175,8 @@ public class sQtest_singleQ {
 	      int minInventory = -1000;
 	      int maxInventory = 1000;
 	      int maxQuantity = 1000;
+	      
+	      double stdParameter = 0.25;
 
 	      return new Instance(
 	            fixedOrderingCost,
@@ -176,7 +187,8 @@ public class sQtest_singleQ {
 	            tail,
 	            minInventory,
 	            maxInventory,
-	            maxQuantity
+	            maxQuantity,
+	            stdParameter
 	            );
 	   } 
 	   @Test

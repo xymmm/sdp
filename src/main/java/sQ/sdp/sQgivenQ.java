@@ -84,7 +84,9 @@ public class sQgivenQ {
 		double[][] costOrder = new double[instance.getStages()][inventory.length];
 		double[][] costNoOrder = new double[instance.getStages()][inventory.length];
 
-		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		//double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
+		
 		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 			for(int i=0;i<inventory.length;i++) { // Inventory   
 				/** a = Q (given) **/
@@ -153,6 +155,8 @@ public class sQgivenQ {
 		int minInventory = -500;
 		int maxInventory = 500;
 		int maxQuantity = 500;
+		
+		double stdParameter = 0.25;
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -163,20 +167,18 @@ public class sQgivenQ {
 				tail,
 				minInventory,
 				maxInventory,
-				maxQuantity
+				maxQuantity,
+				stdParameter
 				);
 		
 		int Q = 84;
-		
-		//int stageIndex = 3;
-		//plotCostGivenQGivenStage(costGivenQ, Q, stageIndex, instance);
-		
+			
 		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		double[] costLimit = {20000, 15000, 10000, 5200};
-		
+		/*
 		System.out.println("Reorder points with Q="+Q+" is:");
 		for(int t=0; t<costGivenQ.length;t++) {
 			plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
@@ -188,7 +190,10 @@ public class sQgivenQ {
 		for(int t=0; t<instance.getStages();t++) {
 			 plotsGivenQforAllQ(s, instance, t);
 		}
+		*/
 		
+		plotCostGivenQGivenStage(costGivenQ, Q, 0, instance);
+		plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, 0, instance, costLimit[0]);
 		
 		
 		

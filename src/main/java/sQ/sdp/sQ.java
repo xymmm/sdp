@@ -138,6 +138,8 @@ public class sQ {
 		int minInventory = -500;
 		int maxInventory = 500;
 		int maxQuantity = 500;
+		
+		double stdParameter = 0.25;
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -148,7 +150,8 @@ public class sQ {
 				tail,
 				minInventory,
 				maxInventory,
-				maxQuantity
+				maxQuantity,
+				stdParameter
 				);
 
 		/** Solve the classic instance **/

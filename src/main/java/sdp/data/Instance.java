@@ -9,6 +9,8 @@ public class Instance {
    public int[] demandMean;
    public int initialInventory = 0;
    
+   public double stdParameter;
+   
    
    /** SDP boundary conditions **/
    public double tail;
@@ -27,7 +29,8 @@ public class Instance {
          double tail,
          int minInventory,
          int maxInventory,
-         int maxQuantity) {
+         int maxQuantity,
+         double stdParameter) {
       this.fixedOrderingCost = fixedOrderingCost;
       this.unitCost = unitCost;
       this.holdingCost = holdingCost;
@@ -37,6 +40,7 @@ public class Instance {
       this.minInventory = minInventory;
       this.maxInventory = maxInventory;
       this.maxQuantity = maxQuantity;
+      this.stdParameter = stdParameter;
    }
    
    public int getStages() {

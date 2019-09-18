@@ -34,6 +34,8 @@ public class TestSDP {
       int minInventory = -1000;
       int maxInventory = 1000;
       int maxQuantity = 1000;
+      
+      double stdParameter = 0.25;
 
 
       return new Instance(
@@ -45,7 +47,8 @@ public class TestSDP {
             tail,
             minInventory,
             maxInventory,
-            maxQuantity
+            maxQuantity,
+            stdParameter
             );
    }
    
@@ -64,7 +67,8 @@ public class TestSDP {
       int maxInventory = 1000;
       int maxQuantity = 1000;
 
-
+      double stdParameter = 0.25;
+      
       return new Instance(
             fixedOrderingCost,
             unitCost,
@@ -74,7 +78,8 @@ public class TestSDP {
             tail,
             minInventory,
             maxInventory,
-            maxQuantity
+            maxQuantity,
+            stdParameter
             );
    }
    
@@ -92,7 +97,9 @@ public class TestSDP {
       int minInventory = -1000;
       int maxInventory = 1000;
       int maxQuantity = 1000;
-
+		
+      
+      double stdParameter = 0.25;
 
       return new Instance(
             fixedOrderingCost,
@@ -103,7 +110,8 @@ public class TestSDP {
             tail,
             minInventory,
             maxInventory,
-            maxQuantity
+            maxQuantity,
+            stdParameter
             );
    }
    
