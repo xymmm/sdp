@@ -1,6 +1,6 @@
 package sdp.data;
 
-public class PoissonInstance {
+public class Instance {
    /*** Problem instance ***/
    public double fixedOrderingCost;
    public double unitCost;
@@ -18,7 +18,7 @@ public class PoissonInstance {
    public int maxInventory;
    public int maxQuantity;
    
-   public PoissonInstance(
+   public Instance(
          double fixedOrderingCost,
          double unitCost,
          double holdingCost,

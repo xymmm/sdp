@@ -34,4 +34,5 @@ public class Demand {
 	   
 	   return demandProbabilities;
    }
+   
 } 
