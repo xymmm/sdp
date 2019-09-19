@@ -66,7 +66,8 @@ public class sQ {
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
 		}
-		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
+		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean[t], instance.stdParameter, instance.maxDemand, instance.tail); //Normal
 		double totalCost[][][] = new double[inventory.length][instance.maxQuantity+1][instance.getStages()];
 		boolean optimalAction[][][] = new boolean [inventory.length][instance.maxQuantity + 1][instance.getStages()];
 
@@ -131,13 +132,13 @@ public class sQ {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {15,5,6,7};//{20,40,60,40};
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
-		int maxQuantity = 500;
+		int minInventory = -35;//-500;
+		int maxInventory = 35;//500;
+		int maxQuantity = 25;//500;
 		
 		double stdParameter = 0.25;
 
@@ -169,7 +170,7 @@ public class sQ {
 
 		presentsQresults(instance, sQsolution);
 
-		/** Simulations **/
+		/** Simulations *
 		System.out.println();
 		System.out.println("Simulations:");
 		int[] reorderPoint = sQsolution.getsSQ(instance, sQsolution);
@@ -198,7 +199,7 @@ public class sQ {
 		sQsystem.statCost.setConfidenceIntervalStudent();
 		System.out.println(sQsystem.statCost.report(0.9, 3));
 		System.out.println("Total CPU time: "+timer.format());
-		
+		*/
 	}
 
 

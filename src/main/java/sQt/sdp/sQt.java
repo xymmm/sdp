@@ -12,20 +12,21 @@ public class sQt {
 	
 	/** print reorder points s **/
 	static void prints(Instance instance, sQtsolution sQtsolution) {
-		System.out.println();
 		System.out.println("Reorder points: ");
 		for(int t=0; t<instance.getStages(); t++) {
-			System.out.println(sQtsolution.getssQt(instance, sQtsolution)[t]);
+			System.out.print(sQtsolution.getssQt(instance, sQtsolution)[t]+" ");
 		}
+		System.out.println();
 	}
 	
 	/** print Qt **/
 	static void printQt(Instance instance, sQtsolution sQtsolution) {
-		System.out.println();
 		System.out.println("Order quantities:");
 		for(int t=0; t<instance.getStages(); t++) {
-			System.out.println(sQtsolution.getQt(instance, sQtsolution)[t]);
+			System.out.print(sQtsolution.getQt(instance, sQtsolution)[t]+" ");
+
 		}
+		System.out.println();
 	}	
 	
 	/** print optimal costs **/
@@ -33,6 +34,7 @@ public class sQt {
 		int[] Qt = sQtsolution.getQt(instance, sQtsolution);
 		System.out.println("Optimal Cost: ");
 		System.out.println(sQtsolution.totalCost1[instance.initialInventory - instance.minInventory][Qt[0]][Qt[1]][Qt[2]][Qt[3]]);
+		System.out.println();
 	}
 	
 	/** plot costs*
@@ -53,12 +55,13 @@ public class sQt {
 	/***** main computation *****/
 	public static sQtsolution solvesQcombinations(Instance instance) {
 		
+		System.out.println("Solution in progress.");
 		//working matrix
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
 		}
-		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
 		
 		//different dimension index from sdp or sQ, as period takes the first.
 		double totalCost4[][] = new double[inventory.length][instance.maxQuantity+1];
@@ -153,6 +156,7 @@ public class sQt {
 			}
 		}System.out.println("Forth loop - totalCost1");
 
+		System.out.println("Problem solved.");
 		
 		return new sQtsolution(totalCost1, totalCost2, totalCost3, totalCost4, inventory);
 	}
@@ -167,7 +171,7 @@ public class sQt {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {5,10,15,10};//{20,40,60,40};
+		int[] demandMean = {15,5,6,7};//{20,40,60,40};
 
 		double tail = 0.00000001;
 
@@ -192,13 +196,13 @@ public class sQt {
 
 		/** Solve the classic instance **/
 		sQtsolution sQtsolution = solvesQcombinations(instance);
-
+		System.out.println();
+		
 		printOptimalCost(instance.initialInventory-instance.minInventory, instance, sQtsolution);
-
 		printQt(instance, sQtsolution);
 		prints(instance, sQtsolution);
 		
-		/** simulations **/
+		/** simulations *
 		System.out.println();
 		System.out.println("Simulations:");
 		int[] reorderPoint = sQtsolution.getssQt(instance, sQtsolution);
@@ -224,6 +228,7 @@ public class sQt {
 		
 		System.out.println();
 		System.out.println("Total CPU time: "+timer.format());
+		*/
 
 		}//main
 	

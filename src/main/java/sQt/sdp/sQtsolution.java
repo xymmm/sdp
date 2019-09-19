@@ -57,9 +57,9 @@ public class sQtsolution {
 	public int[] getQt(Instance instance, sQtsolution sQtsolution) {
 		int[] Qt = new int[instance.getStages()];
 		
-		double min=totalCost1[instance.initialInventory-instance.minInventory][1][0][0][0];
+		double min=totalCost1[instance.initialInventory-instance.minInventory][0][0][0][0];
 		//find the minimum cost among all feasible combinations of Q of all periods
-		for(int q1=0; q1<=instance.maxQuantity; q1++) {
+		for(int q1=1; q1<=instance.maxQuantity; q1++) {
 			for(int q2=0; q2<=instance.maxQuantity;q2++) {
 				for(int q3=0; q3<=instance.maxQuantity;q3++) {
 					for(int q4=0; q4<= instance.maxQuantity;q4++) {

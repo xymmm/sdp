@@ -173,7 +173,7 @@ public class sQgivenQ {
 		
 		int Q = 84;
 			
-		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
+		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
