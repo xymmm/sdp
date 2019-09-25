@@ -52,8 +52,8 @@ public class sQ {
 	
 	public static void presentsQresults(Instance instance, sQsolution sQsolution) {
 		plotComparedCosts(instance, sQsolution, 0);
-		printReorderPoints(instance, sQsolution);
-		System.out.println();
+		//printReorderPoints(instance, sQsolution);
+		//System.out.println();
 		printOptimalQuantity(instance, sQsolution);
 		System.out.println();
 		printOpitmalCost(instance, sQsolution);
@@ -132,13 +132,13 @@ public class sQ {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {15,5,6,7};//{20,40,60,40};
+		int[] demandMean = {40,50,60,50,60,70,20,40};
 
 		double tail = 0.00000001;
 
-		int minInventory = -35;//-500;
-		int maxInventory = 35;//500;
-		int maxQuantity = 25;//500;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 		
 		double stdParameter = 0.25;
 

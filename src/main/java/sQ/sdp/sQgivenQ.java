@@ -178,24 +178,24 @@ public class sQgivenQ {
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		double[] costLimit = {20000, 15000, 10000, 5200};
-		/*
+		
 		System.out.println("Reorder points with Q="+Q+" is:");
 		for(int t=0; t<costGivenQ.length;t++) {
-			plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
+			if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
 			System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
-			plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
+			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
-		
+		/*
 		int[][] s = getsGivenQforAllQ(instance);
 		for(int t=0; t<instance.getStages();t++) {
 			 plotsGivenQforAllQ(s, instance, t);
 		}
 		*/
 		
-		plotCostGivenQGivenStage(costGivenQ, Q, 0, instance);
-		plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, 0, instance, costLimit[0]);
-		
-		
+		System.out.println();
+		for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {
+			System.out.println(sQgivenQ.costGivenQ[0][i]);
+		}
 		
 	}
 

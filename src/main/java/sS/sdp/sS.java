@@ -246,6 +246,11 @@ public class sS {
 
 		presentsSresults(solution, instance);
 
+		System.out.println();
+		for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {
+			System.out.println(solution.optimalCost[i][0]);
+		}
+		
 		/** Simulations **/
 		/*
 		int [] actionS 		= sSsolution.getSSDP(solution.optimalAction);
