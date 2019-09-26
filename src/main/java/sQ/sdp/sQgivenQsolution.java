@@ -32,5 +32,25 @@ public class sQgivenQsolution {
 		return s;
 	}
 
+	public double getMinCost(Instance instance, sQgivenQsolution sQgivenQsolution, int currentStageIndex) {
+		double min = sQgivenQsolution.costGivenQ[currentStageIndex][0];
+		for(int i=1; i<sQgivenQsolution.costGivenQ[currentStageIndex].length; i++) {
+			if (sQgivenQsolution.costGivenQ[currentStageIndex][i]< min) {
+				min = sQgivenQsolution.costGivenQ[currentStageIndex][i];
+				//System.out.println(currentStageIndex + " "+(i+instance.minInventory));
+			}
+		}
+		return min;
+	}
+	
+	public int getMinCostIndex(Instance instance, sQgivenQsolution sQgivenQsolution, int currentStageIndex) {
+		int min = 0;
+		for(int i=1; i<sQgivenQsolution.costGivenQ[currentStageIndex].length; i++) {
+			if (sQgivenQsolution.costGivenQ[currentStageIndex][i]< sQgivenQsolution.costGivenQ[currentStageIndex][i-1]) {
+				min = i+instance.minInventory;
+			}
+		}
+		return min;
+	}
 	
 }

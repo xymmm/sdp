@@ -173,7 +173,7 @@ public class sQgivenQ {
 		
 		int Q = 84;
 			
-		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
+		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
@@ -190,11 +190,14 @@ public class sQgivenQ {
 		for(int t=0; t<instance.getStages();t++) {
 			 plotsGivenQforAllQ(s, instance, t);
 		}
-		*/
-		
 		System.out.println();
 		for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {
 			System.out.println(sQgivenQ.costGivenQ[0][i]);
+		}
+		*/
+		for(int t=0; t<instance.getStages();t++) {
+			System.out.println(sQgivenQ.getMinCost(instance, sQgivenQ, t));
+			System.out.println(sQgivenQ.getMinCostIndex(instance, sQgivenQ, t));
 		}
 		
 	}
