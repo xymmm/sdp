@@ -171,9 +171,9 @@ public class sQgivenQ {
 				stdParameter
 				);
 		
-		int Q = 84;
+		int Q = 109;
 			
-		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
+		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
@@ -181,7 +181,7 @@ public class sQgivenQ {
 		
 		System.out.println("Reorder points with Q="+Q+" is:");
 		for(int t=0; t<costGivenQ.length;t++) {
-			if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
+			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
 			System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}

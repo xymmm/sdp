@@ -30,7 +30,7 @@ public class sQsolution {
 			a = a + 1;
 		}while(a < instance.maxQuantity - 1);
 		int opt_a = minIndex;
-		return opt_a;
+		return opt_a-1;
 	}
 	
 

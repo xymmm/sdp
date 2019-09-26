@@ -44,13 +44,15 @@ public class sQgivenQsolution {
 	}
 	
 	public int getMinCostIndex(Instance instance, sQgivenQsolution sQgivenQsolution, int currentStageIndex) {
-		int min = 0;
+		double min = sQgivenQsolution.costGivenQ[currentStageIndex][0];
+		int index = 0;
 		for(int i=1; i<sQgivenQsolution.costGivenQ[currentStageIndex].length; i++) {
-			if (sQgivenQsolution.costGivenQ[currentStageIndex][i]< sQgivenQsolution.costGivenQ[currentStageIndex][i-1]) {
-				min = i+instance.minInventory;
+			if (sQgivenQsolution.costGivenQ[currentStageIndex][i]< min) {
+				min = sQgivenQsolution.costGivenQ[currentStageIndex][i];
+				index = i+instance.minInventory;
 			}
 		}
-		return min;
+		return index;
 	}
 	
 }

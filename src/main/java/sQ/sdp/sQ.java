@@ -132,7 +132,7 @@ public class sQ {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {40,60,20,30};
 
 		double tail = 0.00000001;
 
