@@ -247,8 +247,11 @@ public class sS {
 		presentsSresults(solution, instance);
 
 		System.out.println();
-		for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {
-			System.out.println(solution.optimalCost[i][0]);
+		//for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {
+			//System.out.println(solution.optimalCost[i][0]);
+		//}
+		for(int t=0; t<4; t++) {
+			System.out.println(solution.optimalAction[0-instance.minInventory][t]);
 		}
 		
 		/** Simulations **/

@@ -132,7 +132,7 @@ public class sQ {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {40,60,20,30};
+		int[] demandMean = {20,40,60,40};
 
 		double tail = 0.00000001;
 
@@ -169,6 +169,11 @@ public class sQ {
 		 */
 
 		presentsQresults(instance, sQsolution);
+		
+		System.out.println();
+		for(int a=0; a<=200; a++) {
+			System.out.println(sQsolution.totalCost[instance.initialInventory - instance.minInventory][a][0]);
+		}
 
 		/** Simulations *
 		System.out.println();

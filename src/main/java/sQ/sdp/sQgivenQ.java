@@ -171,7 +171,7 @@ public class sQgivenQ {
 				stdParameter
 				);
 		
-		int Q = 109;
+		int Q = 84;
 			
 		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
 		
@@ -198,6 +198,14 @@ public class sQgivenQ {
 		for(int t=0; t<instance.getStages();t++) {
 			System.out.println(sQgivenQ.getMinCost(instance, sQgivenQ, t));
 			System.out.println(sQgivenQ.getMinCostIndex(instance, sQgivenQ, t));
+		}
+		
+		for(int i=-instance.minInventory; i<=200-instance.minInventory;i++) {
+			System.out.println(sQgivenQ.costOrder[3][i]);
+		}
+		System.out.println();
+		for(int i=-instance.minInventory; i<=200-instance.minInventory;i++) {
+			System.out.println(sQgivenQ.costNoOrder[3][i]);
 		}
 		
 	}
