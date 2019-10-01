@@ -148,7 +148,7 @@ public class sQgivenQ {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {40,50,60,50,60,70,20,40};
 
 		double tail = 0.00000001;
 
@@ -171,7 +171,7 @@ public class sQgivenQ {
 				stdParameter
 				);
 		
-		int Q = 84;
+		int Q = 99;
 			
 		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
 		
@@ -179,10 +179,11 @@ public class sQgivenQ {
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		double[] costLimit = {20000, 15000, 10000, 5200};
 		
-		System.out.println("Reorder points with Q="+Q+" is:");
+		//System.out.println("Reorder points with Q="+Q+" is:");
 		for(int t=0; t<costGivenQ.length;t++) {
 			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
-			System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
+			//System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
+			System.out.println(sQgivenQ.costGivenQ[t][-instance.minInventory]);
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
 		/*
@@ -194,19 +195,13 @@ public class sQgivenQ {
 		for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {
 			System.out.println(sQgivenQ.costGivenQ[0][i]);
 		}
-		*/
+		
 		for(int t=0; t<instance.getStages();t++) {
 			System.out.println(sQgivenQ.getMinCost(instance, sQgivenQ, t));
 			System.out.println(sQgivenQ.getMinCostIndex(instance, sQgivenQ, t));
-		}
+		}*/
+
 		
-		for(int i=-instance.minInventory; i<=200-instance.minInventory;i++) {
-			System.out.println(sQgivenQ.costOrder[3][i]);
-		}
-		System.out.println();
-		for(int i=-instance.minInventory; i<=200-instance.minInventory;i++) {
-			System.out.println(sQgivenQ.costNoOrder[3][i]);
-		}
 		
 	}
 

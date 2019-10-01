@@ -23,6 +23,8 @@ public class sQsimInstance {
 	public int[] actionQuantity;
 	public int[] reorderPoint;
 	
+	public double coe;
+	
 	public Tally statCost = new Tally("stats on cost");
 
 	public sQsimInstance(
@@ -35,7 +37,8 @@ public class sQsimInstance {
 			int minInventory,
 			int maxInventory,
 			int[] actionQuantity,
-			int[] reorderPoint) {
+			int[] reorderPoint,
+			double coe) {
 		this.fixedOrderingCost = fixedOrderingCost;
 		this.unitCost = unitCost;
 		this.holdingCost = holdingCost;
@@ -46,6 +49,7 @@ public class sQsimInstance {
 		this.maxInventory = maxInventory;
 		this.actionQuantity = actionQuantity;
 		this.reorderPoint = reorderPoint;
+		this.coe = coe;
 	}
 
 	public int getStages() {

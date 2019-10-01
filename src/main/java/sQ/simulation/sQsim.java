@@ -1,5 +1,9 @@
 package sQ.simulation;
 
+import java.util.Random;
+
+import org.apache.commons.math3.distribution.NormalDistribution;
+
 import umontreal.ssj.probdist.PoissonDist;
 import umontreal.ssj.randvar.PoissonGen;
 import umontreal.ssj.randvar.RandomVariateGenInt;
@@ -61,8 +65,26 @@ public class sQsim {
 		  return -demand;
 		 
 	}
+	static int generateNormalDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int currentStageIndex) {
+		Random randomno = new Random();
+		int demand = (int) (randomno.nextGaussian()*sQsimInstance.demandMean[currentStageIndex]* sQsimInstance.coe + sQsimInstance.demandMean[currentStageIndex] );
+		while(checkNormalDemand(demand, sQsimInstance, currentStageIndex) == false) {
+			demand = (int) (randomno.nextGaussian()*sQsimInstance.demandMean[currentStageIndex]* sQsimInstance.coe + sQsimInstance.demandMean[currentStageIndex] );
+		}
+		return -demand;
+	}
 	static boolean checkDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int demand, int currentStageIndex) {
 		if(inventoryLevel -demand >= sQsimInstance.minInventory){
+			return true;
+		}else {
+			return false;
+		}
+	}
+	static boolean checkNormalDemand(int demand, sQsimInstance sQsimInstance, int currentStageIndex) {
+		NormalDistribution dist = new NormalDistribution(sQsimInstance.demandMean[currentStageIndex], sQsimInstance.coe*sQsimInstance.demandMean[currentStageIndex]);
+		int minDemand = (int) dist.inverseCumulativeProbability(sQsimInstance.tail);
+		int maxDemand = (int) dist.inverseCumulativeProbability(1-sQsimInstance.tail);
+		if((demand > minDemand) && (demand < maxDemand)){
 			return true;
 		}else {
 			return false;
@@ -111,6 +133,7 @@ public class sQsim {
 			//1 & 2 check inventory
 			actionDecision = checkInventory(sQsimInstance.reorderPoint[currentStageIndex], inventoryLevel);
 			if(print == true) System.out.println((actionDecision == 1) ? "Replenishment order placed. ":"No order placed. ");
+			//if(currentStageIndex == 0) actionDecision =0;
 			
 			//2. compute purchasing cost
 			cost += computePurchasingCost(actionDecision, currentStageIndex, sQsimInstance);
@@ -120,7 +143,8 @@ public class sQsim {
 			if(print == true) System.out.println("Updated inventory level is "+inventoryLevel);
 			
 			//4. generate, check and meet demand
-			int demand = generateDemand(inventoryLevel, actionDecision, sQsimInstance, currentStageIndex); // as a negative
+			//int demand = generateDemand(inventoryLevel, actionDecision, sQsimInstance, currentStageIndex); // as a negative
+			int demand = generateNormalDemand(inventoryLevel, actionDecision, sQsimInstance, currentStageIndex); // as a negative
 			if(print == true) System.out.println("Demand in this stage is "+(-demand));
 			
 			//update inventory level
@@ -154,17 +178,22 @@ public class sQsim {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {20,40,60,40};
 
 		double tail = 0.00000001;
 
 		int minInventory = -500;
 		int maxInventory = 500;
+		double coe = 0.25;
 		
-		int[] reorderPoint = {13,33,54,24};
-		int[] actionQuantity = {83, 83, 83, 83};
+		int[] demandMean = {40};
+		int[] reorderPoint = {31};
+		int Q = 104;
+		int[] actionQuantity = new int[reorderPoint.length];
+		for(int t=0; t<actionQuantity.length;t++) {
+			actionQuantity[t] = Q;
+		}
 
-		sQsimInstance sQsystem = new sQsimInstance(
+		sQsimInstance sQsystem1 = new sQsimInstance(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
@@ -174,16 +203,17 @@ public class sQsim {
 				minInventory,
 				maxInventory,
 				actionQuantity,
-				reorderPoint
+				reorderPoint,
+				coe
 				);	
 		
 		Chrono timer = new Chrono();
 		
 		int count = 50000;
-		sQsim.simulationsQinstanceRuns(sQsystem, count);
+		sQsim.simulationsQinstanceRuns(sQsystem1, count);
 		
-		sQsystem.statCost.setConfidenceIntervalStudent();
-		System.out.println(sQsystem.statCost.report(0.9, 3));
+		sQsystem1.statCost.setConfidenceIntervalStudent();
+		System.out.println(sQsystem1.statCost.report(0.9, 3));
 		System.out.println("Total CPU time: "+timer.format());
 
 	}
