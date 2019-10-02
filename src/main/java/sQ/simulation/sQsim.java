@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 
+import umontreal.ssj.probdist.NormalDist;
 import umontreal.ssj.probdist.PoissonDist;
 import umontreal.ssj.randvar.PoissonGen;
 import umontreal.ssj.randvar.RandomVariateGenInt;
@@ -65,12 +66,15 @@ public class sQsim {
 		  return -demand;
 		 
 	}
+	
+	static MRG32k3a randomno = new MRG32k3a();
+	
 	static int generateNormalDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int currentStageIndex) {
-		Random randomno = new Random();
-		int demand = (int) (randomno.nextGaussian()*sQsimInstance.demandMean[currentStageIndex]* sQsimInstance.coe + sQsimInstance.demandMean[currentStageIndex] );
-		while(checkNormalDemand(demand, sQsimInstance, currentStageIndex) == false) {
-			demand = (int) (randomno.nextGaussian()*sQsimInstance.demandMean[currentStageIndex]* sQsimInstance.coe + sQsimInstance.demandMean[currentStageIndex] );
-		}
+		//int demand = (int) (randomno.nextGaussian()*sQsimInstance.demandMean[currentStageIndex]* sQsimInstance.coe + sQsimInstance.demandMean[currentStageIndex] );
+		int demand = (int)Math.ceil(NormalDist.inverseF(sQsimInstance.demandMean[currentStageIndex], sQsimInstance.demandMean[currentStageIndex]*sQsimInstance.coe, randomno.nextDouble()));
+		//while(checkNormalDemand(demand, sQsimInstance, currentStageIndex) == false) {
+			//demand = (int) (randomno.nextGaussian()*sQsimInstance.demandMean[currentStageIndex]* sQsimInstance.coe + sQsimInstance.demandMean[currentStageIndex] );
+		//}
 		return -demand;
 	}
 	static boolean checkDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int demand, int currentStageIndex) {
@@ -185,9 +189,9 @@ public class sQsim {
 		int maxInventory = 500;
 		double coe = 0.25;
 		
-		int[] demandMean = {40};
-		int[] reorderPoint = {31};
-		int Q = 104;
+		int[] demandMean = {50, 30, 60, 20, 40, 50};
+		int[] reorderPoint = {49,22,60,12,35,41};
+		int Q = 91;
 		int[] actionQuantity = new int[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
 			actionQuantity[t] = Q;
