@@ -2,42 +2,44 @@ package sQ.simulation;
 
 import umontreal.ssj.stat.Tally;
 
-public class sQsimInstance {
+public class sQsimInstanceDouble {
+	
+	
 	/*** Problem instance ***/
 	public double fixedOrderingCost;
 	public double unitCost;
 	public double holdingCost;
 	public double penaltyCost;
-	public int[] demandMean;
-	public int initialInventory = 0;
-
+	
+	public double[] demandMean;
+	public double initialInventory = 0;
 
 	/** SDP boundary conditions **/
 	public double tail;
 
-	public int maxDemand;
-	public int minInventory;
-	public int maxInventory;
+	public double maxDemand;
+	public double minInventory;
+	public double maxInventory;
 
 	/** sQ replenishment quantity **/
-	public int[] actionQuantity;
-	public int[] reorderPoint;
+	public double[] actionQuantity;
+	public double[] reorderPoint;
 	
 	public double coe;
 	
 	public Tally statCost = new Tally("stats on cost");
 
-	public sQsimInstance(
+	public sQsimInstanceDouble(
 			double fixedOrderingCost,
 			double unitCost,
 			double holdingCost,
 			double penaltyCost,
-			int[] demandMean,
+			double[] demandMean,
 			double tail,
-			int minInventory,
-			int maxInventory,
-			int[] actionQuantity,
-			int[] reorderPoint,
+			double minInventory,
+			double maxInventory,
+			double[] actionQuantity,
+			double[] reorderPoint,
 			double coe) {
 		this.fixedOrderingCost = fixedOrderingCost;
 		this.unitCost = unitCost;
@@ -56,11 +58,13 @@ public class sQsimInstance {
 		return this.demandMean.length;
 	}
 
-	public int getActionQuantity(int currentStageIndex) {
+	public double getActionQuantity(int currentStageIndex) {
 		return this.actionQuantity[currentStageIndex];
 	}
 	
-	public int getInitialInventory() {
+	public double getInitialInventory() {
 		return this.initialInventory;
 	}
+
+
 }

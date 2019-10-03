@@ -8,8 +8,8 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import sQ.simulation.sQsim;
-import sQ.simulation.sQsimInstance;
+import sQ.simulation.sQsimPoisson;
+import sQ.simulation.sQsimInstanceInt;
 import sS.sdp.sS;
 import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;

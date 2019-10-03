@@ -148,7 +148,7 @@ public class sQgivenQ {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {40,60,40};
+
 
 		double tail = 0.00000001;
 
@@ -158,6 +158,9 @@ public class sQgivenQ {
 		
 		double stdParameter = 0.25;
 
+		int Q = 87;
+		int[] demandMean = {50,30,60,20,40,50};
+		
 		Instance instance = new Instance(
 				fixedOrderingCost,
 				unitCost,
@@ -171,7 +174,7 @@ public class sQgivenQ {
 				stdParameter
 				);
 		
-		int Q = 84;
+
 			
 		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
 		

@@ -1,7 +1,7 @@
 package sQt.sdp;
 
-import sQ.simulation.sQsim;
-import sQ.simulation.sQsimInstance;
+import sQ.simulation.sQsimPoisson;
+import sQ.simulation.sQsimInstanceInt;
 import sS.sdp.sS;
 import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;

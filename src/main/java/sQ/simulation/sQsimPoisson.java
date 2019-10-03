@@ -12,7 +12,7 @@ import umontreal.ssj.rng.MRG32k3a;
 import umontreal.ssj.rng.RandomStream;
 import umontreal.ssj.util.Chrono;
 
-public class sQsim {
+public class sQsimPoisson {
 	/**
 	 * Simulating an (s,Q) inventory system consists of the following serial events in one period:
 	 * 
@@ -33,7 +33,7 @@ public class sQsim {
 	}
 	
 	/** 2. compute purchasing cost according to action decision **/
-	static double computePurchasingCost(int actionDecision, int currentStageIndex, sQsimInstance sQsimInstance) {
+	static double computePurchasingCost(int actionDecision, int currentStageIndex, sQsimInstanceInt sQsimInstance) {
 		return actionDecision*(
 				sQsimInstance.fixedOrderingCost 
 				+ sQsimInstance.unitCost*sQsimInstance.getActionQuantity(currentStageIndex)
@@ -46,7 +46,7 @@ public class sQsim {
 	}
 	
 	/** 6. generate Poisson random number as demand **/
-	static int generateDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int currentStageIndex) {
+	static int generateDemand(int inventoryLevel, int actionDecision, sQsimInstanceInt sQsimInstance, int currentStageIndex) {
 		/*
 		int demand = getPoissonVariable(sQsimInstance.demandMean[currentStageIndex]);
 		while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand,currentStageIndex) == false) {
@@ -67,28 +67,8 @@ public class sQsim {
 		 
 	}
 	
-	static MRG32k3a randomno = new MRG32k3a();
-	
-	static int generateNormalDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int currentStageIndex) {
-		//int demand = (int) (randomno.nextGaussian()*sQsimInstance.demandMean[currentStageIndex]* sQsimInstance.coe + sQsimInstance.demandMean[currentStageIndex] );
-		int demand = (int)Math.ceil(NormalDist.inverseF(sQsimInstance.demandMean[currentStageIndex], sQsimInstance.demandMean[currentStageIndex]*sQsimInstance.coe, randomno.nextDouble()));
-		//while(checkNormalDemand(demand, sQsimInstance, currentStageIndex) == false) {
-			//demand = (int) (randomno.nextGaussian()*sQsimInstance.demandMean[currentStageIndex]* sQsimInstance.coe + sQsimInstance.demandMean[currentStageIndex] );
-		//}
-		return -demand;
-	}
-	static boolean checkDemand(int inventoryLevel, int actionDecision, sQsimInstance sQsimInstance, int demand, int currentStageIndex) {
+	static boolean checkDemand(int inventoryLevel, int actionDecision, sQsimInstanceInt sQsimInstance, int demand, int currentStageIndex) {
 		if(inventoryLevel -demand >= sQsimInstance.minInventory){
-			return true;
-		}else {
-			return false;
-		}
-	}
-	static boolean checkNormalDemand(int demand, sQsimInstance sQsimInstance, int currentStageIndex) {
-		NormalDistribution dist = new NormalDistribution(sQsimInstance.demandMean[currentStageIndex], sQsimInstance.coe*sQsimInstance.demandMean[currentStageIndex]);
-		int minDemand = (int) dist.inverseCumulativeProbability(sQsimInstance.tail);
-		int maxDemand = (int) dist.inverseCumulativeProbability(1-sQsimInstance.tail);
-		if((demand > minDemand) && (demand < maxDemand)){
 			return true;
 		}else {
 			return false;
@@ -115,7 +95,7 @@ public class sQsim {
 	
 	
 	/** 5. compute holding or penalty cost **/
-	static double computeClosingCost(int inventoryLevel, sQsimInstance sQsimInstance) {
+	static double computeClosingCost(int inventoryLevel, sQsimInstanceInt sQsimInstance) {
 		if(inventoryLevel >= 0) {//return holding cost
 			return inventoryLevel*sQsimInstance.holdingCost;
 		}else {//return penalty cost
@@ -123,7 +103,7 @@ public class sQsim {
 		}
 	}
 	
-	public static double simulatesQinstanceOneRun(sQsimInstance sQsimInstance, boolean print) {
+	public static double sQsimPoisson(sQsimInstanceInt sQsimInstance, boolean print) {
 
 		int inventoryLevel = sQsimInstance.getInitialInventory();
 		double cost = 0;
@@ -147,8 +127,7 @@ public class sQsim {
 			if(print == true) System.out.println("Updated inventory level is "+inventoryLevel);
 			
 			//4. generate, check and meet demand
-			//int demand = generateDemand(inventoryLevel, actionDecision, sQsimInstance, currentStageIndex); // as a negative
-			int demand = generateNormalDemand(inventoryLevel, actionDecision, sQsimInstance, currentStageIndex); // as a negative
+			int demand = generateDemand(inventoryLevel, actionDecision, sQsimInstance, currentStageIndex); // as a negative
 			if(print == true) System.out.println("Demand in this stage is "+(-demand));
 			
 			//update inventory level
@@ -169,9 +148,9 @@ public class sQsim {
 	}
 	
 	/** multiple run times **/
-	public static void simulationsQinstanceRuns(sQsimInstance sQsimInstance, int count) {
+	public static void sQsimPoissonMultiRuns(sQsimInstanceInt sQsimInstance, int count) {
 		for(int i=0; i<count; i++) {
-			sQsimInstance.statCost.add(simulatesQinstanceOneRun(sQsimInstance,false));
+			sQsimInstance.statCost.add(sQsimPoisson(sQsimInstance,false));
 		}
 	}
 
@@ -197,7 +176,7 @@ public class sQsim {
 			actionQuantity[t] = Q;
 		}
 
-		sQsimInstance sQsystem1 = new sQsimInstance(
+		sQsimInstanceInt sQsystem1 = new sQsimInstanceInt(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
@@ -214,7 +193,7 @@ public class sQsim {
 		Chrono timer = new Chrono();
 		
 		int count = 50000;
-		sQsim.simulationsQinstanceRuns(sQsystem1, count);
+		sQsimPoisson.sQsimPoissonMultiRuns(sQsystem1, count);
 		
 		sQsystem1.statCost.setConfidenceIntervalStudent();
 		System.out.println(sQsystem1.statCost.report(0.9, 3));
