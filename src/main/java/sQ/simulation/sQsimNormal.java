@@ -113,12 +113,12 @@ public class sQsimNormal {
 		int maxInventory = 500;
 		double coe = 0.25;
 		
-		//instance 5
-		
-		double[] demandMean = {50,30,60,20,40,50};
-		double[] reorderPoint = {49,22,60,12,35,41};
-		double Q = 90.765;
-		
+		//instance classic
+		/*
+		double[] demandMean = {20,40,60,40};
+		double[] reorderPoint = {15,30,57,30};
+		double Q = 168.56;
+		*/
 		
 		//instance 1
 		/*
@@ -127,12 +127,59 @@ public class sQsimNormal {
 		double Q = 157.27;
 		*/
 		
-		//instance classic
+		//instance2
 		/*
-		double[] demandMean = {20,40,60,40};
-		double[] reorderPoint = {15,30,57,30};
-		double Q = 168.56;
+		double [] demandMean = {40,20,60,20};
+		double[] reorder={53,13,40,10};
+		double Q = 145.09;
 		*/
+		
+		//instance 3
+		/*
+		double[] demandMean = {80};
+		double[] reorderPoint = {72};
+		double Q = 127.49;
+		*/
+		
+		//instance 4
+		/*
+		double[] demandMean = {30, 40, 60, 70, 50, 20};
+		double[] reorderPoint = {21,35,51,63,51,10};
+		double Q = 140.43;
+		*/
+		
+		//instance 5
+		/*
+		double[] demandMean = {50,30,60,20,40,50};
+		double[] reorderPoint = {49,22,60,12,35,41};
+		double Q = 90.765;
+		*/
+		
+		//instance 6
+		/*
+		double[] demandMean = {70,20,50,60,40,30};
+		double[] reorderPoint = {70,17,42,54,39,20};
+		double Q = 145.59;
+		*/
+		
+		//instance 7
+		/*
+		double[] demandMean = {30,40,60,70,50,20,40,60};
+		double[] reorderPoint = {23,35,55,64,46,13,34,52};
+		double Q = 139.58;
+		*/
+		
+		//instance 8
+		/*
+		double[] demandMean = {70,60,50,40,50,60,70,60};
+		double[] reorderPoint = {67,52,50,31,46,52,65,52};
+		double Q = 121.49;
+		*/
+		
+		//instance 9
+		double[] demandMean = {40};
+		double[] reorderPoint = {31};
+		double Q = 104.05;
 		
 		double[] actionQuantity = new double[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
