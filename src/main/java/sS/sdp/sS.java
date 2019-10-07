@@ -44,8 +44,8 @@ public class sS {
 
 	/** compute immediate cost with actions **/
 	public static double computeImmediateCost(
-			int inventoryLevel, 
-			int Actions, 
+			double inventoryLevel, 
+			double Actions, 
 			int demand,
 			double holdingCost, 
 			double penaltyCost, 

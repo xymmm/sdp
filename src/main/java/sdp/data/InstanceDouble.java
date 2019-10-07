@@ -8,7 +8,7 @@ public class InstanceDouble {
 	   public double unitCost;
 	   public double holdingCost;
 	   public double penaltyCost;
-	   public double[] demandMean;
+	   public int[] demandMean;
 	   public double initialInventory = 0;
 	   
 	   public double stdParameter;
@@ -17,7 +17,7 @@ public class InstanceDouble {
 	   /** SDP boundary conditions **/
 	   public double tail;
 	   
-	   public double maxDemand;
+	   public int maxDemand;
 	   public double minInventory;
 	   public double maxInventory;
 	   public double maxQuantity;
@@ -27,7 +27,7 @@ public class InstanceDouble {
 	         double unitCost,
 	         double holdingCost,
 	         double penaltyCost,
-	         double[] demandMean,
+	         int[] demandMean,
 	         double tail,
 	         double minInventory,
 	         double maxInventory,
