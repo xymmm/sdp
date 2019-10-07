@@ -158,8 +158,13 @@ public class sQgivenQ {
 		
 		double stdParameter = 0.25;
 
-		int Q = 87;
-		int[] demandMean = {50,30,60,20,40,50};
+		//instance classic
+		int Q=84;
+		int[] demandMean = {20,40,60,40};
+		
+		//instance 5
+		//int Q = 87;
+		//int[] demandMean = {50,30,60,20,40,50};
 		
 		Instance instance = new Instance(
 				fixedOrderingCost,
