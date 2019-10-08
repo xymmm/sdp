@@ -29,12 +29,15 @@ public class sQsimNormal {
 	/** 6. generate Normal demand, double**/
 	static MRG32k3a randomStream = new MRG32k3a();
 	
+	static {
+	   long seed[] = {1234,1234,1234,1234,1234,1234};
+	   randomStream.setSeed(seed);
+	}
+	
 	static double generateNormalDemand(double inventoryLevel, int actionDecision, sQsimInstanceDouble sQsimInstanceDouble, int currentStageIndex) {
-		//int demand = (int) (randomno.nextGaussian()*sQsimInstance.demandMean[currentStageIndex]* sQsimInstance.coe + sQsimInstance.demandMean[currentStageIndex] );
-		double refactor = 1-2*sQsimInstanceDouble.tail;//new mass
 		double demand = NormalDist.inverseF(sQsimInstanceDouble.demandMean[currentStageIndex], 
-				sQsimInstanceDouble.demandMean[currentStageIndex]*sQsimInstanceDouble.coe, randomStream.nextDouble()/refactor);
-		return -demand;
+				sQsimInstanceDouble.demandMean[currentStageIndex]*sQsimInstanceDouble.coe, randomStream.nextDouble());
+		return -Math.round(demand);
 	}
 	
 	/** 5. compute holding or penalty cost **/
@@ -50,7 +53,6 @@ public class sQsimNormal {
 
 		double inventoryLevel = sQsimInstanceDouble.getInitialInventory();
 		double cost = 0;
-		int actionDecision;
 		
 		int currentStageIndex = 0;
 		do {
@@ -58,7 +60,7 @@ public class sQsimNormal {
 			if(print == true) System.out.println("Current inventory level is "+inventoryLevel);
 			
 			//1 & 2 check inventory, place orders
-			actionDecision = checkInventory(sQsimInstanceDouble.reorderPoint[currentStageIndex], inventoryLevel);
+			int actionDecision = checkInventory(sQsimInstanceDouble.reorderPoint[currentStageIndex], inventoryLevel);
 			if(print == true) System.out.println((actionDecision == 1) ? "Replenishment order placed. ":"No order placed. ");
 			if(initialOrder == false) {
 				if(currentStageIndex == 0) actionDecision = 0;
@@ -149,11 +151,11 @@ public class sQsimNormal {
 		*/
 		
 		//instance 5
-		/*
 		double[] demandMean = {50,30,60,20,40,50};
-		double[] reorderPoint = {49,22,60,12,35,41};
-		double Q = 90.765;
-		*/
+		//double[] reorderPoint = {49,22,60,12,35,41};
+		//double Q = 90.765;
+		double[] reorderPoint = {45,23,56,13,34,34};
+      double Q = 87;
 		
 		//instance 6
 		/*
@@ -177,9 +179,11 @@ public class sQsimNormal {
 		*/
 		
 		//instance 9
+		/*
 		double[] demandMean = {40};
 		double[] reorderPoint = {31};
 		double Q = 104.05;
+		*/
 		
 		double[] actionQuantity = new double[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
@@ -201,7 +205,7 @@ public class sQsimNormal {
 		
 		Chrono timer = new Chrono();
 		
-		int count = 50000;
+		int count = 500000;
 		
 		sQsimNormal.sQsimNormalMultiRuns(sQsystem, count, true);
 		

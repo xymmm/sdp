@@ -167,8 +167,8 @@ public class sQgivenQ {
 		//int[] demandMean = {50,30,60,20,40,50};
 		
 		//instance 6
-		int[] demandMean = {70,20,50,60,40,30};
-		int Q = 141;
+		int[] demandMean = {50,30,60,20,40,50};
+		int Q = 87;
 		
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -189,13 +189,15 @@ public class sQgivenQ {
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
-		double[] costLimit = {20000, 15000, 10000, 5200};
+		double[] costLimit = {20000, 15000, 10000, 5200, 5200, 5200};
+		
+		System.out.println(sQgivenQ.costGivenQ[0][-instance.minInventory]);
 		
 		for(int t=0; t<costGivenQ.length;t++) {
 			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
-			//System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
-			System.out.println(sQgivenQ.costGivenQ[t][-instance.minInventory]);
-			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
+			System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
+		   //System.out.println(sQgivenQ.costGivenQ[t][-instance.minInventory]);
+			plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
 		/*
 		int[][] s = getsGivenQforAllQ(instance);

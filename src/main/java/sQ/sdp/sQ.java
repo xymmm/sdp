@@ -71,6 +71,7 @@ public class sQ {
 		double totalCost[][][] = new double[inventory.length][instance.maxQuantity+1][instance.getStages()];
 		boolean optimalAction[][][] = new boolean [inventory.length][instance.maxQuantity + 1][instance.getStages()];
 
+		// Fix a to 87
 		for(int a=0; a<instance.maxQuantity+1;a++) { //"a" represents the action index, so the actual action volume is a+1
 			for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 				for(int i=0;i<inventory.length;i++) { // Inventory   
@@ -132,7 +133,7 @@ public class sQ {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int[] demandMean = {70,20,50,60,40,30};
+		int[] demandMean = {50,30,60,20,40,50};
 
 		double tail = 0.00000001;
 
@@ -172,7 +173,7 @@ public class sQ {
 		
 		System.out.println();
 		for(int a=0; a<=200; a++) {
-			System.out.println(sQsolution.totalCost[instance.initialInventory - instance.minInventory][a][0]);
+			System.out.println("a: " + a + "\t" + sQsolution.totalCost[instance.initialInventory - instance.minInventory][a][0]);
 		}
 
 		/** Simulations *
