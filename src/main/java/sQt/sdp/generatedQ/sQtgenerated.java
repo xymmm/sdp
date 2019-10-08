@@ -172,8 +172,12 @@ public class sQtgenerated {
 			writeToText(g, totalCost[(int) -instance.minInventory][0]);
 		}//g
 		
+		long terminalTime = System.currentTimeMillis();
+		System.out.println("total time consumed = "+(terminalTime - startTime)+" ms");
+		
 		return new sQtgeneratedSolution(inventory, minCost, optQ);
 	}
+	
 	
 	public static void main(String[] args) {
 		
@@ -215,6 +219,11 @@ public class sQtgenerated {
 			System.out.println();
 		}
 		*/
+		
+		System.out.println("C(I_0 = 0) = "+solution.minCost[(int) -instance.minInventory]);
+		for(int t=0; t<instance.getStages();t++) {
+			System.out.println("Q["+(t+1)+"]= "+solution.optQ[(int) -instance.minInventory][t]);
+		}
 	}
 	
 

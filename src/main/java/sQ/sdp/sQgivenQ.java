@@ -159,12 +159,16 @@ public class sQgivenQ {
 		double stdParameter = 0.25;
 
 		//instance classic
-		int Q=84;
-		int[] demandMean = {20,40,60,40};
+		//int Q=84;
+		//int[] demandMean = {20,40,60,40};
 		
 		//instance 5
 		//int Q = 87;
 		//int[] demandMean = {50,30,60,20,40,50};
+		
+		//instance 6
+		int[] demandMean = {70,20,50,60,40,30};
+		int Q = 141;
 		
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -187,7 +191,6 @@ public class sQgivenQ {
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		double[] costLimit = {20000, 15000, 10000, 5200};
 		
-		//System.out.println("Reorder points with Q="+Q+" is:");
 		for(int t=0; t<costGivenQ.length;t++) {
 			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
 			//System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
