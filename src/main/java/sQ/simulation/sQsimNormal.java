@@ -116,11 +116,11 @@ public class sQsimNormal {
 		double coe = 0.25;
 		
 		//instance classic
-		/*
+		
 		double[] demandMean = {20,40,60,40};
 		double[] reorderPoint = {15,30,57,30};
 		double Q = 168.56;
-		*/
+		
 		
 		//instance 1
 		/*
@@ -151,11 +151,11 @@ public class sQsimNormal {
 		*/
 		
 		//instance 5
-		double[] demandMean = {50,30,60,20,40,50};
+		//double[] demandMean = {50,30,60,20,40,50};
 		//double[] reorderPoint = {49,22,60,12,35,41};
 		//double Q = 90.765;
-		double[] reorderPoint = {45,23,56,13,34,34};
-      double Q = 87;
+		//double[] reorderPoint = {45,23,56,13,34,34};
+		//double Q = 87;
 		
 		//instance 6
 		/*

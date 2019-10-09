@@ -159,16 +159,16 @@ public class sQgivenQ {
 		double stdParameter = 0.25;
 
 		//instance classic
-		//int Q=84;
-		//int[] demandMean = {20,40,60,40};
+		int Q = 164;
+		int[] demandMean = {20,40,60,40};
 		
 		//instance 5
 		//int Q = 87;
 		//int[] demandMean = {50,30,60,20,40,50};
 		
 		//instance 6
-		int[] demandMean = {50,30,60,20,40,50};
-		int Q = 87;
+		//int[] demandMean = {50,30,60,20,40,50};
+		//int Q = 87;
 		
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -183,13 +183,11 @@ public class sQgivenQ {
 				stdParameter
 				);
 		
-
-			
 		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
-		double[] costLimit = {20000, 15000, 10000, 5200, 5200, 5200};
+		double[] costLimit = {20000, 15000, 10000, 5200};
 		
 		System.out.println(sQgivenQ.costGivenQ[0][-instance.minInventory]);
 		
