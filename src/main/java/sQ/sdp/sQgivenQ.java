@@ -159,12 +159,12 @@ public class sQgivenQ {
 		double stdParameter = 0.25;
 
 		//instance classic
-		int Q = 168;
-		int[] demandMean = {20,40,60,40};
+		//int Q = 84;
+		//int[] demandMean = {20,40,60,40};
 		
 		//instance 5
-		//int Q = 87;
-		//int[] demandMean = {50,30,60,20,40,50};
+		int Q = 91;
+		int[] demandMean = {50,30,60,20,40,50};
 		
 		//instance 6
 		//int[] demandMean = {50,30,60,20,40,50};
@@ -193,7 +193,7 @@ public class sQgivenQ {
 		
 		for(int t=0; t<costGivenQ.length;t++) {
 			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
-			//System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
+			System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
 		    System.out.println(sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
