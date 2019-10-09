@@ -33,7 +33,7 @@ public class sQ {
 	/** print cost of optimal quantity **/
 	public static void printOpitmalCost(Instance instance, sQsolution sQsolution){
 		System.out.println("Optimal cost with initial inventory level " +(instance.initialInventory)+" is: ");
-		System.out.println(sQsolution.totalCost[instance.initialInventory-instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][0]);
+		System.out.println(sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][0]);
 	}
 
 	/** Plot costs - cost with no action and with a given Q for a given stage**/
@@ -60,7 +60,7 @@ public class sQ {
 	}
 
 	/** main computation **/
-	public static sQsolution solvesQInstance(Instance instance, boolean initialOrder) {
+	public static sQsolution solvesQInstance(Instance instance) {
 
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
@@ -68,8 +68,8 @@ public class sQ {
 		}
 		
 		//demandProbabilities[stages][demandValue] = Prob(dt = demandValue), dt is the realized demand of the random varuable d_t
-		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
-		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean[t], instance.stdParameter, instance.maxDemand, instance.tail); //Normal
+		//double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
+		double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
 		
 		double totalCost[][][] = new double[inventory.length][instance.maxQuantity+1][instance.getStages()];
 		boolean optimalAction[][][] = new boolean [inventory.length][instance.maxQuantity + 1][instance.getStages()];
@@ -99,6 +99,7 @@ public class sQ {
 						}
 					}
 					totalCostOrder /= scenarioProb;
+					//if((a==0)&&(i==-instance.minInventory)) System.out.println("t="+t+" cost order = "+totalCostOrder);//check if a=0 == costNoOrder
 
 					/** a = 0**/
 					double totalCostNoOrder = 0;
@@ -120,6 +121,7 @@ public class sQ {
 						}
 					}
 					totalCostNoOrder /= scenarioProb;
+					//if((a==0)&&(i==-instance.minInventory)) System.out.println("t="+t+" cost no order = "+totalCostNoOrder);//check if a=0 == costNoOrder
 					
 					totalCost[i][a][t] = Math.min(totalCostNoOrder, totalCostOrder);
 					optimalAction[i][a][t] = totalCostNoOrder < totalCostOrder ? false : true;
@@ -161,7 +163,7 @@ public class sQ {
 				);
 
 		/** Solve the classic instance **/
-		sQsolution sQsolution = solvesQInstance(instance,true);
+		sQsolution sQsolution = solvesQInstance(instance);
 		
 		/*
 		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];
@@ -176,12 +178,17 @@ public class sQ {
 		presentsQresults(instance, sQsolution);
 		
 		System.out.println();
-
-		System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t" + sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][0] +" ");
-		System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t" + sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][1] +" ");
-		System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t" + sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][2] +" ");
-		System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t" + sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][3] +" ");
-
+		
+		for(int t=0; t<instance.getStages();t++) {
+			System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t" + "t: "+ t+ "\t" + sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][t] +" ");
+		}
+		
+		/*
+		for(int i=0; i<sQsolution.inventory.length;i++) {
+			System.out.println("i: "+ (i+instance.minInventory) + "\t" + sQsolution.totalCost[i][sQsolution.getOpt_aSQ(instance)+1][0]);
+		}
+		*/
+		
 
 	}
 
