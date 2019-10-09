@@ -54,7 +54,7 @@ public class sQtest_singleQ {
 	   public void testInstanceClassic() {
 	      Instance instance = getInstanceClassic();
 	      
-	     sQsolution sQsolution = sQ.solvesQInstance(instance);
+	     sQsolution sQsolution = sQ.solvesQInstance(instance,false);
 	      
 	     /*
 	      double expectedTotalCost = 2500.0;
@@ -107,7 +107,7 @@ public class sQtest_singleQ {
 	   public void testInstanceA() {
 	      Instance instance = getInstanceA();
 	      
-	      sQsolution sQsolution = sQ.solvesQInstance(instance);
+	      sQsolution sQsolution = sQ.solvesQInstance(instance,false);
 	      
 	      double expectedTotalCost = 9.571778965387995E20;
 	      assertEquals(
@@ -151,7 +151,7 @@ public class sQtest_singleQ {
 	   public void testInstanceB() {
 	      Instance instance = getInstanceB();
 	      
-	      sQsolution sQsolution = sQ.solvesQInstance(instance);
+	      sQsolution sQsolution = sQ.solvesQInstance(instance,false);
 	      
 	      double expectedTotalCost = 1.2041562679020247E28;
 	      assertEquals(
@@ -195,7 +195,7 @@ public class sQtest_singleQ {
 	   public void testInstanceC() {
 	      Instance instance = getInstanceC();
 	      
-	      sQsolution sQsolution = sQ.solvesQInstance(instance);
+	      sQsolution sQsolution = sQ.solvesQInstance(instance,false);
 	      
 	      double expectedTotalCost = 2.3525420541466773E23;
 	      assertEquals(

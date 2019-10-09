@@ -60,7 +60,7 @@ public class sQ {
 	}
 
 	/** main computation **/
-	public static sQsolution solvesQInstance(Instance instance) {
+	public static sQsolution solvesQInstance(Instance instance, boolean initialOrder) {
 
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
@@ -73,27 +73,27 @@ public class sQ {
 		
 		double totalCost[][][] = new double[inventory.length][instance.maxQuantity+1][instance.getStages()];
 		boolean optimalAction[][][] = new boolean [inventory.length][instance.maxQuantity + 1][instance.getStages()];
-
-		// Fix a to 87
-		//int a = 87;
+		
+		int Q;
 		for(int a=0; a<instance.maxQuantity+1;a++) { //"a" represents the action index, so the actual action volume is a+1
 			for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 				for(int i=0;i<inventory.length;i++) { // Inventory   
 					/** a > 0 **/
+					Q = ((t==0)&&(!initialOrder))? 0: a;
 					double totalCostOrder = sS.computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost); 
 					double scenarioProb = 0;
 					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
-						if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
+						if((inventory[i] + Q - d <= instance.maxInventory) && (inventory[i] + Q - d >= instance.minInventory)) {
 							totalCostOrder += demandProbabilities[t][d]*(
 									sS.computeImmediateCost(
 											inventory[i], 
-											a, 
+											Q, 
 											d, 
 											instance.holdingCost, 
 											instance.penaltyCost, 
 											instance.fixedOrderingCost, 
 											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : totalCost[i+a-d][a][t+1]) 
+									+ ((t==instance.getStages()-1) ? 0 : totalCost[i+Q-d][Q][t+1]) 
 									);
 							scenarioProb += demandProbabilities[t][d];
 						}
@@ -115,7 +115,7 @@ public class sQ {
 											instance.penaltyCost, 
 											instance.fixedOrderingCost, 
 											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : totalCost[i-d][a][t+1]) /**MAJOR CHANGE: second index a -> 0**/
+									+ ((t==instance.getStages()-1) ? 0 : totalCost[i-d][a][t+1]) 
 									);
 							scenarioProb += demandProbabilities[t][d];
 						}
@@ -139,10 +139,6 @@ public class sQ {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		//instance classic
-		//int[] demandMean = {20,40,60,40};
-		//instance 5
-		int[] demandMean = {50,30,60,20,40,50};
 
 		double tail = 0.00000001;
 
@@ -151,6 +147,12 @@ public class sQ {
 		int maxQuantity = 500;
 		
 		double stdParameter = 0.25;
+		
+		//instance classic
+		int[] demandMean = {20,40,60,40};
+		
+		//instance 5
+		//int[] demandMean = {50,30,60,20,40,50};
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -166,7 +168,7 @@ public class sQ {
 				);
 
 		/** Solve the classic instance **/
-		sQsolution sQsolution = solvesQInstance(instance);
+		sQsolution sQsolution = solvesQInstance(instance,true);
 		
 		/*
 		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];
@@ -181,7 +183,6 @@ public class sQ {
 		presentsQresults(instance, sQsolution);
 		
 		System.out.println();
-		
 		for(int t=0; t<instance.getStages();t++) {
 			System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t"
 								+ "t: "+ (t+1)+ "\t"  
