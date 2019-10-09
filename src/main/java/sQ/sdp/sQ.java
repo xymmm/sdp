@@ -180,7 +180,9 @@ public class sQ {
 		System.out.println();
 		
 		for(int t=0; t<instance.getStages();t++) {
-			System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t" + "t: "+ t+ "\t" + sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][t] +" ");
+			System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t"
+								+ "t: "+ (t+1)+ "\t"  
+								+sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][t]);
 		}
 		
 		/*

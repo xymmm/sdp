@@ -159,7 +159,7 @@ public class sQgivenQ {
 		double stdParameter = 0.25;
 
 		//instance classic
-		int Q = 164;
+		int Q = 168;
 		int[] demandMean = {20,40,60,40};
 		
 		//instance 5
@@ -187,7 +187,7 @@ public class sQgivenQ {
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
-		double[] costLimit = {20000, 15000, 10000, 5200};
+		//double[] costLimit = {20000, 15000, 10000, 5200};
 		
 		//System.out.println(sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
 		
@@ -197,20 +197,6 @@ public class sQgivenQ {
 		    System.out.println(sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
-		/*
-		int[][] s = getsGivenQforAllQ(instance);
-		for(int t=0; t<instance.getStages();t++) {
-			 plotsGivenQforAllQ(s, instance, t);
-		}
-		System.out.println();
-		for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {
-			System.out.println(sQgivenQ.costGivenQ[0][i]);
-		}
-		
-		for(int t=0; t<instance.getStages();t++) {
-			System.out.println(sQgivenQ.getMinCost(instance, sQgivenQ, t));
-			System.out.println(sQgivenQ.getMinCostIndex(instance, sQgivenQ, t));
-		}*/
 
 		
 		
