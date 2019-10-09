@@ -187,9 +187,10 @@ public class sQgivenQ {
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
-		//double[] costLimit = {20000, 15000, 10000, 5200};
+		double[] costLimit = {20000, 15000, 10000, 5200};
 		
 		//System.out.println(sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
+		plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, 0, instance,costLimit[0]);
 		
 		for(int t=0; t<costGivenQ.length;t++) {
 			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);

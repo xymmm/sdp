@@ -17,7 +17,7 @@ Optimal Q for all periods is:
 84
 Optimal cost with initial inventory level 0 is: 
 391.6271119055776
-a: 84	t: 0	【391.6271119055776】 
+a: 84	t: 0	391.6271119055776
 a: 84	t: 1	345.76188020635465 
 a: 84	t: 2	246.0787912893067 
 a: 84	t: 3	143.99902660282834 
@@ -26,23 +26,23 @@ a: 84	t: 3	143.99902660282834
 
 
 sQgivenQ.java
-Q = 84
-【391.6271119055776】
-345.76188020635465
-246.0787912893067
-143.99902660282834
+Expected cost for initial inventory level 0 when
+t:1		391.6271119055776
+t:2		345.76188020635465
+t:3		246.0787912893067
+t:4		143.99902660282834
 s = {13,35,57,24}
 ====>>>>simulation table
 REPORT on Tally stat. collector ==> stats on cost
     num. obs.      min          max        average     variance    standard dev.
-    500000      261.000     1330.000      【391.669】     3219.221       56.738
+    500000      261.000     1330.000      391.669     3219.221       56.738
   90.0% conf. interval for the mean (Student approx.): (   391.537,   391.801 )
 
 
 
   
 【MINLP - delta1 = 1】
-// solution (optimal) with objective 【398.750871996883】
+// solution (optimal) with objective 398.750871996883
 // Quality Incumbent solution:
 // MILP objective                                 3.9875087200e+02
 // MILP solution norm |x| (Total, Max)            4.95482e+02  8.37428e+01
@@ -57,7 +57,7 @@ purchase = [1
 stockhlb = [0 63.912 24.122 47.994 11.546];
 stockplb = [0 0.16953 0.37907 0.50858 4.0605];
 stock = [0 63.743 23.743 47.486 7.4855];
-【Q = 83.743】;
+Q = 83.743;
 P = [[1 1 0 0]
              [0 0 0 0]
              [0 0 1 1]
@@ -67,5 +67,5 @@ P = [[1 1 0 0]
 simulation MINLP results:
 REPORT on Tally stat. collector ==> stats on cost
     num. obs.      min          max        average     variance    standard dev.
-    500000      259.972     1337.196      【394.282】     2994.778       54.725
+    500000      259.972     1337.196      394.282     2994.778       54.725
   90.0% conf. interval for the mean (Student approx.): (   394.155,   394.409 )

@@ -15,7 +15,7 @@ Optimal Q for all periods is:
 91
 Optimal cost with initial inventory level 0 is: 
 550.4268567907682
-a: 91	t: 1	【550.4268567907682】
+a: 91	t: 1	550.4268567907682
 a: 91	t: 2	536.9018577299911
 a: 91	t: 3	372.28862204337815
 a: 91	t: 4	344.45666540594766
@@ -25,18 +25,19 @@ a: 91	t: 6	141.0173828586379
 
 
 sQgivenQ.java
-【550.4268567907682】
-536.9018577299911
-372.28862204337815
-344.45666540594766
-215.3435883986378
-141.0173828586379
+Expected cost for initial inventory level 0 when
+t:1		550.4268567907682
+t:2		536.9018577299911
+t:3		372.28862204337815
+t:4		344.45666540594766
+t:5		215.3435883986378
+t:6		141.0173828586379
 s={45,23,55,12,34,34}
 ==================>>>>>>>>>Simulation table
 REPORT on Tally stat. collector ==> stats on cost
     num. obs.      min          max        average     variance    standard dev.
-    500000      380.000     1253.000      【550.489】     5603.866       74.859
-  90.0% conf. interval for the mean (Student approx.): 【(   550.315,   550.663 )】
+    500000      380.000     1253.000      550.489    5603.866       74.859
+  90.0% conf. interval for the mean (Student approx.): (   550.315,   550.663 )
   
   
   
@@ -56,7 +57,7 @@ purchase = [1
 stockhlb = [0 41.416 13.349 42.493 22.654 73.316 23.52];
 stockplb = [0 0.42381 2.3569 0.50858 0.66932 0.33905 0.54275];
 stock = [0 40.992 10.992 41.985 21.985 72.977 22.977];
-【Q = 90.992;】
+Q = 90.992;
 P = [[1 1 0 0 0 0]
              [0 0 0 0 0 0]
              [0 0 1 1 0 0]
@@ -64,3 +65,8 @@ P = [[1 1 0 0 0 0]
              [0 0 0 0 1 1]
              [0 0 0 0 0 0]];
 ==================>>>>>>>>>>>>>reorderPoint = {50,21,59,11,34,41}
+Simulations:
+REPORT on Tally stat. collector ==> stats on cost
+    num. obs.      min          max        average     variance    standard dev.
+    500000      391.168     1272.144      553.003     5417.487       73.604
+  90.0% conf. interval for the mean (Student approx.): (   552.832,   553.174 )

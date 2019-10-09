@@ -115,7 +115,7 @@ public class sQ {
 											instance.penaltyCost, 
 											instance.fixedOrderingCost, 
 											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : totalCost[i-d][a][t+1]) 
+									+ ((t==instance.getStages()-1) ? 0 : totalCost[i-d][a][t+1]) /** changed from totalCost[i-d][0][t+1] **/
 									);
 							scenarioProb += demandProbabilities[t][d];
 						}
