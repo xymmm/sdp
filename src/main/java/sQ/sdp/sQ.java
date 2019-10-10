@@ -168,7 +168,7 @@ public class sQ {
 				);
 
 		/** Solve the classic instance **/
-		sQsolution sQsolution = solvesQInstance(instance,true);
+		sQsolution sQsolution = solvesQInstance(instance,false);
 		
 		/*
 		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];

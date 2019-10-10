@@ -159,7 +159,7 @@ public class sQgivenQ {
 		double stdParameter = 0.25;
 
 		//instance classic
-		int Q = 84;
+		int Q = 171;
 		int[] demandMean = {20,40,60,40};
 		
 		//instance 5
@@ -183,7 +183,7 @@ public class sQgivenQ {
 				stdParameter
 				);
 		
-		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
+		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
@@ -194,10 +194,15 @@ public class sQgivenQ {
 		
 		for(int t=0; t<costGivenQ.length;t++) {
 			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
-			System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
-		    System.out.println(sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
+			//System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
+		    System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
+		System.out.print("reorderPoints = {");
+		for(int t=0; t<costGivenQ.length;t++) {
+			System.out.print(sGivenQ[t]);
+			if(t<costGivenQ.length-1)System.out.print(",");
+		}System.out.print("}");
 
 		
 		
