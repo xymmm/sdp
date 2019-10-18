@@ -8,6 +8,9 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import ilog.concert.IloException;
+import ilog.concert.IloNumVar;
+import ilog.cplex.IloCplex;
 import sQ.simulation.sQsimPoisson;
 import sQ.simulation.sQsimInstanceInt;
 import sS.sdp.sS;
@@ -144,7 +147,7 @@ public class sQ {
 
 		int minInventory = -500;
 		int maxInventory = 500;
-		int maxQuantity = 500;
+		int maxQuantity = 9;
 		
 		double stdParameter = 0.25;
 		
@@ -168,7 +171,7 @@ public class sQ {
 				);
 
 		/** Solve the classic instance **/
-		sQsolution sQsolution = solvesQInstance(instance,false);
+		sQsolution sQsolution = solvesQInstance(instance,true);
 		
 		/*
 		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];
@@ -182,6 +185,7 @@ public class sQ {
 
 		presentsQresults(instance, sQsolution);
 		
+		/*
 		System.out.println();
 		for(int t=0; t<instance.getStages();t++) {
 			System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t"
@@ -193,7 +197,17 @@ public class sQ {
 		for(int i=0; i<sQsolution.inventory.length;i++) {
 			System.out.println("i: "+ (i+instance.minInventory) + "\t" + sQsolution.totalCost[i][sQsolution.getOpt_aSQ(instance)+1][0]);
 		}
+		
+		
+		for(int a=0; a<201;a++) {
+			System.out.println(sQsolution.totalCost[instance.initialInventory - instance.minInventory][a][0]);
+		}
 		*/
+		
+		
+		
+
+		
 		
 
 	}

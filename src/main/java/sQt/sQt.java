@@ -1,4 +1,4 @@
-package sQt.sdp;
+package sQt;
 
 import sQ.simulation.sQsimPoisson;
 import sQ.simulation.sQsimInstanceInt;

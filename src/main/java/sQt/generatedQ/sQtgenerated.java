@@ -1,4 +1,4 @@
-package sQt.sdp.generatedQ;
+package sQt.generatedQ;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -164,12 +164,12 @@ public class sQtgenerated {
 			
 			//update computation status
 			long endTime=System.currentTimeMillis();
-			System.out.println("Computation completed for generator = "+g);
+			if(g%1000 == 0) System.out.println("Computation completed for generator = "+g);
 			//System.out.println("For I0 = 0: ETC = "+totalCost[(int) -instance.minInventory][0]);
 			//System.out.println("Total comsumed time = "+(endTime - startTime)+" ms");
 			//System.out.println("Consumed time for single combination = "+(endTime-singleTime)+" ms");
 			//System.out.println("---------------------------------------------------------");
-			writeToText(g, totalCost[(int) -instance.minInventory][0]);
+			//writeToText(g, totalCost[(int) -instance.minInventory][0]);
 		}//g
 		
 		long terminalTime = System.currentTimeMillis();
@@ -194,7 +194,7 @@ public class sQtgenerated {
 		
 		double stdParameter = 0.25;
 		
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {20,40,60,40,20,40,60,40};
 		
 		InstanceDouble instance = new InstanceDouble(
 		         fixedOrderingCost,

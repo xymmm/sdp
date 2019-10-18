@@ -1,4 +1,4 @@
-package sQt.sdp.generatedQ;
+package sQt.generatedQ;
 
 public class sQtgeneratedSolution {
 	

@@ -117,12 +117,15 @@ public class sQsimNormal {
 		
 		//instance classic
 		double[] demandMean = {20,40,60,40};
-		double[] reorderPoint = {16,30,57,30};//MINLP
+		//double[] reorderPoint = {16,30,57,30};//MINLP p4
+		//double[] reorderPoint = {16, 30, 58, 29}; //MINLP p10
 		//double Q = 83.743;
 		//double[] reorderPoint = {13,35,57,24};//SDP
 		//double Q = 84;
-		double Q = 171;
+		//double Q = 171;
 		//double[] reorderPoint = {0,25,46,16};
+		double Q = 9;
+		double[] reorderPoint = {139, 124, 88, 31};
 		
 		
 		//instance 1
@@ -210,7 +213,7 @@ public class sQsimNormal {
 		
 		int count = 500000;
 		
-		sQsimNormal.sQsimNormalMultiRuns(sQsystem, count, false);
+		sQsimNormal.sQsimNormalMultiRuns(sQsystem, count, true);
 		
 		sQsystem.statCost.setConfidenceIntervalStudent();
 		System.out.println(sQsystem.statCost.report(0.9, 3));

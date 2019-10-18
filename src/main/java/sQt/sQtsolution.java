@@ -1,4 +1,4 @@
-package sQt.sdp;
+package sQt;
 
 import sdp.data.Instance;
 

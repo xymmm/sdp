@@ -225,7 +225,7 @@ public class sS {
 
 		int minInventory = -500;
 		int maxInventory = 500;
-		int maxQuantity = 500;
+		int maxQuantity = 500;//9;
 		
 		double stdParameter = 0.25;
 
@@ -242,7 +242,7 @@ public class sS {
 										stdParameter
 										);
 
-		sSsolution solution = solveInstance(instance, false);	//with initial order 
+		sSsolution solution = solveInstance(instance, true);	//with initial order 
 
 		presentsSresults(solution, instance);
 

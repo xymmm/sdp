@@ -46,17 +46,6 @@ public class sQgivenQ {
 			frame.setSize(1800,1500);
 	}
 	
-	/**solve reorder points for all feasible Q**/
-	public static int[][] getsGivenQforAllQ(Instance instance){
-		int[][] s = new int [instance.maxQuantity][instance.getStages()];
-		for(int q=0; q<instance.maxQuantity;q++) {
-			sQgivenQsolution sQgivenQ = costVaryingWithInventory((q+1), instance,false);
-			for(int t=0; t<instance.getStages();t++) {
-				s[q][t] = sQgivenQ.getsGivenQ(instance, sQgivenQ)[t];
-			}
-		}
-		return s;
-	}
 	/**plot reorder points varying with Q**/
 	public static void plotsGivenQforAllQ(int[][] s, Instance instance, int stageIndex) {
 		XYSeries series = new XYSeries("reorder point with Given Qs");
@@ -154,12 +143,12 @@ public class sQgivenQ {
 
 		int minInventory = -500;
 		int maxInventory = 500;
-		int maxQuantity = 500;
+		int maxQuantity = 9;
 		
 		double stdParameter = 0.25;
 
 		//instance classic
-		int Q = 171;
+		int Q = 8;
 		int[] demandMean = {20,40,60,40};
 		
 		//instance 5
@@ -183,26 +172,38 @@ public class sQgivenQ {
 				stdParameter
 				);
 		
-		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
+		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		double[] costLimit = {20000, 15000, 10000, 5200};
 		
 		//System.out.println(sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
-		plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, 0, instance,costLimit[0]);
+		//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, 0, instance,costLimit[0]);
 		
 		for(int t=0; t<costGivenQ.length;t++) {
 			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
 			//System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
 		    System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
-			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
+			plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
+		
 		System.out.print("reorderPoints = {");
 		for(int t=0; t<costGivenQ.length;t++) {
 			System.out.print(sGivenQ[t]);
 			if(t<costGivenQ.length-1)System.out.print(",");
 		}System.out.print("}");
+		
+		/* print costs for MATLAB plots
+		for(int t=0;t<instance.getStages();t++) {
+			System.out.println("t="+t+"===========================================================");
+			for(int i=instance.initialInventory-instance.minInventory;i<instance.initialInventory-instance.minInventory+201;i++) {
+				System.out.println(sQgivenQ.costOrder[t][i]);
+			}System.out.println();
+			for(int i=instance.initialInventory-instance.minInventory;i<instance.initialInventory-instance.minInventory+201;i++) {
+				System.out.println(sQgivenQ.costNoOrder[t][i]);
+			}System.out.println();
+		}*/
 
 		
 		
