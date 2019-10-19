@@ -68,8 +68,7 @@ public class period25runs {
 			e.printStackTrace();
 		}
 		PrintWriter pw = new PrintWriter(fw);
-		pw.println(initialOrder);
-		pw.println(initialOrder + "        "+results[0]+"       "+ results[1] +"       "+results[2] +"       "+"\r\n");
+		pw.println(initialOrder + "     "+results[0]+"     "+ results[1] +"     "+results[2]);
 		/*
 		for(int t=0; t<instance.getStages();t++) {
 			pw.print(s[t]+"   ");
@@ -104,13 +103,13 @@ public class period25runs {
 				{122,130,120,98,77,70,81,103,124,130,118,95,75,71,84,107,126,129,115,91,73,72,87,110,127},				//SIN2
 				{100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100},	//STA
 				{178,178,136,211,119,165,47,100,62,31,43,199,172,96,69,8,29,135,97,70,248,57,11,94,13},					//RAND
-				{2,51,152,467,268,489,446,248,281,363,155,293,220,93,107,234,124,184,223,101,123,99,31,82,0},			//EMP1
-				{47,81,236,394,164,287,508,391,754,694,261,195,320,111,191,160,55,84,58,0,0,0,0,0,0},					//EMP2
-				{44,116,264,144,146,198,74,183,204,114,165,318,119,482,534,136,260,299,76,218,323,102,174,284,0},		//EMP3
-				{49,188,64,279,453,224,223,517,291,547,646,224,215,440,116,185,211,26,55,0,0,0,0,0,0}					//EMP4
+				{2,51,152,467,268,489,446,248,281,363,155,293,220,93,107,234,124,184,223,101,123,99,31,82},			//EMP1
+				{47,81,236,394,164,287,508,391,754,694,261,195,320,111,191,160,55,84,58},					//EMP2
+				{44,116,264,144,146,198,74,183,204,114,165,318,119,482,534,136,260,299,76,218,323,102,174,284},		//EMP3
+				{49,188,64,279,453,224,223,517,291,547,646,224,215,440,116,185,211,26,55}					//EMP4
 				};
 		
-		System.out.println("total number = "+penaltyCost.length * unitCost.length * fixedCost.length * stdParameter.length * demandMeans.length * 2);
+		System.out.println("total number = "+penaltyCost.length * unitCost.length * fixedCost.length * stdParameter.length * demandMeans.length);
 		int count = 1;
 		
 		for(int p=0; p<penaltyCost.length; p++) {
@@ -131,7 +130,7 @@ public class period25runs {
 								
 								cost = period25costs(instance, false);
 								//s = period25reorderPoints(instance, cost, false);
-								writeToTextResults(instance, cost, false);
+								//writeToTextResults(instance, cost, false);
 								
 								//status
 								System.out.println(count);
