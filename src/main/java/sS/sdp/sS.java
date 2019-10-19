@@ -244,7 +244,7 @@ public class sS {
 
 		sSsolution solution = solveInstance(instance, true);	//with initial order 
 
-		presentsSresults(solution, instance);
+		//presentsSresults(solution, instance);
 
 		System.out.println();
 		//for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {

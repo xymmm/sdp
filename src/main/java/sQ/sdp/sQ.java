@@ -138,21 +138,21 @@ public class sQ {
 
 		Chrono timer = new Chrono();
 
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 200;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		double penaltyCost = 5;
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
-		int maxQuantity = 9;
+		int minInventory = -1000;
+		int maxInventory = 1000;
+		int maxQuantity = 1000;
 		
-		double stdParameter = 0.25;
+		double stdParameter = 0.1;
 		
 		//instance classic
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11};
 		
 		//instance 5
 		//int[] demandMean = {50,30,60,20,40,50};
@@ -171,7 +171,7 @@ public class sQ {
 				);
 
 		/** Solve the classic instance **/
-		sQsolution sQsolution = solvesQInstance(instance,true);
+		sQsolution sQsolution = solvesQInstance(instance,false);
 		
 		/*
 		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];
