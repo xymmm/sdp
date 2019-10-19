@@ -130,7 +130,7 @@ public class period25runs {
 								
 								cost = period25costs(instance, false);
 								//s = period25reorderPoints(instance, cost, false);
-								//writeToTextResults(instance, cost, false);
+								writeToTextResults(instance, cost, false);
 								
 								//status
 								System.out.println(count);
