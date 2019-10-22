@@ -1,4 +1,4 @@
-package sQt;
+package sQt_4periods;
 
 import sQ.simulation.sQsimPoisson;
 import sQ.simulation.sQsimInstanceInt;

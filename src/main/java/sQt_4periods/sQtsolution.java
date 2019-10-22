@@ -1,4 +1,4 @@
-package sQt;
+package sQt_4periods;
 
 import sdp.data.Instance;
 

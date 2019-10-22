@@ -194,7 +194,7 @@ public class sQtgenerated {
 		
 		double stdParameter = 0.25;
 		
-		int[] demandMean = {20,40,60,40,20,40,60,40};
+		int[] demandMean = {20,40,60,40};
 		
 		InstanceDouble instance = new InstanceDouble(
 		         fixedOrderingCost,
