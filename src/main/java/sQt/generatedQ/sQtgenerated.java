@@ -98,8 +98,8 @@ public class sQtgenerated {
 			inventory[i] = i + instance.minInventory;
 		}
 		//demand
-		double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
-		
+		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
 
 		//totalCost[i][t] stores the values of costs for an inventory level at a stage with a given Q combination
 		double totalCost[][] = new double[inventory.length][instance.getStages()];
@@ -113,9 +113,6 @@ public class sQtgenerated {
 		for(int i=0; i<inventory.length;i++) {
 			minCost[i] = Double.POSITIVE_INFINITY;
 		}
-		
-		//to generate Q
-		//int[] generator = new int[(int) Math.pow(10, instance.getStages())];
 		
 		//for each possible combination
 		for(int g=0; g<(int) Math.pow(10, instance.getStages());g++) {
@@ -163,7 +160,7 @@ public class sQtgenerated {
 			}//update
 			
 			//update computation status
-			long endTime=System.currentTimeMillis();
+			//long endTime=System.currentTimeMillis();
 			if(g%1000 == 0) System.out.println("Computation completed for generator = "+g);
 			//System.out.println("For I0 = 0: ETC = "+totalCost[(int) -instance.minInventory][0]);
 			//System.out.println("Total comsumed time = "+(endTime - startTime)+" ms");

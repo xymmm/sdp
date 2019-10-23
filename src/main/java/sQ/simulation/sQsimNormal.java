@@ -117,18 +117,15 @@ public class sQsimNormal {
 		
 		//instance classic
 		double[] demandMean = {20,40,60,40};
-		//double[] reorderPoint = {16,30,57,30};//MINLP p4
+		//double[] reorderPoint = {16,30,57,30};	//MINLP p4
 		//double[] reorderPoint = {16, 30, 58, 29}; //MINLP p10
-		//double Q = 83.743;
-		//double[] reorderPoint = {13,35,57,24};//SDP
-		//double Q = 84;
-		//double Q = 171;
-		//double[] reorderPoint = {0,25,46,16};
-		double Q = 9;
-		double[] reorderPoint = {139, 124, 88, 31};
-		//double[] actionQuantity = {9,9,9,0};
-		//double[] actionQuantity = {70.266, 0, 106.29, 0};
-		//double[] reorderPoint = {16,31,60,31};
+		//double Q = 83.743;						//MINLP
+		//double[] reorderPoint = {13,35,57,24};	//SDP
+		//double Q = 84;							//SDP
+		double Q = 9;								//SDP sQ
+		double[] reorderPoint = {139, 124, 88, 31};	//SDP sQ, SDP sQt
+		//double[] actionQuantity = {9,9,9,0};		//SDP sQt
+
 		
 		double[] actionQuantity = new double[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
@@ -157,8 +154,6 @@ public class sQsimNormal {
 		sQsystem.statCost.setConfidenceIntervalStudent();
 		System.out.println(sQsystem.statCost.report(0.9, 3));
 		System.out.println("Total CPU time: "+timer.format());
-
-		
 	}
 	
 

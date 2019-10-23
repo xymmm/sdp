@@ -74,8 +74,8 @@ public class sQtgeneratedQ_s {
 		double[][] costOrder = new double[instance.getStages()][inventory.length];
 		double[][] costNoOrder = new double[instance.getStages()][inventory.length];
 
-		//double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
-		double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
+		//double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);//normal
 		
 		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 			for(int i=0;i<inventory.length;i++) { // Inventory   
