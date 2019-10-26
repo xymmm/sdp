@@ -178,20 +178,20 @@ public class sQtgenerated {
 	
 	public static void main(String[] args) {
 		
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 1;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		double penaltyCost = 1;
 		
 		double tail = 0.00000001;
 		
-		int minInventory = -500;
-		int maxInventory = 500;
-		int maxQuantity = 500;
+		int minInventory = -50;
+		int maxInventory = 50;
+		int maxQuantity = 50;
 		
 		double stdParameter = 0.25;
 		
-		int[] demandMean = {70,60,50,40,30};
+		int[] demandMean = {2,4,6,4};
 		
 		InstanceDouble instance = new InstanceDouble(
 		         fixedOrderingCost,
@@ -220,6 +220,14 @@ public class sQtgenerated {
 		System.out.println("C(I_0 = 0) = "+solution.minCost[(int) -instance.minInventory]);
 		for(int t=0; t<instance.getStages();t++) {
 			System.out.println("Q["+(t+1)+"]= "+solution.optQ[(int) -instance.minInventory][t]);
+		}
+		
+		System.out.println("Qt");
+		for(int i=0; i<solution.inventory.length;i++) {
+			System.out.print(i+" ");
+			for(int t=0; t<instance.getStages();t++) {
+				System.out.print(solution.optQ[i][t] + " ");
+			}System.out.println();
 		}
 	}
 	
