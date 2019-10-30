@@ -1,4 +1,4 @@
-package PoissonPiecewise;
+package PoissonPiecewise_sQ;
 
 import java.util.Arrays;
 import org.apache.commons.math3.distribution.PoissonDistribution;
