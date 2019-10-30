@@ -134,7 +134,7 @@ public class sQtgeneratedQ_s {
 	
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
@@ -149,8 +149,8 @@ public class sQtgeneratedQ_s {
 		double stdParameter = 0.25;
 
 		//instance classic
-		int[] Q = {9,9,9,0};
-		int[] demandMean = {20,40,60,40};
+		int[] Q = {9,9,9,9};
+		int[] demandMean = {2,4,6,4};
 			
 		Instance instance = new Instance(
 				fixedOrderingCost,

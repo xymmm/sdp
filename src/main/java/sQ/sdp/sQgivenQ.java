@@ -73,8 +73,8 @@ public class sQgivenQ {
 		double[][] costOrder = new double[instance.getStages()][inventory.length];
 		double[][] costNoOrder = new double[instance.getStages()][inventory.length];
 
-		//double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
-		double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		//double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
 		
 		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 			for(int i=0;i<inventory.length;i++) { // Inventory   
@@ -133,7 +133,7 @@ public class sQgivenQ {
 	
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
@@ -148,8 +148,8 @@ public class sQgivenQ {
 		double stdParameter = 0.25;
 
 		//instance classic
-		int Q = 8;
-		int[] demandMean = {20,40,60,40};
+		int Q = 9;
+		int[] demandMean = {2,4,6,4};
 		
 		//instance 5
 		//int Q = 91;

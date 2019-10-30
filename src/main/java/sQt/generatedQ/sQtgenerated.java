@@ -178,16 +178,16 @@ public class sQtgenerated {
 	
 	public static void main(String[] args) {
 		
-		double fixedOrderingCost = 1;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 1;
+		double penaltyCost = 10;
 		
 		double tail = 0.00000001;
 		
 		int minInventory = -50;
 		int maxInventory = 50;
-		int maxQuantity = 50;
+		int maxQuantity = 9;
 		
 		double stdParameter = 0.25;
 		
@@ -217,14 +217,14 @@ public class sQtgenerated {
 		}
 		*/
 		
-		System.out.println("C(I_0 = 0) = "+solution.minCost[(int) -instance.minInventory]);
+		System.out.println("C(I_0 = 0) = "+solution.minCost[(int) (instance.initialInventory - instance.minInventory)]);
 		for(int t=0; t<instance.getStages();t++) {
-			System.out.println("Q["+(t+1)+"]= "+solution.optQ[(int) -instance.minInventory][t]);
+			System.out.println("Q["+(t+1)+"]= "+solution.optQ[(int) (instance.initialInventory - instance.minInventory)][t]);
 		}
 		
 		System.out.println("Qt");
 		for(int i=0; i<solution.inventory.length;i++) {
-			System.out.print(i+" ");
+			System.out.print((int)(i +instance.minInventory)+" ");
 			for(int t=0; t<instance.getStages();t++) {
 				System.out.print(solution.optQ[i][t] + " ");
 			}System.out.println();

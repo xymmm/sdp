@@ -71,8 +71,8 @@ public class sQ {
 		}
 		
 		//demandProbabilities[stages][demandValue] = Prob(dt = demandValue), dt is the realized demand of the random varuable d_t
-		//double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
-		double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
+		//double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
 		
 		double totalCost[][][] = new double[inventory.length][instance.maxQuantity+1][instance.getStages()];
 		boolean optimalAction[][][] = new boolean [inventory.length][instance.maxQuantity + 1][instance.getStages()];
@@ -138,21 +138,20 @@ public class sQ {
 
 		Chrono timer = new Chrono();
 
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-
+		
 		double tail = 0.00000001;
-
-		int minInventory = -500;
-		int maxInventory = 500;
-		int maxQuantity = 500;
+		
+		int minInventory = -50;
+		int maxInventory = 50;
+		int maxQuantity = 9;
 		
 		double stdParameter = 0.25;
 		
-		//instance classic
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {2,4,6,4};
 		
 		//instance 5
 		//int[] demandMean = {50,30,60,20,40,50};

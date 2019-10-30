@@ -215,21 +215,21 @@ public class sS {
 
 		Chrono timer = new Chrono();
 		
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-
+		
 		double tail = 0.00000001;
-
-		int minInventory = -500;
-		int maxInventory = 500;
+		
+		int minInventory = -50;
+		int maxInventory = 50;
 		int maxQuantity = 9;
 		
 		double stdParameter = 0.25;
 		
 		//instance classic
-		int[] demandMean = {70,60,50,40,30};
+		int[] demandMean = {2,4,6,4};
 
 		Instance instance = new Instance(
 										fixedOrderingCost,
