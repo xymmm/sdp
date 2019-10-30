@@ -46,34 +46,22 @@ public class sQsimPoisson {
 	}
 	
 	/** 6. generate Poisson random number as demand **/
-	static int generateDemand(int inventoryLevel, int actionDecision, sQsimInstanceInt sQsimInstance, int currentStageIndex) {
-		/*
-		int demand = getPoissonVariable(sQsimInstance.demandMean[currentStageIndex]);
-		while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand,currentStageIndex) == false) {
-			demand = getPoissonVariable(sQsimInstance.demandMean[currentStageIndex]);
-		}
-		return -demand;
-		*/
-		  RandomVariateGenInt genDemand;
-		  RandomStream streamDemand = new MRG32k3a();
-		  
-		  genDemand = new PoissonGen(streamDemand, new PoissonDist(sQsimInstance.demandMean[currentStageIndex])); 
-		  int demand = genDemand.nextInt();
-		  
-		  while(checkDemand(inventoryLevel, actionDecision, sQsimInstance, demand, currentStageIndex) == false) { 
-			  demand = genDemand.nextInt(); 
-		  } 
-		  return -demand;
-		 
+	static MRG32k3a randomStream = new MRG32k3a();
+	
+	static {
+	   long seed[] = {1234,1234,1234,1234,1234,1234};
+	   randomStream.setSeed(seed);
 	}
 	
-	static boolean checkDemand(int inventoryLevel, int actionDecision, sQsimInstanceInt sQsimInstance, int demand, int currentStageIndex) {
-		if(inventoryLevel -demand >= sQsimInstance.minInventory){
-			return true;
-		}else {
-			return false;
-		}
+	static int generateDemand(int inventoryLevel, int actionDecision, sQsimInstanceInt sQsimInstance, int currentStageIndex) {
+		RandomVariateGenInt genDemand;
+		  
+		genDemand = new PoissonGen(randomStream, new PoissonDist(sQsimInstance.demandMean[currentStageIndex])); 
+		int demand = genDemand.nextInt();
+
+		return -demand;
 	}
+	
 	/*
 	private static int getPoissonVariable(double lamda) {
 		int x = 0;
@@ -168,9 +156,9 @@ public class sQsimPoisson {
 		int maxInventory = 500;
 		double coe = 0.25;
 		
-		int[] demandMean = {50, 30, 60, 20, 40, 50};
-		int[] reorderPoint = {49,22,60,12,35,41};
-		int Q = 91;
+		int[] demandMean = {20,40,60,40};
+		int[] reorderPoint = {31,60,32,17};
+		int Q = 82;
 		int[] actionQuantity = new int[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
 			actionQuantity[t] = Q;

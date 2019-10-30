@@ -158,8 +158,8 @@ public class sS {
 		 * The probability of each possible demand in each period is computed and stored in a 2D array, demandProbabilities[][].
 		 * The first index represents the possible demand value ranged from 0 to maxDemand, and the second index represents the time period.
 		 * **/
-		//double demandProbabilities [][] = computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
-		double demandProbabilities [][] = computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		//double demandProbabilities [][] = computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
 
 		/** Compute ETC 
 		 *
@@ -215,21 +215,21 @@ public class sS {
 
 		Chrono timer = new Chrono();
 		
-		double fixedOrderingCost = 5;
+		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 		
 		double tail = 0.00000001;
 		
-		int minInventory = -50;
-		int maxInventory = 50;
-		int maxQuantity = 9;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 		
 		double stdParameter = 0.25;
 		
 		//instance classic
-		int[] demandMean = {2,4,6,4};
+		int[] demandMean = {20,40,60,40};
 
 		Instance instance = new Instance(
 										fixedOrderingCost,

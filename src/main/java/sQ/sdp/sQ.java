@@ -138,23 +138,20 @@ public class sQ {
 
 		Chrono timer = new Chrono();
 
-		double fixedOrderingCost = 5;
+		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 		
 		double tail = 0.00000001;
 		
-		int minInventory = -50;
-		int maxInventory = 50;
-		int maxQuantity = 9;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 		
 		double stdParameter = 0.25;
 		
-		int[] demandMean = {2,4,6,4};
-		
-		//instance 5
-		//int[] demandMean = {50,30,60,20,40,50};
+		int[] demandMean = {20,40,60,40};
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
