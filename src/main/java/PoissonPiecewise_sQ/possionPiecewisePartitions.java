@@ -6,12 +6,12 @@ import org.apache.commons.math3.distribution.PoissonDistribution;
 public class possionPiecewisePartitions {
 	
 	/**formulate 3D matrix for d_jt with p partitions**/
-	public static double[][][] lamdaMatrix(int[] demandMean, int partitions, int binCounts){
+	public static double[][][] lamdaMatrix(int[] demandMean, int partitions, int nbSamples){
 		double[][][] lamdaMatrix = new double [demandMean.length][demandMean.length][partitions];
 		for(int t=0; t<demandMean.length; t++) {
 			for(int j=0; j<=t; j++){
 				int sumLamda = convolution(demandMean, j,t);
-				lamdaMatrix[j][t] = conditionalExpectationGivenPartitions(sumLamda, binCounts, partitions);
+				lamdaMatrix[j][t] = conditionalExpectationGivenPartitions(sumLamda, nbSamples, partitions);
 			}
 		}
 		return lamdaMatrix;
@@ -26,15 +26,15 @@ public class possionPiecewisePartitions {
 	}
 	
 	/** to compute probability of subregions**/
-	public static double[] computeProb(double partitions) {
+	public static double[] computeProb(int partitions) {
 		double[] prob = new double[(int) partitions];
 		for(int i=0; i<prob.length; i++) {
-			prob[i] = 1/partitions;
+			prob[i] = 1.0/partitions;
 		}
 		return prob;
 	}
 	/**to compute accumulative probability of subregions**/
-	public static double[] computeAccumulativeProb (double partitions, double[] prob) {
+	public static double[] computeCumulativeProb (double partitions, double[] prob) {
 		double[] accumulativeProb = new double[(int) partitions];
 		accumulativeProb[0] = prob[0];
 		int count = 1;
@@ -46,22 +46,22 @@ public class possionPiecewisePartitions {
 	}
 	
 	/** to compute expectations of subregions**/
-	public static double[] conditionalExpectationGivenPartitions(int lamda, int binCounts, double partitions) {
+	public static double[] conditionalExpectationGivenPartitions(int lamda, int nbSamples, int partitions) {
 		double[] prob = computeProb(partitions);
 		PoissonDistribution PoissonDist = new PoissonDistribution(lamda);
-		int[] samples = PoissonDist.sample(binCounts);
-		Arrays.sort(samples);
-		double[] exp = new double [(int) partitions];
-		int conditionalExpectationIndex = 1;
+		int[] realisations = PoissonDist.sample(nbSamples);
+		Arrays.sort(realisations);
+		double[] exp = new double [partitions];
+		int conditionalExpectationIndex = 0;
 		double probabilityMass = 0;
-		for(int i=0; i<binCounts; i++) {
-			if((probabilityMass<1)&&(probabilityMass<prob[conditionalExpectationIndex])) {
-				exp[conditionalExpectationIndex] += samples[i]/binCounts;
-				probabilityMass += 1/binCounts;
+		for(int i=0; i<nbSamples; i++) {
+			if((probabilityMass < 1) && (probabilityMass<prob[conditionalExpectationIndex])) {
+				exp[conditionalExpectationIndex] += realisations[i]*1.0/nbSamples;
+				probabilityMass += 1.0/nbSamples;
 			}else {
 				exp[conditionalExpectationIndex] /= prob[conditionalExpectationIndex];
 				probabilityMass = 0;
-				conditionalExpectationIndex ++;
+				conditionalExpectationIndex++;
 			}
 		}
 		exp[conditionalExpectationIndex] /= prob[conditionalExpectationIndex];
@@ -72,19 +72,31 @@ public class possionPiecewisePartitions {
 	
 
 	public static void main(String[] args) {
-		/*
-		double[] exp = matrixSampling(20, 100000, 5);
-		for(int i=0; i<5; i++) {
-			System.out.println(exp[i]);
-		}*/
+	   
+	   //testExpectedValues();
 		
 		int[] demandMean = {2,4,6,4};
-		int c = convolution(demandMean, 1, 3);
-		System.out.println(c);
+		int nbSamples = 100000;
+      int partitions = 5;
+		double[][][] coefficients = lamdaMatrix(demandMean, partitions, nbSamples);
+		System.out.println(Arrays.deepToString(coefficients));
+		
+		
 		
 	}
 	
 	
+	
+	/** Test E[d|\Omega_i] **/
+	public static void testExpectedValues() {
+	   int lamda = 14; 
+	   int nbSamples = 100000;
+	   int partitions = 5;
+	   double[] targetEv = {8.99635, 11.918, 13.841, 15.8981, 19.4344};
+	   double[] results = conditionalExpectationGivenPartitions(lamda, nbSamples, partitions);
+	   System.out.println("Target: "+Arrays.toString(targetEv));
+	   System.out.println("Result: "+Arrays.toString(results));
+	}
 	
 
 }
