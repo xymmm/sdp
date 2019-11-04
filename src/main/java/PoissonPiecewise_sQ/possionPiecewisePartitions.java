@@ -75,7 +75,7 @@ public class possionPiecewisePartitions {
 	   
 	   //testExpectedValues();
 		
-		int[] demandMean = {40};
+		int[] demandMean = {4};
 		int nbSamples = 100000;
         int partitions = 5;
 		double[][][] coefficients = lamdaMatrix(demandMean, partitions, nbSamples);
@@ -85,6 +85,7 @@ public class possionPiecewisePartitions {
 	
 	
 	/** Test E[d|\Omega_i] **/
+	/*
 	public static void testExpectedValues() {
 	   int lamda = 14; 
 	   int nbSamples = 100000;
@@ -94,6 +95,7 @@ public class possionPiecewisePartitions {
 	   System.out.println("Target: "+Arrays.toString(targetEv));
 	   System.out.println("Result: "+Arrays.toString(results));
 	}
+	*/
 	
 
 }

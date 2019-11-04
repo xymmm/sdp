@@ -226,9 +226,7 @@ public class sQtgenerated {
 				);
 
 		sQtgeneratedSolution solution = sQtgeneratedSingle(instance);
-		
-		System.out.println("optG = "+ solution.optG);
-		
+				
 		for(int t=0; t<instance.getStages();t++) {
 		    System.out.println("t: "+ (t+1)+ "\t"+ solution.totalCost[solution.optG[(int) (instance.initialInventory - instance.minInventory)]][(int) (instance.initialInventory - instance.minInventory)][t]);
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q[t], t, instance);
