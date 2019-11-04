@@ -76,7 +76,7 @@ public class sQtgeneratedQ_s {
 
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
 		//double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);//normal
-		
+			
 		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 			for(int i=0;i<inventory.length;i++) { // Inventory   
 				/** a = Q (given) **/
@@ -101,7 +101,8 @@ public class sQtgeneratedQ_s {
 				}
 				totalCostOrder /= scenarioProb;
 				costOrder[t][i] = totalCostOrder;
-
+				if(i==instance.initialInventory - instance.minInventory) System.out.println(costOrder[t][instance.initialInventory - instance.minInventory]);
+				
 				/** a = 0**/
 				double totalCostNoOrder = 0;
 				scenarioProb = 0;
@@ -123,6 +124,7 @@ public class sQtgeneratedQ_s {
 				}
 				totalCostNoOrder /= scenarioProb;
 				costNoOrder[t][i] = totalCostNoOrder;
+				if(i==instance.initialInventory - instance.minInventory) System.out.println(costNoOrder[t][instance.initialInventory - instance.minInventory]);
 
 				costGivenQ[t][i] = Math.min(totalCostNoOrder, totalCostOrder);
 				actionGivenQ[t][i] = totalCostNoOrder < totalCostOrder ? false : true;
@@ -134,23 +136,22 @@ public class sQtgeneratedQ_s {
 	
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 5;
+		double fixedOrderingCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
-
+		double penaltyCost = 5;
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
+		int minInventory = -50;
+		int maxInventory = 50;
 		int maxQuantity = 9;
-		
+
 		double stdParameter = 0.25;
 
-		//instance classic
-		int[] Q = {9,9,9,9};
 		int[] demandMean = {2,4,6,4};
+		
+		int[] Q = {8,0,9,0};
 			
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -170,16 +171,19 @@ public class sQtgeneratedQ_s {
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		
+		
 		for(int t=0; t<costGivenQ.length;t++) {
 		    System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
-			plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q[t], t, instance);
+			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q[t], t, instance);
 		}
+		
 		
 		System.out.print("reorderPoints = {");
 		for(int t=0; t<costGivenQ.length;t++) {
 			System.out.print(sGivenQ[t]);
 			if(t<costGivenQ.length-1)System.out.print(",");
 		}System.out.print("}");
+		System.out.println();
 
 	}
 

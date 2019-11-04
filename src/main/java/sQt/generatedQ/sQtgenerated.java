@@ -5,13 +5,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 import sS.sdp.sS;
 //Q \in {0,1,2,3,4,5,6,7,8,9}
 import sdp.data.InstanceDouble;
 
 public class sQtgenerated {
-	
+
 	public static void writeToText(int generator, double totalCost){
 		/*
 		try {
@@ -25,7 +26,7 @@ public class sQtgenerated {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		*/
+		 */
 		FileWriter fw = null;
 		try {
 			File f = new File("E:\\sQtGenerated.txt");
@@ -54,7 +55,7 @@ public class sQtgenerated {
 		}
 		return generator;
 	}
-	
+
 	/**summation of entries*10^t of an array before a given index**/
 	public static double sumWithPower(double[] arr, int stopIndex) {//befor stopIndex, not include it
 		double sum = 0;
@@ -71,7 +72,7 @@ public class sQtgenerated {
 		}
 		return arrNew;
 	}
-	
+
 	/**
 	 * Given a value of generator ranged in [0,10^T-1], a series of Qt is created by modular operation.
 	 * The assignment starts with the last period, and is completed backwards.
@@ -87,11 +88,12 @@ public class sQtgenerated {
 		}
 		return reverseArray(Q);
 	}
-	
+
+
 	public static sQtgeneratedSolution sQtgeneratedSingle(InstanceDouble instance) {
-		
+
 		long startTime=System.currentTimeMillis();
-		
+
 		//create inventory state space
 		double[] inventory = new double[(int) (instance.maxInventory - instance.minInventory + 1)];
 		for(int i=0;i<inventory.length;i++) {
@@ -101,64 +103,54 @@ public class sQtgenerated {
 		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
 
-		//totalCost[i][t] stores the values of costs for an inventory level at a stage with a given Q combination
-		double totalCost[][] = new double[inventory.length][instance.getStages()];
-		
+		int nbCombinations = (int) Math.pow(10, instance.getStages());
+
+		//totalCost[g][i][t] stores the values of costs for an inventory level at a stage with a given combination of generator g
+		double totalCost[][][] = new double[nbCombinations][inventory.length][instance.getStages()];
+
 		//optQ[i][t] stores the Q combination with the optimal ETC amongst all Q combinations
 		double[][] optQ = new double[inventory.length][instance.getStages()];
-		
+		int[] optG = new int [inventory.length];
+
 		//minCost[i] stores the optimal ETC amongst all Q combinations
 		//it is obtained by comparing the existing value with a new-computed totalCost[i][0] for a new Q combination.
 		double[] minCost = new double[inventory.length];//the optimal cost for an initial inventory level among all combinations
-		for(int i=0; i<inventory.length;i++) {
-			minCost[i] = Double.POSITIVE_INFINITY;
-		}
-		
+
+
 		//for each possible combination
 		for(int g=0; g<(int) Math.pow(10, instance.getStages());g++) {
-			
+
 			long singleTime = System.currentTimeMillis();
-			
+
 			//initial Qs
 			double[] Q = generateQ(instance.getStages(), g);
 
 			//compute cost for each combination
-			for(int t=instance.getStages()-1; t>=0; t--) {
+			for(int t=instance.getStages()-1; t>=0; t--) {			
 				for(int i=0; i<inventory.length;i++) {
-					totalCost[i][t] = sS.computePurchasingCost((int)Q[t], (int)instance.fixedOrderingCost, (int)instance.unitCost);
+
+					totalCost[g][i][t] = sS.computePurchasingCost((int)Q[t], (int)instance.fixedOrderingCost, (int)instance.unitCost);
 					double scenarioProb = 0;
 					for(int d=0; d<demandProbabilities[t].length;d++) {
 						if((inventory[i] + Q[t] - d <= instance.maxInventory) && (inventory[i] + Q[t] - d >= instance.minInventory)) {
-							totalCost[i][t] += demandProbabilities[t][d]*(
-												sS.computeImmediateCost(
-														inventory[i], 
-														Q[t], 
-														d, 
-														instance.holdingCost, 
-														instance.penaltyCost, 
-														instance.fixedOrderingCost, 
-														instance.unitCost)
-												+((t==instance.getStages()-1) ? 0 : totalCost[(int) (i+Q[t]-d)][t+1])
-												);
+							totalCost[g][i][t] += demandProbabilities[t][d]*(
+									sS.computeImmediateCost(
+											inventory[i], 
+											Q[t], 
+											d, 
+											instance.holdingCost, 
+											instance.penaltyCost, 
+											instance.fixedOrderingCost, 
+											instance.unitCost)
+									+((t==instance.getStages()-1) ? 0 : totalCost[g][(int) (i+Q[t]-d)][t+1])
+									);
 							scenarioProb += demandProbabilities[t][d];
 						}//if
 					}//d
-					totalCost[i][t] /= scenarioProb;
+					totalCost[g][i][t] /= scenarioProb;
 				}//i
 			}//t
-			
-			//update optimal values of cost and Qs for each initial inventory level
-			for(int i=0; i<inventory.length;i++) {
-				if(minCost[i] > totalCost[i][0]) {
-					//update cost
-					minCost[i] = totalCost[i][0];
-					//update Qs
-					for(int t=0; t<instance.getStages();t++) {
-						optQ[i][t] = Q[t];
-					}
-				}
-			}//update
-			
+
 			//update computation status
 			//long endTime=System.currentTimeMillis();
 			if(g%1000 == 0) System.out.println("Computation completed for generator = "+g);
@@ -166,47 +158,82 @@ public class sQtgenerated {
 			//System.out.println("Total comsumed time = "+(endTime - startTime)+" ms");
 			//System.out.println("Consumed time for single combination = "+(endTime-singleTime)+" ms");
 			//System.out.println("---------------------------------------------------------");
-			//writeToText(g, totalCost[(int) -instance.minInventory][0]);
+			//writeToText(g, totalCost[g][(int) (instance.initialInventory -instance.minInventory)][0]);
+
 		}//g
-		
+
+		//choose the minimum cost for i = initial inventory //instance.initialInventory - instance.minInventory
+		// by completing minCost[i]
+		for(int i=0;i<inventory.length;i++) {
+			minCost[i] = totalCost[0][i][0];
+			for(int g=1; g<nbCombinations; g++) {
+				if((totalCost[g][i][0] < totalCost[g-1][i][0])&&( totalCost[g][i][0] < minCost[i])) {
+					minCost[i] = totalCost[g][i][0];
+				}
+			}
+		}
+
+		//get optQ[i][]
+		for(int i=0; i<inventory.length;i++) {
+			for(int g=0; g<nbCombinations; g++) {
+				if(totalCost[g][i][0] == minCost[i]) {
+					optG[i] = g;
+					for(int t=0; t<instance.getStages(); t++) {
+						optQ[i] = generateQ(instance.getStages(), g);
+					}
+				}
+			}
+		}
+
 		long terminalTime = System.currentTimeMillis();
 		System.out.println("total time consumed = "+(terminalTime - startTime)+" ms");
-		
-		return new sQtgeneratedSolution(inventory, minCost, optQ);
+
+		//System.out.println(Arrays.deepToString(totalCost));
+
+		return new sQtgeneratedSolution(inventory, minCost, optQ, totalCost, optG);
+
 	}
-	
-	
+
+
 	public static void main(String[] args) {
-		
-		double fixedOrderingCost = 5;
+
+		double fixedOrderingCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
-		
+		double penaltyCost = 5;
+
 		double tail = 0.00000001;
-		
+
 		int minInventory = -50;
 		int maxInventory = 50;
 		int maxQuantity = 9;
-		
+
 		double stdParameter = 0.25;
-		
+
 		int[] demandMean = {2,4,6,4};
-		
+
 		InstanceDouble instance = new InstanceDouble(
-		         fixedOrderingCost,
-		         unitCost,
-		         holdingCost,
-		         penaltyCost,
-		         demandMean,
-		         tail,
-		         minInventory,
-		         maxInventory,
-		         maxQuantity,
-		         stdParameter
+				fixedOrderingCost,
+				unitCost,
+				holdingCost,
+				penaltyCost,
+				demandMean,
+				tail,
+				minInventory,
+				maxInventory,
+				maxQuantity,
+				stdParameter
 				);
-		
+
 		sQtgeneratedSolution solution = sQtgeneratedSingle(instance);
+		
+		System.out.println("optG = "+ solution.optG);
+		
+		for(int t=0; t<instance.getStages();t++) {
+		    System.out.println("t: "+ (t+1)+ "\t"+ solution.totalCost[solution.optG[(int) (instance.initialInventory - instance.minInventory)]][(int) (instance.initialInventory - instance.minInventory)][t]);
+			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q[t], t, instance);
+		}
+		
 		/*
 		for(int i=0; i<solution.inventory.length; i++) {
 			System.out.print(i+" "+solution.minCost[i] +" ");
@@ -215,13 +242,14 @@ public class sQtgenerated {
 			}
 			System.out.println();
 		}
-		*/
+		 */
 		
-		System.out.println("C(I_0 = 0) = "+solution.minCost[(int) (instance.initialInventory - instance.minInventory)]);
+		System.out.print("reorderPoints = {");
 		for(int t=0; t<instance.getStages();t++) {
-			System.out.println("Q["+(t+1)+"]= "+solution.optQ[(int) (instance.initialInventory - instance.minInventory)][t]);
-		}
-		
+			System.out.print((int)solution.optQ[(int) (instance.initialInventory - instance.minInventory)][t]);
+			if(t<instance.getStages()-1)System.out.print(",");
+		}System.out.print("}");
+		/*
 		System.out.println("Qt");
 		for(int i=0; i<solution.inventory.length;i++) {
 			System.out.print((int)(i +instance.minInventory)+" ");
@@ -229,8 +257,9 @@ public class sQtgenerated {
 				System.out.print(solution.optQ[i][t] + " ");
 			}System.out.println();
 		}
+		 */
 	}
-	
 
-	
+
+
 }

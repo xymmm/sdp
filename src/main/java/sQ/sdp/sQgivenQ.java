@@ -100,6 +100,8 @@ public class sQgivenQ {
 				}
 				totalCostOrder /= scenarioProb;
 				costOrder[t][i] = totalCostOrder;
+				if(i==instance.initialInventory - instance.minInventory) System.out.println(costOrder[t][instance.initialInventory - instance.minInventory]);
+
 
 				/** a = 0**/
 				double totalCostNoOrder = 0;
@@ -122,6 +124,8 @@ public class sQgivenQ {
 				}
 				totalCostNoOrder /= scenarioProb;
 				costNoOrder[t][i] = totalCostNoOrder;
+				if(i==instance.initialInventory - instance.minInventory) System.out.println(costNoOrder[t][instance.initialInventory - instance.minInventory]);
+
 
 				costGivenQ[t][i] = Math.min(totalCostNoOrder, totalCostOrder);
 				actionGivenQ[t][i] = totalCostNoOrder < totalCostOrder ? false : true;
@@ -133,31 +137,24 @@ public class sQgivenQ {
 	
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 5;
+		double fixedOrderingCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
-
+		double penaltyCost = 5;
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
+		int minInventory = -50;
+		int maxInventory = 50;
 		int maxQuantity = 9;
-		
+
 		double stdParameter = 0.25;
 
-		//instance classic
-		int Q = 9;
 		int[] demandMean = {2,4,6,4};
-		
-		//instance 5
-		//int Q = 91;
-		//int[] demandMean = {50,30,60,20,40,50};
-		
-		//instance 6
-		//int[] demandMean = {50,30,60,20,40,50};
-		//int Q = 87;
+
+		//instance classic
+		int Q = 8;
+
 		
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -178,14 +175,12 @@ public class sQgivenQ {
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		double[] costLimit = {20000, 15000, 10000, 5200};
 		
-		//System.out.println(sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
-		//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, 0, instance,costLimit[0]);
 		
 		for(int t=0; t<costGivenQ.length;t++) {
 			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
 			//System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
 		    System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
-			plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
+			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
 		}
 		
 		System.out.print("reorderPoints = {");
