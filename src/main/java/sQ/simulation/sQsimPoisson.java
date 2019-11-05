@@ -62,6 +62,26 @@ public class sQsimPoisson {
 		return -demand;
 	}
 	
+	/*
+	private static int getPoissonVariable(double lamda) {
+		int x = 0;
+		double y = Math.random(), cdf = getPoissonProbability(x, lamda); // USE SSJ RANDOM NUMBER GENERATOR AND SET SEED!
+		while (cdf < y) {
+			x++;
+			cdf += getPoissonProbability(x, lamda);
+		}
+		return x;
+	}
+	private static double getPoissonProbability(int k, double lamda) {
+		double c = Math.exp(-lamda), sum = 1;
+		for (int i = 1; i <= k; i++) {
+			sum *= lamda / i;
+		}
+		return sum * c;
+	}
+	*/
+	
+	
 	/** 5. compute holding or penalty cost **/
 	static double computeClosingCost(int inventoryLevel, sQsimInstanceInt sQsimInstance) {
 		if(inventoryLevel >= 0) {//return holding cost
@@ -83,11 +103,7 @@ public class sQsimPoisson {
 			if(print == true) System.out.println("Current inventory level is "+inventoryLevel);
 			
 			//1 & 2 check inventory
-			if(sQsimInstance.getActionQuantity(currentStageIndex) == 0) {
-				actionDecision = 0;
-			}else {
-				actionDecision = checkInventory(sQsimInstance.reorderPoint[currentStageIndex], inventoryLevel);
-			}System.out.println(actionDecision);
+			actionDecision = checkInventory(sQsimInstance.reorderPoint[currentStageIndex], inventoryLevel);
 			if(print == true) System.out.println((actionDecision == 1) ? "Replenishment order placed. ":"No order placed. ");
 			//if(currentStageIndex == 0) actionDecision =0;
 			
@@ -122,33 +138,31 @@ public class sQsimPoisson {
 	/** multiple run times **/
 	public static void sQsimPoissonMultiRuns(sQsimInstanceInt sQsimInstance, int count) {
 		for(int i=0; i<count; i++) {
-			sQsimInstance.statCost.add(sQsimPoisson(sQsimInstance,true));
+			sQsimInstance.statCost.add(sQsimPoisson(sQsimInstance,false));
 		}
 	}
 
 	public static void main(String[] args) {
 
 		/** declare instance parameters **/
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 10;
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
+		int minInventory = -500;
+		int maxInventory = 500;
 		double coe = 0.25;
 		
-		int[] demandMean = {2,4,6,4};
-		int[] reorderPoint = {-15, -5, -6, -19};
-		/*
+		int[] demandMean = {20,40,60,40};
+		int[] reorderPoint = {31,60,32,17};
 		int Q = 82;
 		int[] actionQuantity = new int[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
 			actionQuantity[t] = Q;
-		}*/
-		int[] actionQuantity = {8,0,9,0};
+		}
 
 		sQsimInstanceInt sQsystem1 = new sQsimInstanceInt(
 				fixedOrderingCost,
@@ -166,7 +180,7 @@ public class sQsimPoisson {
 		
 		Chrono timer = new Chrono();
 		
-		int count = 2;
+		int count = 50000;
 		sQsimPoisson.sQsimPoissonMultiRuns(sQsystem1, count);
 		
 		sQsystem1.statCost.setConfidenceIntervalStudent();
