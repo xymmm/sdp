@@ -78,6 +78,7 @@ public class sQ {
 		boolean optimalAction[][][] = new boolean [inventory.length][instance.maxQuantity + 1][instance.getStages()];
 		
 		int Q;
+		long startTime=System.currentTimeMillis();
 		for(int a=0; a<instance.maxQuantity+1;a++) { //"a" represents the action index, so the actual action volume is a+1
 			for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 				for(int i=0;i<inventory.length;i++) { // Inventory   
@@ -131,7 +132,9 @@ public class sQ {
 				}
 			}
 		}
-		return new sQsolution(totalCost, optimalAction, inventory);
+		long endTime=System.currentTimeMillis();
+		long timeConsumedsQ = endTime - startTime;
+		return new sQsolution(totalCost, optimalAction, inventory, timeConsumedsQ);
 	}
 
 	public static void main(String[] args) {

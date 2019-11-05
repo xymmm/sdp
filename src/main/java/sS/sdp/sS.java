@@ -178,6 +178,7 @@ public class sS {
 		double totalCost[][] = null;
 		double optimalCost[][] = new double [inventory.length][Stages]; 
 
+		long startTime=System.currentTimeMillis();
 		for(int t=Stages-1;t>=0;t--) { // Time
 			totalCost = new double [inventory.length][((t==0)&&(!initialOrder)) ?  1 : instance.maxQuantity+1];
 			for(int i=0;i<inventory.length;i++) { // Inventory
@@ -207,7 +208,9 @@ public class sS {
 				optimalAction[i][t] = getOptimalAction(totalCost[i]);
 			}
 		}
-		return new sSsolution(optimalAction, optimalCost, inventory);
+		long endTime=System.currentTimeMillis();
+		long timeConsumed = endTime - startTime;
+		return new sSsolution(optimalAction, optimalCost, inventory, timeConsumed);
 	}
 
 	/** main computation **/

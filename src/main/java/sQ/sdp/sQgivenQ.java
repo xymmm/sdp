@@ -100,7 +100,7 @@ public class sQgivenQ {
 				}
 				totalCostOrder /= scenarioProb;
 				costOrder[t][i] = totalCostOrder;
-				if(i==instance.initialInventory - instance.minInventory) System.out.println(costOrder[t][instance.initialInventory - instance.minInventory]);
+				//if(i==instance.initialInventory - instance.minInventory) System.out.println(costOrder[t][instance.initialInventory - instance.minInventory]);
 
 
 				/** a = 0**/
@@ -124,7 +124,7 @@ public class sQgivenQ {
 				}
 				totalCostNoOrder /= scenarioProb;
 				costNoOrder[t][i] = totalCostNoOrder;
-				if(i==instance.initialInventory - instance.minInventory) System.out.println(costNoOrder[t][instance.initialInventory - instance.minInventory]);
+				//if(i==instance.initialInventory - instance.minInventory) System.out.println(costNoOrder[t][instance.initialInventory - instance.minInventory]);
 
 
 				costGivenQ[t][i] = Math.min(totalCostNoOrder, totalCostOrder);

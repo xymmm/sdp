@@ -7,13 +7,16 @@ public class sQsolution {
 	public int[] inventory;
 	public double totalCost[][][];
 	public boolean optimalAction[][][];
+	public long timeConsumedsQ;
 
 	public sQsolution(double[][][] totalCost, 
 			boolean[][][] optimalAction, 
-			int[] inventory) {
+			int[] inventory,
+			long timeConsumedsQ) {
 		this.totalCost = totalCost;
 		this.optimalAction = optimalAction;
 		this.inventory = inventory;
+		this.timeConsumedsQ = timeConsumedsQ;
 	}
 
 	

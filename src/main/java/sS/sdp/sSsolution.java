@@ -8,11 +8,13 @@ public class sSsolution {
    /** Explain meaning of indexes **/
    public double optimalAction[][];
    public double optimalCost[][];
+   public long timeConsumed;
    
-   public sSsolution(double optimalAction[][], double optimalCost[][], int[] inventory) {
+   public sSsolution(double optimalAction[][], double optimalCost[][], int[] inventory, long timeConsumed) {
       this.optimalAction = optimalAction;
       this.optimalCost = optimalCost;
       this.inventory = inventory;
+      this.timeConsumed = timeConsumed;
    }
    
    public static int[] getsSDP(double optimalAction[][]) {

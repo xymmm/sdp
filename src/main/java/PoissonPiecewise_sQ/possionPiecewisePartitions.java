@@ -79,13 +79,14 @@ public class possionPiecewisePartitions {
 	public static void writeToText(double[][][] coefficients){
 		FileWriter fw = null;
 		try {
-			File f = new File("E:\\lamda_matrix.txt");
+			File f = new File("E:\\sQpoissionInstance_lamda_matrix.txt");
 			fw = new FileWriter(f, true);//true, continue to write
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		PrintWriter pw = new PrintWriter(fw);
-		pw.print(Arrays.deepToString(coefficients)+";\r\n");
+		pw.println(Arrays.deepToString(coefficients));
+		pw.println();
 		pw.flush();
 		try {
 			fw.flush();
@@ -106,16 +107,30 @@ public class possionPiecewisePartitions {
 
 
 	public static void main(String[] args) {
-	   
-	   //testExpectedValues();		
-		int[] demandMeanInput = {11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11};
+	   		
+		int[][] demandMeanInput = {
+				{11,38,115,175,115,38},
+				{122,77,124,95,107,73},
+				{100,62,31,43,199,172},
+				{100,100,100,100,100,100,100,100},
+				{211,119,165,47,100,62,31,82},
+				{97,33,41,76,122,29,37,66},
+				{54,23,35,49,66,26,37,41,71,19},
+				{65,73,59,42,36,31,28,23,18,11},
+				{11,18,23,28,31,36,42,59,73,65},
+				{9,17,22,35,49,52,68,53,50,36,23,18},
+				{76,58,22,54,69,21,13,89,75,66,45,29},
+				{60,60,60,60,60,60,60,60,60,60,60,60}
+		};
 		int nbSamples = 100000;
-        int partitions = 5;
-		for(int i=0; i<demandMeanInput.length; i++) {
-			int[] demandMean = getDemandMeanArray(demandMeanInput, i);
-			double[][][] coefficients = lamdaMatrix(demandMean, partitions, nbSamples);
-			System.out.println(Arrays.deepToString(coefficients));	
-			writeToText(coefficients);		
+		int partitions = 4;
+		for(int d=0; d<demandMeanInput.length; d++) {
+			for(int i=0; i<demandMeanInput[d].length; i++) {
+				int[] demandMean = getDemandMeanArray(demandMeanInput[d], i);
+				double[][][] coefficients = lamdaMatrix(demandMean, partitions, nbSamples);
+				System.out.println(Arrays.deepToString(coefficients));	
+				writeToText(coefficients);		
+			}
 		}
 		
 
@@ -124,7 +139,9 @@ public class possionPiecewisePartitions {
 	
 	
 	
-	/** Test E[d|\Omega_i] **/
+	/** Test E[d|\Omega_i] 
+	 *  if included in .main, by //testExpectedValues();**/
+	/**
 	public static void testExpectedValues() {
 	   int lamda = 14; 
 	   int nbSamples = 100000;
@@ -134,6 +151,6 @@ public class possionPiecewisePartitions {
 	   System.out.println("Target: "+Arrays.toString(targetEv));
 	   System.out.println("Result: "+Arrays.toString(results));
 	}
-	
+	**/
 
 }
