@@ -101,7 +101,7 @@ public class sQtgeneratedQ_s {
 				}
 				totalCostOrder /= scenarioProb;
 				costOrder[t][i] = totalCostOrder;
-				if(i==instance.initialInventory - instance.minInventory) System.out.println(costOrder[t][instance.initialInventory - instance.minInventory]);
+				//if(i==instance.initialInventory - instance.minInventory) System.out.println(costOrder[t][instance.initialInventory - instance.minInventory]);
 				
 				/** a = 0**/
 				double totalCostNoOrder = 0;
@@ -124,7 +124,7 @@ public class sQtgeneratedQ_s {
 				}
 				totalCostNoOrder /= scenarioProb;
 				costNoOrder[t][i] = totalCostNoOrder;
-				if(i==instance.initialInventory - instance.minInventory) System.out.println(costNoOrder[t][instance.initialInventory - instance.minInventory]);
+				//if(i==instance.initialInventory - instance.minInventory) System.out.println(costNoOrder[t][instance.initialInventory - instance.minInventory]);
 
 				costGivenQ[t][i] = Math.min(totalCostNoOrder, totalCostOrder);
 				actionGivenQ[t][i] = totalCostNoOrder < totalCostOrder ? false : true;

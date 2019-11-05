@@ -92,8 +92,6 @@ public class sQtgenerated {
 
 	public static sQtgeneratedSolution sQtgeneratedSingle(InstanceDouble instance) {
 
-		long startTime=System.currentTimeMillis();
-
 		//create inventory state space
 		double[] inventory = new double[(int) (instance.maxInventory - instance.minInventory + 1)];
 		for(int i=0;i<inventory.length;i++) {
@@ -116,11 +114,12 @@ public class sQtgenerated {
 		//it is obtained by comparing the existing value with a new-computed totalCost[i][0] for a new Q combination.
 		double[] minCost = new double[inventory.length];//the optimal cost for an initial inventory level among all combinations
 
-
+		long startTime=System.currentTimeMillis();
+		
 		//for each possible combination
 		for(int g=0; g<(int) Math.pow(10, instance.getStages());g++) {
 
-			long singleTime = System.currentTimeMillis();
+			//long singleTime = System.currentTimeMillis();
 
 			//initial Qs
 			double[] Q = generateQ(instance.getStages(), g);
@@ -153,7 +152,7 @@ public class sQtgenerated {
 
 			//update computation status
 			//long endTime=System.currentTimeMillis();
-			if(g%1000 == 0) System.out.println("Computation completed for generator = "+g);
+			//if(g%1000 == 0) System.out.println("Computation completed for generator = "+g);
 			//System.out.println("For I0 = 0: ETC = "+totalCost[(int) -instance.minInventory][0]);
 			//System.out.println("Total comsumed time = "+(endTime - startTime)+" ms");
 			//System.out.println("Consumed time for single combination = "+(endTime-singleTime)+" ms");
@@ -186,11 +185,12 @@ public class sQtgenerated {
 		}
 
 		long terminalTime = System.currentTimeMillis();
-		System.out.println("total time consumed = "+(terminalTime - startTime)+" ms");
+		//System.out.println("total time consumed = "+(terminalTime - startTime)+" ms");
 
 		//System.out.println(Arrays.deepToString(totalCost));
-
-		return new sQtgeneratedSolution(inventory, minCost, optQ, totalCost, optG);
+		
+		long timeConsumed_sQt = terminalTime - startTime;
+		return new sQtgeneratedSolution(inventory, minCost, optQ, totalCost, optG, timeConsumed_sQt);
 
 	}
 
@@ -210,7 +210,7 @@ public class sQtgenerated {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4};
+		int[] demandMean = {2,4,6,4,2};
 
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
@@ -227,14 +227,15 @@ public class sQtgenerated {
 
 		sQtgeneratedSolution solution = sQtgeneratedSingle(instance);
 		
-		System.out.println("optG = "+ solution.optG);
-		
+		System.out.println("optG = "+ solution.optG[(int) (instance.initialInventory - instance.minInventory)]);
+		System.out.println("optCost = "+ solution.totalCost[solution.optG[(int) (instance.initialInventory - instance.minInventory)]][(int) (instance.initialInventory - instance.minInventory)][0]);
+		/*
 		for(int t=0; t<instance.getStages();t++) {
 		    System.out.println("t: "+ (t+1)+ "\t"+ solution.totalCost[solution.optG[(int) (instance.initialInventory - instance.minInventory)]][(int) (instance.initialInventory - instance.minInventory)][t]);
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q[t], t, instance);
 		}
 		
-		/*
+		
 		for(int i=0; i<solution.inventory.length; i++) {
 			System.out.print(i+" "+solution.minCost[i] +" ");
 			for(int t=0; t<instance.getStages();t++) {
@@ -244,7 +245,7 @@ public class sQtgenerated {
 		}
 		 */
 		
-		System.out.print("reorderPoints = {");
+		System.out.print("Qt = {");
 		for(int t=0; t<instance.getStages();t++) {
 			System.out.print((int)solution.optQ[(int) (instance.initialInventory - instance.minInventory)][t]);
 			if(t<instance.getStages()-1)System.out.print(",");

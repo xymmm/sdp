@@ -79,7 +79,7 @@ public class possionPiecewisePartitions {
 	public static void writeToText(double[][][] coefficients){
 		FileWriter fw = null;
 		try {
-			File f = new File("E:\\sQpoissionInstance_lamda_matrix.txt");
+			File f = new File("E:\\sQtpoissonInstance_lamda_matrix.txt");
 			fw = new FileWriter(f, true);//true, continue to write
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -107,7 +107,7 @@ public class possionPiecewisePartitions {
 
 
 	public static void main(String[] args) {
-	   		
+	   	/*	
 		int[][] demandMeanInput = {
 				{11,38,115,175,115,38},
 				{122,77,124,95,107,73},
@@ -121,9 +121,21 @@ public class possionPiecewisePartitions {
 				{9,17,22,35,49,52,68,53,50,36,23,18},
 				{76,58,22,54,69,21,13,89,75,66,45,29},
 				{60,60,60,60,60,60,60,60,60,60,60,60}
+		};*/
+		int demandMeanInput[][] = {
+				{2,4,6,4},
+				{9,7,5,3},
+				{2,5,7,8},
+				{6,6,6,6},
+				{5,7,2,5},
+				{4,5,6,7,6},
+				{8,6,3,7,9},
+				{6,3,9,1,5},
+				{2,5,4,8,3},
+				{4,4,8,8,3}
 		};
 		int nbSamples = 100000;
-		int partitions = 4;
+		int partitions = 8;
 		for(int d=0; d<demandMeanInput.length; d++) {
 			for(int i=0; i<demandMeanInput[d].length; i++) {
 				int[] demandMean = getDemandMeanArray(demandMeanInput[d], i);

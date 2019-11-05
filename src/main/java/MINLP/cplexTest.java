@@ -1,4 +1,4 @@
-package instanceRuns;
+package MINLP;
 
 import ilog.concert.IloException;
 import ilog.concert.IloNumVar;
