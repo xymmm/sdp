@@ -27,13 +27,13 @@ public class sQsimPoisson {
 
 
 	/** 1. check inventory and return action decision **/
-	static int checkInventory(int reorderPoint, int inventoryLevel) {
+	static int checkInventory(double reorderPoint, double inventoryLevel) {
 		//compare the current inventory level and reorder point, 1 represents reorder 
 		return (inventoryLevel<reorderPoint)? 1 : 0;
 	}
 	
 	/** 2. compute purchasing cost according to action decision **/
-	static double computePurchasingCost(int actionDecision, int currentStageIndex, sQsimInstanceInt sQsimInstance) {
+	static double computePurchasingCost(int actionDecision, int currentStageIndex, sQsimInstanceDouble sQsimInstance) {
 		return actionDecision*(
 				sQsimInstance.fixedOrderingCost 
 				+ sQsimInstance.unitCost*sQsimInstance.getActionQuantity(currentStageIndex)
@@ -41,7 +41,7 @@ public class sQsimPoisson {
 	}
 	
 	/** 3(1) & 5(2) update inventory level**/
-	static int updateInventoryLevel(int inventoryLevel, int inventoryAlteration) {
+	static double updateInventoryLevel(double inventoryLevel, double inventoryAlteration) {
 		return inventoryLevel + inventoryAlteration;
 	}
 	
@@ -53,7 +53,7 @@ public class sQsimPoisson {
 	   randomStream.setSeed(seed);
 	}
 	
-	static int generateDemand(int inventoryLevel, int actionDecision, sQsimInstanceInt sQsimInstance, int currentStageIndex) {
+	static double generateDemand(double inventoryLevel, int actionDecision, sQsimInstanceDouble sQsimInstance, int currentStageIndex) {
 		RandomVariateGenInt genDemand;
 		  
 		genDemand = new PoissonGen(randomStream, new PoissonDist(sQsimInstance.demandMean[currentStageIndex])); 
@@ -62,28 +62,9 @@ public class sQsimPoisson {
 		return -demand;
 	}
 	
-	/*
-	private static int getPoissonVariable(double lamda) {
-		int x = 0;
-		double y = Math.random(), cdf = getPoissonProbability(x, lamda); // USE SSJ RANDOM NUMBER GENERATOR AND SET SEED!
-		while (cdf < y) {
-			x++;
-			cdf += getPoissonProbability(x, lamda);
-		}
-		return x;
-	}
-	private static double getPoissonProbability(int k, double lamda) {
-		double c = Math.exp(-lamda), sum = 1;
-		for (int i = 1; i <= k; i++) {
-			sum *= lamda / i;
-		}
-		return sum * c;
-	}
-	*/
-	
 	
 	/** 5. compute holding or penalty cost **/
-	static double computeClosingCost(int inventoryLevel, sQsimInstanceInt sQsimInstance) {
+	static double computeClosingCost(double inventoryLevel, sQsimInstanceDouble sQsimInstance) {
 		if(inventoryLevel >= 0) {//return holding cost
 			return inventoryLevel*sQsimInstance.holdingCost;
 		}else {//return penalty cost
@@ -91,9 +72,9 @@ public class sQsimPoisson {
 		}
 	}
 	
-	public static double sQsimPoisson(sQsimInstanceInt sQsimInstance, boolean print) {
+	public static double sQsimPoisson(sQsimInstanceDouble sQsimInstance, boolean print) {
 
-		int inventoryLevel = sQsimInstance.getInitialInventory();
+		double inventoryLevel = sQsimInstance.getInitialInventory();
 		double cost = 0;
 		int actionDecision;
 		
@@ -115,7 +96,7 @@ public class sQsimPoisson {
 			if(print == true) System.out.println("Updated inventory level is "+inventoryLevel);
 			
 			//4. generate, check and meet demand
-			int demand = generateDemand(inventoryLevel, actionDecision, sQsimInstance, currentStageIndex); // as a negative
+			double demand = generateDemand(inventoryLevel, actionDecision, sQsimInstance, currentStageIndex); // as a negative
 			if(print == true) System.out.println("Demand in this stage is "+(-demand));
 			
 			//update inventory level
@@ -136,7 +117,7 @@ public class sQsimPoisson {
 	}
 	
 	/** multiple run times **/
-	public static void sQsimPoissonMultiRuns(sQsimInstanceInt sQsimInstance, int count) {
+	public static void sQsimPoissonMultiRuns(sQsimInstanceDouble sQsimInstance, int count) {
 		for(int i=0; i<count; i++) {
 			sQsimInstance.statCost.add(sQsimPoisson(sQsimInstance,false));
 		}
@@ -152,19 +133,19 @@ public class sQsimPoisson {
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
+		double minInventory = -500;
+		double maxInventory = 500;
 		double coe = 0.25;
 		
-		int[] demandMean = {20,40,60,40};
-		int[] reorderPoint = {31,60,32,17};
+		double[] demandMean = {20,40,60,40};
+		double[] reorderPoint = {31,60,32,17};
 		int Q = 82;
-		int[] actionQuantity = new int[reorderPoint.length];
+		double[] actionQuantity = new double[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
 			actionQuantity[t] = Q;
 		}
 
-		sQsimInstanceInt sQsystem1 = new sQsimInstanceInt(
+		sQsimInstanceDouble sQsystem1 = new sQsimInstanceDouble(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
