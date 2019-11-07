@@ -143,15 +143,15 @@ public class sQtgeneratedQ_s {
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
+		int minInventory = -120;
+		int maxInventory = 120;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4};
+		int[] demandMean = {2,4,6,4,2,4};
 		
-		int[] Q = {8,0,9,0};
+		int[] Q = {7,0,8,9,0,0};
 			
 		Instance instance = new Instance(
 				fixedOrderingCost,

@@ -49,7 +49,7 @@ public class sQsimPoisson {
 	static MRG32k3a randomStream = new MRG32k3a();
 	
 	static {
-	   long seed[] = {1234,1234,1234,1234,1234,1234};
+   long seed[] = {1234,1234,1234,1234,1234,1234};
 	   randomStream.setSeed(seed);
 	}
 	
@@ -133,13 +133,13 @@ public class sQsimPoisson {
 
 		double tail = 0.00000001;
 
-		double minInventory = -500;
-		double maxInventory = 500;
+		double minInventory = -1000;
+		double maxInventory = 1000;
 		double coe = 0.25;
-		
-		double[] demandMean = {20,40,60,40};
-		double[] reorderPoint = {31,60,32,17};
-		int Q = 82;
+		//1,28,108,164,106,20
+		double[] demandMean = {11,38,115,175,115,38};
+		double[] reorderPoint = {-8,17,98, 155, 96, 10};
+		double Q = 114.85;
 		double[] actionQuantity = new double[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
 			actionQuantity[t] = Q;

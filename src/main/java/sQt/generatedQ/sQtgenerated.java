@@ -152,7 +152,7 @@ public class sQtgenerated {
 
 			//update computation status
 			//long endTime=System.currentTimeMillis();
-			//if(g%1000 == 0) System.out.println("Computation completed for generator = "+g);
+			if(g%1000 == 0) System.out.println("Computation completed for generator = "+g);
 			//System.out.println("For I0 = 0: ETC = "+totalCost[(int) -instance.minInventory][0]);
 			//System.out.println("Total comsumed time = "+(endTime - startTime)+" ms");
 			//System.out.println("Consumed time for single combination = "+(endTime-singleTime)+" ms");
@@ -161,6 +161,7 @@ public class sQtgenerated {
 
 		}//g
 
+		//if we store all cost information
 		//choose the minimum cost for i = initial inventory //instance.initialInventory - instance.minInventory
 		// by completing minCost[i]
 		for(int i=0;i<inventory.length;i++) {
@@ -210,7 +211,7 @@ public class sQtgenerated {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4,2};
+		int[] demandMean = {5,5,10,10,2};
 
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
