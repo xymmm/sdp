@@ -134,6 +134,7 @@ public class sQ {
 		}
 		long endTime=System.currentTimeMillis();
 		long timeConsumedsQ = endTime - startTime;
+		System.out.println(timeConsumedsQ);
 		return new sQsolution(totalCost, optimalAction, inventory, timeConsumedsQ);
 	}
 
@@ -141,20 +142,20 @@ public class sQ {
 
 		Chrono timer = new Chrono();
 
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 10;
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
-		int maxQuantity = 9;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4};
+		int[] demandMean = {20,40,60,40};
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -170,7 +171,7 @@ public class sQ {
 				);
 
 		/** Solve the classic instance **/
-		sQsolution sQsolution = solvesQInstance(instance,true);
+		sQsolution sQsolution = solvesQInstance(instance,false);
 		
 		/*
 		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];
@@ -191,17 +192,17 @@ public class sQ {
 								+ "t: "+ (t+1)+ "\t"  
 								+sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][t]);
 		}
-		/*
-		/*
+		
+		
 		for(int i=0; i<sQsolution.inventory.length;i++) {
 			System.out.println("i: "+ (i+instance.minInventory) + "\t" + sQsolution.totalCost[i][sQsolution.getOpt_aSQ(instance)+1][0]);
 		}
 		
-		
+		/*
 		for(int a=0; a<201;a++) {
 			System.out.println(sQsolution.totalCost[instance.initialInventory - instance.minInventory][a][0]);
-		}
-		*/
+		}*/
+		
 		
 		
 		

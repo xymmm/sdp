@@ -137,23 +137,23 @@ public class sQgivenQ {
 	
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 10;
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
-		int maxQuantity = 9;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4};
+		int[] demandMean = {20, 40, 60, 40};
 
 		//instance classic
-		int Q = 8;
+		int Q = 167;
 
 		
 		Instance instance = new Instance(
@@ -169,19 +169,19 @@ public class sQgivenQ {
 				stdParameter
 				);
 		
-		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
+		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		double[] costLimit = {20000, 15000, 10000, 5200};
 		
 		
-		for(int t=0; t<costGivenQ.length;t++) {
+		//for(int t=0; t<costGivenQ.length;t++) {
 			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
 			//System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
-		    System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
+		    //System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
-		}
+		//}
 		
 		System.out.print("reorderPoints = {");
 		for(int t=0; t<costGivenQ.length;t++) {
@@ -189,15 +189,19 @@ public class sQgivenQ {
 			if(t<costGivenQ.length-1)System.out.print(",");
 		}System.out.print("}");
 		
-		/* print costs for MATLAB plots
+		
 		for(int t=0;t<instance.getStages();t++) {
 			System.out.println("t="+t+"===========================================================");
-			for(int i=instance.initialInventory-instance.minInventory;i<instance.initialInventory-instance.minInventory+201;i++) {
-				System.out.println(sQgivenQ.costOrder[t][i]);
-			}System.out.println();
-			for(int i=instance.initialInventory-instance.minInventory;i<instance.initialInventory-instance.minInventory+201;i++) {
+			//for(int i=instance.initialInventory-50-instance.minInventory;i<instance.initialInventory-50-instance.minInventory+251;i++) {
+				//System.out.println(sQgivenQ.costOrder[t][i]);
+			//}System.out.println();
+			for(int i=instance.initialInventory-50-instance.minInventory;i<instance.initialInventory-50-instance.minInventory+251;i++) {
 				System.out.println(sQgivenQ.costNoOrder[t][i]);
 			}System.out.println();
+		}
+		/* print costs for MATLAB plots
+		for(int i=0; i< maxInventory - minInventory + 1; i++) {
+			System.out.println(sQgivenQ.costGivenQ[0][i]);
 		}*/
 
 		

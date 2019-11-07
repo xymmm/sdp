@@ -210,6 +210,7 @@ public class sS {
 		}
 		long endTime=System.currentTimeMillis();
 		long timeConsumed = endTime - startTime;
+		System.out.println(timeConsumed);
 		return new sSsolution(optimalAction, optimalCost, inventory, timeConsumed);
 	}
 
@@ -225,13 +226,13 @@ public class sS {
 
 		double tail = 0.00000001;
 
-		int minInventory = -1000;
-		int maxInventory = 1000;
-		int maxQuantity = 1000;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {60,60,60,60,60,60,60,60,60,60,60,60};
+		int[] demandMean = {20,40,60,40};
 
 		Instance instance = new Instance(
 										fixedOrderingCost,
@@ -246,14 +247,14 @@ public class sS {
 										stdParameter
 										);
 
-		sSsolution solution = solveInstance(instance, true);	//with initial order 
+		sSsolution solution = solveInstance(instance, false);	//with initial order 
 
 		presentsSresults(solution, instance);
 
 		System.out.println();
-		//for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {
-			//System.out.println(solution.optimalCost[i][0]);
-		//}
+		for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {
+			System.out.println(solution.optimalCost[i][0]);
+		}
 		for(int t=0; t<4; t++) {
 			System.out.println(solution.optimalAction[0-instance.minInventory][t]);
 		}
