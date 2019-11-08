@@ -149,8 +149,8 @@ public class sQ {
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
+		int minInventory = -1000;
+		int maxInventory = 1000;
 		int maxQuantity = 500;
 
 		double stdParameter = 0.25;

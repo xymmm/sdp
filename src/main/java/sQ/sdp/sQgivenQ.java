@@ -144,8 +144,8 @@ public class sQgivenQ {
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
+		int minInventory = -1000;
+		int maxInventory = 1000;
 		int maxQuantity = 500;
 
 		double stdParameter = 0.25;
@@ -153,7 +153,7 @@ public class sQgivenQ {
 		int[] demandMean = {20, 40, 60, 40};
 
 		//instance classic
-		int Q = 167;
+		int Q = 84;
 
 		
 		Instance instance = new Instance(
@@ -189,7 +189,7 @@ public class sQgivenQ {
 			if(t<costGivenQ.length-1)System.out.print(",");
 		}System.out.print("}");
 		
-		
+		/* print costs for MATLAB plots
 		for(int t=0;t<instance.getStages();t++) {
 			System.out.println("t="+t+"===========================================================");
 			//for(int i=instance.initialInventory-50-instance.minInventory;i<instance.initialInventory-50-instance.minInventory+251;i++) {
@@ -199,10 +199,23 @@ public class sQgivenQ {
 				System.out.println(sQgivenQ.costNoOrder[t][i]);
 			}System.out.println();
 		}
-		/* print costs for MATLAB plots
+		
 		for(int i=0; i< maxInventory - minInventory + 1; i++) {
 			System.out.println(sQgivenQ.costGivenQ[0][i]);
 		}*/
+		
+		int[] index = new int[271];
+		double costs [][] = new double [instance.getStages()][271];
+		for(int i=0; i<271; i++) {
+			index[i] = -20 + i;
+			for(int t=0; t<instance.getStages(); t++) {
+				costs[t][i] = sQgivenQ.costGivenQ[t][i+instance.initialInventory-20-instance.minInventory];
+			}
+		}
+		int t=0;
+		sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costs[t], index, "inventory level", "expected cost", "t="+t);
+		
+	
 
 		
 		

@@ -11,7 +11,7 @@ import java.util.List;
 import sS.sdp.sS;
 import sdp.data.InstanceDouble;
 
-public class sQtgeneratedQUnstore {
+public class sQtgeneratedQlocalM {
 	
 	public static void writeToText(int generator, double totalCost){
 		/*
@@ -131,7 +131,7 @@ public class sQtgeneratedQUnstore {
 		return totalCost[(int)(instance.initialInventory -instance.minInventory)][0];
 	}
 	
-	public static sQtgeneratedQUnstoreSolution sQtMultipleG(InstanceDouble instance) {
+	public static sQtgeneratedQlocalMsolution sQtMultipleG(InstanceDouble instance) {
 		
 		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
@@ -191,7 +191,7 @@ public class sQtgeneratedQUnstore {
 		long endTime = System.currentTimeMillis();
 		long timeConsumed_sQt = endTime - startTime;
 	
-		return new sQtgeneratedQUnstoreSolution(minCost, optQ, optG, timeConsumed_sQt);		
+		return new sQtgeneratedQlocalMsolution(minCost, optQ, optG, timeConsumed_sQt);		
 	}
 
 	
@@ -226,7 +226,7 @@ public class sQtgeneratedQUnstore {
 				stdParameter
 				);
 
-		sQtgeneratedQUnstoreSolution solution = sQtMultipleG(instance);
+		sQtgeneratedQlocalMsolution solution = sQtMultipleG(instance);
 		
 		System.out.println("optimal Cost for I0 = 0 is "+solution.minCost);
 		
