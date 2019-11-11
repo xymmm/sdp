@@ -8,11 +8,6 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import ilog.concert.IloException;
-import ilog.concert.IloNumVar;
-import ilog.cplex.IloCplex;
-import sQ.simulation.sQsimPoisson;
-import sQ.simulation.sQsimInstanceInt;
 import sS.sdp.sS;
 import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;
@@ -149,13 +144,13 @@ public class sQ {
 
 		double tail = 0.00000001;
 
-		int minInventory = -1000;
-		int maxInventory = 1000;
+		int minInventory = -500;
+		int maxInventory = 500;
 		int maxQuantity = 500;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {50,50,50,50};
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -171,7 +166,7 @@ public class sQ {
 				);
 
 		/** Solve the classic instance **/
-		sQsolution sQsolution = solvesQInstance(instance,false);
+		sQsolution sQsolution = solvesQInstance(instance,true);
 		
 		/*
 		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];
