@@ -4,12 +4,14 @@ import sdp.data.Instance;
 
 public class sQgivenQsolution {
 
+	public int[] inventory;
 	public double[][] costGivenQ;
 	public  boolean[][] actionGivenQ;
 	public double[][] costOrder;
 	public double[][] costNoOrder;
 
-	public sQgivenQsolution(double[][] costGivenQ, 
+	public sQgivenQsolution(int[] inventory,
+			double[][] costGivenQ, 
 			boolean[][] actionGivenQ,
 			double[][] costOrder,
 			double[][] costNoOrder) {
@@ -17,6 +19,7 @@ public class sQgivenQsolution {
 		this.actionGivenQ = actionGivenQ;
 		this.costOrder = costOrder;
 		this.costNoOrder = costNoOrder;
+		this.inventory = inventory;
 	}
 	
 	public static int[] getsGivenQ(Instance instance, sQgivenQsolution sQgivenQsolution) {

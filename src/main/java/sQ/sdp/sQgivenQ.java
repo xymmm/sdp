@@ -102,7 +102,7 @@ public class sQgivenQ {
 			}
 		}
 
-		return new sQgivenQsolution(costGivenQ, actionGivenQ, costOrder, costNoOrder);
+		return new sQgivenQsolution(inventory, costGivenQ, actionGivenQ, costOrder, costNoOrder);
 	}
 	
 	
@@ -134,13 +134,7 @@ public class sQgivenQ {
 		int Q = 167;
 		
 		double[] costLimit = {20000, 15000, 10000, 5200};
-		
-		
-		int[] inventory = new int [maxInventory - minInventory + 1];
-		for(int i=0;i<inventory.length;i++) {
-			inventory[i] = i + minInventory;
-		}
-		
+				
 		for(int i=0; i<demandMean.length;i++) {
 
 			Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMeanInput[i], 
@@ -152,10 +146,10 @@ public class sQgivenQ {
 			for(int j=0; j<costDifference.length; j++) {
 				costDifference[j] = sQgivenQ.costGivenQ[0][j] - sQgivenQ.costGivenQ[0][j+Q];
 			}
-			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, inventory, "inventory level", "cost difference", "t="+(i+1));//cost difference
+			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, sQgivenQ.inventory, "inventory level", "cost difference", "t="+(i+1));//cost difference
 			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costGivenQ[0], inventory, "inventory level", "expected cost", "t=1");//cost
 			for(int j=0; j<costDifference.length-1; j++) {
-				if(costDifference[j]<=100) {
+				if(costDifference[j] <= fixedOrderingCost) {
 					System.out.println("BreakPoints = "+(j + minInventory));
 					break;
 				}
@@ -166,10 +160,7 @@ public class sQgivenQ {
 			plotTwoCostGivenQ(sQgivenQorder.costOrder[0], sQgivenQorder.costNoOrder[0], Q, i, instance,costLimit[i]);
 			int[] s = sQgivenQsolution.getsGivenQ(instance, sQgivenQorder);
 			System.out.println("reorder points by comparing actions = " + s[0]);
-
-			
-
-			
+		
 		}
 
 
