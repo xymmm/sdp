@@ -12,29 +12,16 @@ import sS.sdp.sS;
 import sdp.data.Instance;
 
 public class sQgivenQ {
-
-	/**plot OPTIMAL cost with a given Q**/
-	public static void plotCostGivenQGivenStage(double[][] costGivenQ, int Q, int stageIndex, Instance instance) {
-		XYSeries series = new XYSeries("Optimal Cost with Given Q");
-		for(int i = 0; i<instance.maxInventory - instance.minInventory + 1; i++) {
-			series.add((i+instance.minInventory),costGivenQ[stageIndex][i]);
-		}
-		XYDataset xyDataset = new XYSeriesCollection(series);
-		JFreeChart chart = ChartFactory.createXYLineChart("expected cost with given Q="+Q+" at period "+(stageIndex+1), "inventory level", "expected cost",
-				xyDataset, PlotOrientation.VERTICAL, true, true, false);
-		ChartFrame frame = new ChartFrame("Cost with Given Q",chart);
-		frame.setVisible(true);
-		frame.setSize(1800,1500);
-	}
+	
 	/**plot TWO costs with a given Q - Reorder & Non-reorder**/
-	public static void plotTwoCostGivenQ(double[][] costOrder, double[][] costNoOrder, int Q, int stageIndex, Instance instance, double costLimit) {
+	public static void plotTwoCostGivenQ(double[] costOrder, double[] costNoOrder, int Q, int stageIndex, Instance instance, double costLimit) {
 		  XYSeries series1 = new XYSeries("Cost with Reorder");
-	      for(int i=0;i<costOrder[0].length;i++) {
-	    	  if(costOrder[stageIndex][i]<costLimit) series1.add((i+instance.minInventory),costOrder[stageIndex][i]);
+	      for(int i=0;i<costOrder.length;i++) {
+	    	  if(costOrder[i]<costLimit) series1.add((i+instance.minInventory),costOrder[i]);
 	      }
 	      XYSeries series2 = new XYSeries("Cost with No Reorder");
-	      for(int i=0;i<costOrder[0].length;i++) {
-	    	  if(costNoOrder[stageIndex][i]<costLimit) series2.add((i+instance.minInventory),costNoOrder[stageIndex][i]);
+	      for(int i=0;i<costOrder.length;i++) {
+	    	  if(costNoOrder[i]<costLimit) series2.add((i+instance.minInventory),costNoOrder[i]);
 	      }
 		  XYSeriesCollection collection = new XYSeriesCollection();
 		  collection.addSeries(series1);
@@ -46,19 +33,6 @@ public class sQgivenQ {
 			frame.setSize(1800,1500);
 	}
 	
-	/**plot reorder points varying with Q**/
-	public static void plotsGivenQforAllQ(int[][] s, Instance instance, int stageIndex) {
-		XYSeries series = new XYSeries("reorder point with Given Qs");
-		for(int q=0; q<instance.maxQuantity;q++) {
-			if(s[q][stageIndex]>=-30) series.add((q+1),s[q][stageIndex]);
-		}
-		XYDataset xyDataset = new XYSeriesCollection(series);
-		JFreeChart chart = ChartFactory.createXYLineChart("reorder point s varying with given Qs"+" at period "+(stageIndex+1), "feasible quantities", "reorder points",
-				xyDataset, PlotOrientation.VERTICAL, true, true, false);
-		ChartFrame frame = new ChartFrame("reorder point with Given Qs",chart);
-		frame.setVisible(true);
-		frame.setSize(1800,1500);
-	}
 
 	/****compute cost function f(Q,t,i) with given t and Q****/
 	public static sQgivenQsolution costVaryingWithInventory(int Q, Instance instance, boolean initialOrder){
@@ -100,8 +74,6 @@ public class sQgivenQ {
 				}
 				totalCostOrder /= scenarioProb;
 				costOrder[t][i] = totalCostOrder;
-				//if(i==instance.initialInventory - instance.minInventory) System.out.println(costOrder[t][instance.initialInventory - instance.minInventory]);
-
 
 				/** a = 0**/
 				double totalCostNoOrder = 0;
@@ -124,8 +96,6 @@ public class sQgivenQ {
 				}
 				totalCostNoOrder /= scenarioProb;
 				costNoOrder[t][i] = totalCostNoOrder;
-				//if(i==instance.initialInventory - instance.minInventory) System.out.println(costNoOrder[t][instance.initialInventory - instance.minInventory]);
-
 
 				costGivenQ[t][i] = Math.min(totalCostNoOrder, totalCostOrder);
 				actionGivenQ[t][i] = totalCostNoOrder < totalCostOrder ? false : true;
@@ -134,6 +104,8 @@ public class sQgivenQ {
 
 		return new sQgivenQsolution(costGivenQ, actionGivenQ, costOrder, costNoOrder);
 	}
+	
+	
 	
 	public static void main(String[] args) {
 
@@ -151,47 +123,56 @@ public class sQgivenQ {
 		double stdParameter = 0.25;
 
 		int[] demandMean = {20,40,60,40};
+		
+		int[][] demandMeanInput = {
+				{20, 40, 60, 40},
+				{40, 60, 40},
+				{60, 40},
+				{40}
+		};
 
-		//instance classic
 		int Q = 167;
-
 		
-		Instance instance = new Instance(
-				fixedOrderingCost,
-				unitCost,
-				holdingCost,
-				penaltyCost,
-				demandMean,
-				tail,
-				minInventory,
-				maxInventory,
-				maxQuantity,
-				stdParameter
-				);
-		
-		sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
-		
-		double costGivenQ[][] = sQgivenQ.costGivenQ;
-		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		double[] costLimit = {20000, 15000, 10000, 5200};
 		
 		
-		//for(int t=0; t<costGivenQ.length;t++) {
-			//if(t==0) plotCostGivenQGivenStage(costGivenQ, Q, t, instance);
-			//System.out.println("s("+(t+1)+") = "+sGivenQ[t]);
-		    //System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
-			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q, t, instance,costLimit[t]);
-		//}
+		int[] inventory = new int [maxInventory - minInventory + 1];
+		for(int i=0;i<inventory.length;i++) {
+			inventory[i] = i + minInventory;
+		}
 		
-		System.out.print("reorderPoints = {");
-		for(int t=0; t<costGivenQ.length;t++) {
-			System.out.print(sGivenQ[t]);
-			if(t<costGivenQ.length-1)System.out.print(",");
-		}System.out.print("}");
-		
+		for(int i=0; i<demandMean.length;i++) {
 
-		//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costGivenQ[0], inventory, "inventory level", "expected cost", "t=1");
-		
+			Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMeanInput[i], 
+					tail, minInventory, maxInventory, maxQuantity, stdParameter );
+			
+			//determine s by compare c(s) and c(s+Q)
+			sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
+			double[] costDifference = new double[maxInventory-minInventory+1-Q];
+			for(int j=0; j<costDifference.length; j++) {
+				costDifference[j] = sQgivenQ.costGivenQ[0][j] - sQgivenQ.costGivenQ[0][j+Q];
+			}
+			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, inventory, "inventory level", "cost difference", "t="+(i+1));//cost difference
+			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costGivenQ[0], inventory, "inventory level", "expected cost", "t=1");//cost
+			for(int j=0; j<costDifference.length-1; j++) {
+				if(costDifference[j]<=100) {
+					System.out.println("BreakPoints = "+(j + minInventory));
+					break;
+				}
+			}
+			
+			//determine s by compare c(order) and c(no order)
+			sQgivenQsolution sQgivenQorder = costVaryingWithInventory(Q,instance, true);
+			plotTwoCostGivenQ(sQgivenQorder.costOrder[0], sQgivenQorder.costNoOrder[0], Q, i, instance,costLimit[i]);
+			int[] s = sQgivenQsolution.getsGivenQ(instance, sQgivenQorder);
+			System.out.println("reorder points by comparing actions = " + s[0]);
+
+			
+
+			
+		}
+
+
 		/* print costs for MATLAB plots
 		for(int t=0;t<instance.getStages();t++) {
 			System.out.println("t="+t+"===========================================================");
@@ -202,27 +183,15 @@ public class sQgivenQ {
 				System.out.println(sQgivenQ.costNoOrder[t][i]);
 			}System.out.println();
 		}
-		*/
-		System.out.println();
-		for(int i=instance.initialInventory-instance.minInventory;i<instance.initialInventory-instance.minInventory+301;i++) {
-			System.out.println((i+minInventory)+"    "+sQgivenQ.costGivenQ[0][i]+"    "+sQgivenQ.actionGivenQ[0][i]);
-		}
-		
-		/*
-		int[] index = new int[271];
-		double costs [][] = new double [instance.getStages()][271];
-		for(int i=0; i<271; i++) {
-			index[i] = -20 + i;
-			for(int t=0; t<instance.getStages(); t++) {
-				costs[t][i] = sQgivenQ.costGivenQ[t][i+instance.initialInventory-20-instance.minInventory];
-			}
-		}
-		int t=0;
-		sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costs[t], index, "inventory level", "expected cost", "t="+t);
-		*/
-	
 
-		
+
+		System.out.print("reorderPoints = {");
+			for(int t=0; t<costGivenQ.length;t++) {
+				System.out.print(sGivenQ[t]);
+				if(t<costGivenQ.length-1)System.out.print(",");
+			}System.out.print("}");System.out.println();
+		 */
+
 		
 	}
 

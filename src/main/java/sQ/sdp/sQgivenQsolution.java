@@ -19,7 +19,7 @@ public class sQgivenQsolution {
 		this.costNoOrder = costNoOrder;
 	}
 	
-	public int[] getsGivenQ(Instance instance, sQgivenQsolution sQgivenQsolution) {
+	public static int[] getsGivenQ(Instance instance, sQgivenQsolution sQgivenQsolution) {
 		int[] s = new int[instance.getStages()];
 		for(int t=0;t<instance.getStages();t++) { // Time
 			for(int i=0;i<(instance.maxInventory - instance.minInventory+1);i++) {  // Inventory   
