@@ -117,6 +117,7 @@ public class Model {
 	}
    
    public static void main(String[] args){
+	  System.out.println(System.getProperty("java.library.path"));
       //int Nbmonths = 10;
       //double[] expDemand = {200,50,100,300,150,200,100,50,200,150}; 
       //double[] stdDemand = {60,15,30,90,45,60,30,15,60,45}; 

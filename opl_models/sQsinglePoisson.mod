@@ -6,12 +6,12 @@ float h=...;
 float p=...;
 float v=...;
 float meandemand[months]=...;
-int initialStock = ...;
+float initialStock = ...;
 
 int nbpartitions=...;
 range partitions=1..nbpartitions;
 float prob[partitions]=...;
-float lamda_matrix[t in months, j in months, i in partitions] = ...;
+float lamda_matrix[months][months][partitions] = ...;
 
 //variables
 dvar float stock[0..nbmonths];
@@ -19,7 +19,7 @@ dvar float+ stockhlb[0..nbmonths];
 dvar float+ stockplb[0..nbmonths];
 dvar boolean purchase[months];
 dvar boolean P[months][months];
-dvar float+ U[1..nbmonths];
+dvar float+ U[months];
 
 dvar float+ Q;
 
@@ -30,10 +30,6 @@ minimize sum(t in months)( fc*purchase[t]+h*stockhlb[t]+p*stockplb[t] +  v*U[t])
 
 //constraints
 subject to{
-
-//for sQt small instances
-//Q <= 9;
-
 
  stock[0] == initialStock;
  stockhlb[0]==maxl(stock[0],0);

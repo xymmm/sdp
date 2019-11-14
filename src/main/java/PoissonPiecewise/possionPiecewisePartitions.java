@@ -13,9 +13,9 @@ public class possionPiecewisePartitions {
 	public static double[][][] lamdaMatrix(int[] demandMean, int partitions, int nbSamples){
 		double[][][] lamdaMatrix = new double [demandMean.length][demandMean.length][partitions];
 		for(int t=0; t<demandMean.length; t++) {
-			System.out.println("t = "+t);
+			//System.out.println("t = "+t);
 			for(int j=0; j<=t; j++){
-				System.out.println("j = "+j);
+				//System.out.println("j = "+j);
 				int sumLamda = convolution(demandMean, j,t);
 				lamdaMatrix[j][t] = conditionalExpectationGivenPartitions(sumLamda, nbSamples, partitions);
 			}

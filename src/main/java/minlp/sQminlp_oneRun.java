@@ -25,7 +25,7 @@ public class sQminlp_oneRun{
 	double 	fixedCost;
 	double 	unitCost;
 	double 	penaltyCost;
-	double 	initialStock;
+	double 	initialInventoryLevel;
 	int 	partitions;
 	
 	String instanceIdentifier;
@@ -43,7 +43,7 @@ public class sQminlp_oneRun{
 		this.fixedCost 		= fixedCost;
 		this.unitCost 		= unitCost;
 		this.penaltyCost 	= penaltyCost;
-		this.initialStock 	= initialStock;
+		this.initialInventoryLevel 	= initialStock;
 		this.partitions 	= partitions;
 	}
 	
@@ -89,7 +89,7 @@ public class sQminlp_oneRun{
         	double objective = cplex.getObjValue();
         	double time = end - start;
         	//System.out.println("OBJECTIVE: " + objective);  
-        	double Q = cplex.getValue((IloNumVar) opl.getElement("Q"));
+        	double Q = cplex.getValue(opl.getElement("Q").asNumVar());
         	opl.postProcess();
         	//opl.printSolution(System.out);
         	//opl.end();
@@ -120,7 +120,7 @@ public class sQminlp_oneRun{
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		double initialStock = 0;
+		double initialInventoryLevel = 0;
 		int partitions = 10;
 		
 		double Q = Double.NaN;
@@ -132,7 +132,7 @@ public class sQminlp_oneRun{
 					fixedCost,
 					unitCost,
 					penaltyCost,
-					initialStock,
+					initialInventoryLevel,
 					partitions,
 					null
 					);
@@ -160,28 +160,37 @@ public class sQminlp_oneRun{
             handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
             handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
             handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
+            
             handler.startElement("meandemand"); handler.startArray();
             for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
             handler.endArray(); handler.endElement();
-            handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();
+            
+            handler.startElement("initialStock"); handler.addNumItem(initialInventoryLevel); handler.endElement();
             
             //piecewise
             handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
             
-            handler.startElement("probabilities"); handler.startArray();
-            for (int j = 0 ; j<demandMean.length ; j++){handler.addNumItem(1.0/partitions);}
+            double partitionProb = 1.0/partitions;
+            handler.startElement("prob"); handler.startArray();
+            for (int j = 0 ; j<partitions; j++){handler.addNumItem(partitionProb);}
             handler.endArray(); handler.endElement();
             
             double[][][] coefficients = getLamdaMatrix (demandMean, partitions, 100000);
             handler.startElement("lamda_matrix");
             handler.startArray();
             for(int t=0; t<demandMean.length; t++) {
-            	for(int j=0; j<=t; j++) {
-            		for(int p =0; p<partitions; p++) {
+            	handler.startArray();
+            	for(int j=0; j<demandMean.length; j++) {
+            		handler.startArray();
+            		for(int p = 0; p<partitions; p++) {
             			handler.addNumItem(coefficients[t][j][p]);
             		}
+            		handler.endArray(); 
             	}
-            }handler.endArray(); handler.endElement();
+            	handler.endArray(); 
+            }
+            handler.endArray(); 
+            handler.endElement();
         }
 		
 	}
