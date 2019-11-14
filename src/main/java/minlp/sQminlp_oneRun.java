@@ -18,20 +18,19 @@ import ilog.opl.IloOplModelDefinition;
 import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
 
+public class sQminlp_oneRun{
 
-public class sQminlp {
-
-	int[] demandMean;
-	double holdingCost;
-	double fixedCost;
-	double unitCost;
-	double penaltyCost;
-	double initialStock;
-	int partitions;
+	int[] 	demandMean;
+	double 	holdingCost;
+	double 	fixedCost;
+	double 	unitCost;
+	double 	penaltyCost;
+	double 	initialStock;
+	int 	partitions;
 	
 	String instanceIdentifier;
 	
-	public sQminlp(int[] demandMean, 
+	public sQminlp_oneRun(int[] demandMean, 
 				   double holdingCost,
 				   double fixedCost,
 				   double unitCost,
@@ -39,22 +38,22 @@ public class sQminlp {
 				   double initialStock,
 				   int partitions,
 				   String instanceIdentifier) {
-		this.demandMean = demandMean;
-		this.holdingCost =  holdingCost;
-		this.fixedCost = fixedCost;
-		this.unitCost = unitCost;
-		this.penaltyCost = penaltyCost;
-		this.initialStock = initialStock;
-		this.partitions = partitions;
+		this.demandMean 	= demandMean;
+		this.holdingCost 	= holdingCost;
+		this.fixedCost 		= fixedCost;
+		this.unitCost 		= unitCost;
+		this.penaltyCost 	= penaltyCost;
+		this.initialStock 	= initialStock;
+		this.partitions 	= partitions;
 	}
 	
 	/** compute lamda matrix for linearisation of Poisson distribution **/
 	public static double[][][] getLamdaMatrix (int[] demandMean, int partitions, int nbSamples){
-		double[][][] coefficients = PoissonPiecewise_sQ.possionPiecewisePartitions.lamdaMatrix(demandMean, partitions, nbSamples);
+		double[][][] coefficients = PoissonPiecewise.possionPiecewisePartitions.lamdaMatrix(demandMean, partitions, nbSamples);
 		return coefficients;
 	}
 	
-	private InputStream getMINLPmodelStream(File file) {
+	public InputStream getMINLPmodelStream(File file) {
 	      FileInputStream is = null;
 	      try{
 	         is = new FileInputStream(file);
@@ -64,18 +63,18 @@ public class sQminlp {
 	      return is;
 	}
 	
-	public double solveMINLP (String model_name) throws IloException{
+	public double solveMINLP_oneRun (String model_name) throws IloException{
 		IloOplFactory oplF = new IloOplFactory();
         IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
         IloCplex cplex = oplF.createCplex();
-        IloOplModelSource modelSource=oplF.createOplModelSourceFromStream(getMINLPmodelStream(new File("./opl_models/backorders/"+model_name+".mod")),model_name);
+        IloOplModelSource modelSource=oplF.createOplModelSourceFromStream(getMINLPmodelStream(new File("./opl_models/"+model_name+".mod")),model_name);
         IloOplSettings settings = oplF.createOplSettings(errHandler);
         IloOplModelDefinition def=oplF.createOplModelDefinition(modelSource,settings);
         IloOplModel opl=oplF.createOplModel(def,cplex);
         cplex.setParam(IloCplex.IntParam.Threads, 8);
         cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);
         
-        IloOplDataSource dataSource = new sQminlp.MyData(oplF);
+        IloOplDataSource dataSource = new sQminlp_oneRun.sQsingleData(oplF);
         opl.addDataSource(dataSource);
         opl.generate();
 
@@ -115,8 +114,40 @@ public class sQminlp {
 	}
 	
 	
-	class MyData extends IloCustomOplDataSource{
-        MyData(IloOplFactory oplF){
+	public static void main(String[] args) {
+		int[] demandMean = {20, 40, 60, 40};
+		double fixedCost = 100;
+		double unitCost = 0;
+		double holdingCost = 1;
+		double penaltyCost = 10;
+		double initialStock = 0;
+		int partitions = 10;
+		
+		double Q = Double.NaN;
+		
+		try {
+			sQminlp_oneRun sQmodel = new sQminlp_oneRun(
+					demandMean,
+					holdingCost,
+					fixedCost,
+					unitCost,
+					penaltyCost,
+					initialStock,
+					partitions,
+					null
+					);
+			Q = sQmodel.solveMINLP_oneRun("sQsinglePoisson");
+		}catch(IloException e){
+	         e.printStackTrace();
+	    }
+		System.out.println("Q = "+Q);
+	}
+	
+	
+
+
+	class sQsingleData extends IloCustomOplDataSource{
+		sQsingleData(IloOplFactory oplF){
             super(oplF);
         }
 
@@ -129,7 +160,7 @@ public class sQminlp {
             handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
             handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
             handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
-            handler.startElement("expDemand"); handler.startArray();
+            handler.startElement("meandemand"); handler.startArray();
             for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
             handler.endArray(); handler.endElement();
             handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();
@@ -157,32 +188,5 @@ public class sQminlp {
 
 	
 	
-	public static void main(String[] args) {
-		int[] demandMean = {20, 40, 60, 40};
-		double fixedCost = 100;
-		double unitCost = 0;
-		double holdingCost = 1;
-		double penaltyCost = 10;
-		double initialStock = 0;
-		int partitions = 10;
-		
-		double Q = Double.NaN;
-		
-		try {
-			sQminlp sQmodel = new sQminlp(
-					demandMean,
-					holdingCost,
-					fixedCost,
-					unitCost,
-					penaltyCost,
-					initialStock,
-					partitions,
-					null
-					);
-			Q = sQmodel.solveMINLP("sQsinglePoisson");
-		}catch(IloException e){
-	         e.printStackTrace();
-	    }
-		System.out.println("Q = "+Q);
-	}
+
 }

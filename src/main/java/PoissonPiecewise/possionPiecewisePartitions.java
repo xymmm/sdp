@@ -1,4 +1,4 @@
-package PoissonPiecewise_sQ;
+package PoissonPiecewise;
 
 import java.io.File;
 import java.io.FileWriter;
