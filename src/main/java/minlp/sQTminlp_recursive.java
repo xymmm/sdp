@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
 
 import ilog.concert.IloException;
 import ilog.opl.IloCplex;
@@ -19,24 +21,24 @@ import ilog.opl.IloOplModelDefinition;
 import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
 
-public class sQtminlp_recursive {
+public class sQTminlp_recursive {
 	
 	int[] 		demandMean;
 	double 		holdingCost;
 	double 		fixedCost;
 	double 		unitCost;
 	double 		penaltyCost;
-	double 		initialStock;
+	int 		initialStock;
 	int 		partitions;
 	
 	String instanceIdentifier;
 	
-	public sQtminlp_recursive(int[] demandMean, 
+	public sQTminlp_recursive(int[] demandMean, 
 				   double holdingCost,
 				   double fixedCost,
 				   double unitCost,
 				   double penaltyCost,
-				   double initialStock,
+				   int initialStock,
 				   int 	  partitions,
 				   String instanceIdentifier) {
 		this.demandMean 	= demandMean;
@@ -70,20 +72,16 @@ public class sQtminlp_recursive {
         cplex.setParam(IloCplex.IntParam.Threads, 8);
         cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);
         
-        IloOplDataSource dataSource = new sQtminlp_recursive.sQtRecursiveData(oplF);
+        IloOplDataSource dataSource = new sQTminlp_recursive.sQtRecursiveData(oplF);
         opl.addDataSource(dataSource);
         opl.generate();
 
         cplex.setOut(null);
         
-        double start = cplex.getCplexImpl().getCplexTime();
-        boolean status =  cplex.solve();
-        double end = cplex.getCplexImpl().getCplexTime();
-        
+        boolean status =  cplex.solve();        
         if ( status )
         {   
         	double objective = cplex.getObjValue();
-        	double time = end - start;
         	opl.postProcess();
         	oplF.end();
         	System.gc();
@@ -113,49 +111,61 @@ public class sQtminlp_recursive {
             handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
             handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
             handler.startElement("meandemand"); handler.startArray();
-            for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
+            for (int j = 0 ; j<demandMean.length ; j++) {handler.addIntItem(demandMean[j]);}
             handler.endArray(); handler.endElement();
-            handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();
+            handler.startElement("initialStock"); handler.addIntItem(initialStock); handler.endElement();
             
             //piecewise
             handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
             
-            handler.startElement("probabilities"); handler.startArray();
-            for (int j = 0 ; j<demandMean.length ; j++){handler.addNumItem(1.0/partitions);}
+            double partitionProb = 1.0/partitions;
+            handler.startElement("prob"); handler.startArray();
+            for (int j = 0 ; j<partitions; j++){handler.addNumItem(partitionProb);}
             handler.endArray(); handler.endElement();
             
             double[][][] coefficients = sQminlp_oneRun.getLamdaMatrix (demandMean, partitions, 100000);
             handler.startElement("lamda_matrix");
             handler.startArray();
             for(int t=0; t<demandMean.length; t++) {
-            	for(int j=0; j<=t; j++) {
-            		for(int p =0; p<partitions; p++) {
+            	handler.startArray();
+            	for(int j=0; j<demandMean.length; j++) {
+            		handler.startArray();
+            		for(int p = 0; p<partitions; p++) {
             			handler.addNumItem(coefficients[t][j][p]);
             		}
+            		handler.endArray(); 
             	}
-            }handler.endArray(); handler.endElement();
+            	handler.endArray(); 
+            }
+            handler.endArray(); 
+            handler.endElement();
         }
 
 	}
 	
 	public static void writeToText(double value, boolean enter){
-		
+		FileWriter fw = null;
 		try {
-			File writename = new File("./sQtRecursiveResults.txt"); // relative path, if no file then create a new output.txt
-			writename.createNewFile(); // create new file
-			BufferedWriter out = new BufferedWriter(new FileWriter(writename));
-			if(!enter) {
-			out.write(value+"     "); // \r\n is enter
-			}else {
-				out.write("\r\n");
-			}
-			out.flush(); // save soft drive
-			out.close(); // close the file
-		} 
-		catch (Exception e) {
+			File f = new File("./sQtRecursiveResults.txt"); // relative path, if no file then create a new output.txt
+			fw = new FileWriter(f, true);//true, continue to write
+		}catch(IOException e) {
 			e.printStackTrace();
 		}
-	}	
+		PrintWriter pw = new PrintWriter(fw);
+		if(!enter) {
+			pw.print(value+"  "); // \r\n is enter
+		}else {
+			pw.print("\r\n");
+		}
+		pw.flush(); // save soft drive
+		try {
+			fw.flush();
+			pw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
 
 
 	public static void main(String[] args) {
@@ -164,16 +174,23 @@ public class sQtminlp_recursive {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		double[] initialStock = new double[1001];
+		
+		int minInventory = -500;
+		int maxInventory = 500;
+		int[] initialStock = new int[maxInventory - minInventory +1];
 		for(int i=0; i<initialStock.length;i++) {
-			initialStock[i] = i - 500;
+			initialStock[i] = i + minInventory;
 		}
+		
 		int partitions = 10;
+		
+		double[] cost_i = new double[initialStock.length];
+		long startTime = System.currentTimeMillis();
 
-		for(int i=0; i<1001; i++) {
+		for(int i=0; i<initialStock.length; i++) {
 			writeToText(initialStock[i], false);
 			try {
-				sQtminlp_recursive sQmodel = new sQtminlp_recursive(
+				sQTminlp_recursive sQmodel = new sQTminlp_recursive(
 						demandMean,
 						holdingCost,
 						fixedCost,
@@ -181,18 +198,35 @@ public class sQtminlp_recursive {
 						penaltyCost,
 						initialStock[i],
 						partitions,
-						null
+						"sQtPoisson_recursive"
 						);
-				double obj = sQmodel.solveMINLP_recursive("sQsinglePoisson_recursive");
+				double obj = sQmodel.solveMINLP_recursive("sQtPoisson_recursive");
 				System.out.println("c("+initialStock[i]+") = " +obj);
+				cost_i[i] = obj;
 				writeToText(obj,false);
 			}catch(IloException e){
 				e.printStackTrace();
 			}
-
-
 			writeToText(initialStock[i],true);
 		}
+		
+		sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(cost_i, initialStock, "Opening inventory level", "Approximated expected cost", "Approximated expected total cost by sQt-MINLP");
+		int s = 0;
+		int globalMinimumIndex = sdp.util.globalMinimum.getGlobalMinimumJavaIndex(cost_i);
+		double targetCost = cost_i[globalMinimumIndex] + fixedCost;
+		for(int i=0; i<cost_i.length;i++) {
+			if(cost_i[i]<targetCost) {
+				s = i + minInventory;
+				break;
+			}
+		}
+		long endTime = System.currentTimeMillis();
+		
+		System.out.println("time consumed = "+(endTime - startTime)/1000+" s");
+		System.out.println("cost(s="+s+") = "+ cost_i[s-minInventory]+", with global minimum = cost_i("+(globalMinimumIndex+minInventory)+") = "+cost_i[globalMinimumIndex]);
+		
+		
+		
 	}
 
 

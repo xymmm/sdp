@@ -7,7 +7,7 @@ float p=...;
 float v=...;
 float meandemand[months]=...;
 int initialStock = ...;
-double Q;
+float Q;
 
 int nbpartitions=...;
 range partitions=1..nbpartitions;

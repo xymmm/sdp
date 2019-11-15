@@ -6,6 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import ilog.concert.IloException;
 import ilog.opl.IloCplex;
@@ -26,7 +30,7 @@ public class sQminlp_recursive {
 	double 	fixedCost;
 	double 	unitCost;
 	double 	penaltyCost;
-	double 	initialStock;
+	int 	initialStock;
 	int 	partitions;
 	double 	Q;
 	
@@ -37,7 +41,7 @@ public class sQminlp_recursive {
 				   double fixedCost,
 				   double unitCost,
 				   double penaltyCost,
-				   double initialStock,
+				   int initialStock,
 				   int partitions,
 				   double Q,
 				   String instanceIdentifier) {
@@ -79,14 +83,14 @@ public class sQminlp_recursive {
 
         cplex.setOut(null);
         
-        double start = cplex.getCplexImpl().getCplexTime();
+        //double start = cplex.getCplexImpl().getCplexTime();
         boolean status =  cplex.solve();
-        double end = cplex.getCplexImpl().getCplexTime();
+        //double end = cplex.getCplexImpl().getCplexTime();
         
         if ( status )
         {   
         	double objective = cplex.getObjValue();
-        	double time = end - start;
+        	//double time = end - start;
         	opl.postProcess();
         	oplF.end();
         	System.gc();
@@ -118,45 +122,57 @@ public class sQminlp_recursive {
             handler.startElement("meandemand"); handler.startArray();
             for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
             handler.endArray(); handler.endElement();
-            handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();
+            handler.startElement("initialStock"); handler.addIntItem(initialStock); handler.endElement();
             handler.restartElement("Q");handler.addNumItem(Q); handler.endElement();
             
             //piecewise
             handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
             
-            handler.startElement("probabilities"); handler.startArray();
-            for (int j = 0 ; j<demandMean.length ; j++){handler.addNumItem(1.0/partitions);}
+            double partitionProb = 1.0/partitions;
+            handler.startElement("prob"); handler.startArray();
+            for (int j = 0 ; j<partitions; j++){handler.addNumItem(partitionProb);}
             handler.endArray(); handler.endElement();
             
             double[][][] coefficients = sQminlp_oneRun.getLamdaMatrix (demandMean, partitions, 100000);
             handler.startElement("lamda_matrix");
             handler.startArray();
             for(int t=0; t<demandMean.length; t++) {
-            	for(int j=0; j<=t; j++) {
-            		for(int p =0; p<partitions; p++) {
+            	handler.startArray();
+            	for(int j=0; j<demandMean.length; j++) {
+            		handler.startArray();
+            		for(int p = 0; p<partitions; p++) {
             			handler.addNumItem(coefficients[t][j][p]);
             		}
+            		handler.endArray(); 
             	}
-            }handler.endArray(); handler.endElement();
+            	handler.endArray(); 
+            }
+            handler.endArray(); 
+            handler.endElement();
         }
 		
 	}
 	
 	public static void writeToText(double value, boolean enter){
-		
+		FileWriter fw = null;
 		try {
-			File writename = new File("./sQrecursiveResults.txt"); // relative path, if no file then create a new output.txt
-			writename.createNewFile(); // create new file
-			BufferedWriter out = new BufferedWriter(new FileWriter(writename));
-			if(!enter) {
-			out.write(value+"     "); // \r\n is enter
-			}else {
-				out.write("\r\n");
-			}
-			out.flush(); // save soft drive
-			out.close(); // close the file
-		} 
-		catch (Exception e) {
+			File f = new File("./sQrecursiveResults.txt"); // relative path, if no file then create a new output.txt
+			fw = new FileWriter(f, true);//true, continue to write
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
+		PrintWriter pw = new PrintWriter(fw);
+		if(!enter) {
+			pw.print(value+"  "); // \r\n is enter
+		}else {
+			pw.print("\r\n");
+		}
+		pw.flush(); // save soft drive
+		try {
+			fw.flush();
+			pw.close();
+			fw.close();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}	 
@@ -168,21 +184,29 @@ public class sQminlp_recursive {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		double[] initialStock = new double[1001];
+		
+		int minInventory = -500;
+		int maxInventory = 500;
+		int[] initialStock = new int[maxInventory - minInventory +1];
 		for(int i=0; i<initialStock.length;i++) {
-			initialStock[i] = i - 500;
+			initialStock[i] = i + minInventory;
 		}
-		int partitions = 10;
-
-		double Q[] = new double [501];
+		
+		int maxQuantity = 500;
+		double[] Q = new double [maxQuantity +1];
 		for(int i=0; i<Q.length; i++) {
 			Q[i] = i;
 		}
-
-		for(int i=0; i<1001; i++) {
-			writeToText(initialStock[i], false);
-			for(int q=0; q<501; q++) {
+		
+		int partitions = 10;
+		
+		double[][] cost_iQ = new double[maxQuantity+1][maxInventory - minInventory + 1];
+		
+		for(int q=0; q<=maxQuantity; q++) {
+			//writeToText(initialStock[i], false);
+			for(int i=0; i<initialStock.length; i++) {
 				try {
+					System.out.println("Onging (i,Q) = ("+(i+minInventory)+", "+q+")");
 					sQminlp_recursive sQmodel = new sQminlp_recursive(
 							demandMean,
 							holdingCost,
@@ -192,18 +216,21 @@ public class sQminlp_recursive {
 							initialStock[i],
 							partitions,
 							Q[q],
-							null
+							"sQsinglePoisson_recursive"
 							);
 					double obj = sQmodel.solveMINLP_recursive("sQsinglePoisson_recursive");
-					System.out.println("c("+initialStock[i]+", "+Q[q]+") = " +obj);
-					writeToText(obj,false);
+					cost_iQ[i][q] = obj;
+					System.out.println("c("+initialStock[i]+", "+Q[q]+") = " +cost_iQ[i][q]);
+					//writeToText(obj,false);
 				}catch(IloException e){
 					e.printStackTrace();
 				}
 
 			}
-			writeToText(initialStock[i],true);
+			//writeToText(initialStock[i],true);
 		}
+		
+		System.out.println(Arrays.deepToString(cost_iQ));
 	}
 
 	

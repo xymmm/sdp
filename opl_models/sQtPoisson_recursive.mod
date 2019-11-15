@@ -37,6 +37,8 @@ minimize sum(t in months)( fc*purchase[t]+h*stockhlb[t]+p*stockplb[t] +  v*U[t])
 
 //constraints
 subject to{
+ 
+ purchase[1] == 0;
 
  stock[0] == initialStock;
  stockhlb[0]==maxl(stock[0],0);
