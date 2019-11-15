@@ -169,14 +169,14 @@ public class sQTminlp_recursive {
 
 
 	public static void main(String[] args) {
-		int[] demandMean = {20, 40, 60, 40};
-		double fixedCost = 100;
+		int[] demandMean = {2, 4, 6, 4};
+		double fixedCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		double penaltyCost = 5;
 		
-		int minInventory = -500;
-		int maxInventory = 500;
+		int minInventory = -50;
+		int maxInventory = 50;
 		int[] initialStock = new int[maxInventory - minInventory +1];
 		for(int i=0; i<initialStock.length;i++) {
 			initialStock[i] = i + minInventory;

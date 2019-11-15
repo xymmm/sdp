@@ -179,34 +179,34 @@ public class sQminlp_recursive {
 	
 	
 	public static void main(String[] args) {
+		
+		long startTime = System.currentTimeMillis();
+		
 		int[] demandMean = {20, 40, 60, 40};
 		double fixedCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 		
-		int minInventory = -500;
-		int maxInventory = 500;
+		int minInventory = 0;
+		int maxInventory = 250;
 		int[] initialStock = new int[maxInventory - minInventory +1];
 		for(int i=0; i<initialStock.length;i++) {
 			initialStock[i] = i + minInventory;
 		}
 		
-		int maxQuantity = 500;
-		double[] Q = new double [maxQuantity +1];
-		for(int i=0; i<Q.length; i++) {
-			Q[i] = i;
-		}
+		int maxQuantity = 200;
 		
 		int partitions = 10;
 		
-		double[][] cost_iQ = new double[maxQuantity+1][maxInventory - minInventory + 1];
+		double[][] cost_Qi = new double[maxQuantity+1][maxInventory - minInventory + 1];
 		
 		for(int q=0; q<=maxQuantity; q++) {
-			//writeToText(initialStock[i], false);
+			writeToText(q, false);
+			long singleStartTime = System.currentTimeMillis();
 			for(int i=0; i<initialStock.length; i++) {
 				try {
-					System.out.println("Onging (i,Q) = ("+(i+minInventory)+", "+q+")");
+					//System.out.println("Onging (i,Q) = ("+(i+minInventory)+", "+q+")");
 					sQminlp_recursive sQmodel = new sQminlp_recursive(
 							demandMean,
 							holdingCost,
@@ -215,22 +215,48 @@ public class sQminlp_recursive {
 							penaltyCost,
 							initialStock[i],
 							partitions,
-							Q[q],
+							q,
 							"sQsinglePoisson_recursive"
 							);
 					double obj = sQmodel.solveMINLP_recursive("sQsinglePoisson_recursive");
-					cost_iQ[i][q] = obj;
-					System.out.println("c("+initialStock[i]+", "+Q[q]+") = " +cost_iQ[i][q]);
-					//writeToText(obj,false);
+					cost_Qi[q][i] = obj;
+					System.out.println("c("+initialStock[i]+", "+q+") = " +cost_Qi[q][i]);
+
+					writeToText(obj,false);
 				}catch(IloException e){
 					e.printStackTrace();
 				}
 
 			}
-			//writeToText(initialStock[i],true);
+			long singleEndTime = System.currentTimeMillis();
+			System.out.println("time for Q = "+q+" is "+(singleEndTime - singleStartTime)/1000+" s");
+			writeToText(q,true);
 		}
 		
-		System.out.println(Arrays.deepToString(cost_iQ));
+		//System.out.println(Arrays.deepToString(cost_iQ));
+		
+		int[] s = new int[maxQuantity+1];
+		for(int q=0; q<=maxQuantity; q++) {
+			for(int i=0; i<initialStock.length-q; i++) {
+				if(cost_Qi[q][i] - cost_Qi[q][i+q] <= fixedCost) {
+					s[q] = i+minInventory;
+					break;
+				}
+			}		
+		}
+		writeToText(0,true);
+		for(int i=0; i<s.length; i++) {
+			writeToText(s[i],false);
+		}
+		System.out.println(Arrays.toString(s));
+		
+		
+		long endTime = System.currentTimeMillis();
+		System.out.println("timeConsumed = "+(endTime - startTime)/1000 +"s");
+		
+		
+		
+		
 	}
 
 	
