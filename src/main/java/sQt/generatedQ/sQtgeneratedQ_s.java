@@ -1,5 +1,7 @@
 package sQt.generatedQ;
 
+import java.util.Arrays;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
@@ -143,22 +145,29 @@ public class sQtgeneratedQ_s {
 
 		double tail = 0.00000001;
 
-		int minInventory = -120;
-		int maxInventory = 120;
+		int minInventory = -50;
+		int maxInventory = 50;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4,2,4};
+		int[] demandMean = {2,4,6,4};
+		int[][] demandMeanInput = {
+				{2,4,6,4},
+				{4,6,4},
+				{6,4},
+				{4}
+		};
 		
-		int[] Q = {7,0,8,9,0,0};
-			
+		int[] Q = {8, 0, 9, 0};
+		
+		for(int d=0; d<demandMeanInput.length; d++) {
 		Instance instance = new Instance(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
 				penaltyCost,
-				demandMean,
+				demandMeanInput[d],
 				tail,
 				minInventory,
 				maxInventory,
@@ -173,18 +182,21 @@ public class sQtgeneratedQ_s {
 		
 		
 		for(int t=0; t<costGivenQ.length;t++) {
-		    System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
+		    //System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q[t], t, instance);
 		}
+	    System.out.println(Arrays.toString(sQgivenQ.costGivenQ[0]));
 		
-		
+	    /*
 		System.out.print("reorderPoints = {");
 		for(int t=0; t<costGivenQ.length;t++) {
 			System.out.print(sGivenQ[t]);
 			if(t<costGivenQ.length-1)System.out.print(",");
 		}System.out.print("}");
 		System.out.println();
+		*/
 
+	}
 	}
 
 }

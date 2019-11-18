@@ -29,7 +29,7 @@ public class sQtgeneratedQlocalM {
 		 */
 		FileWriter fw = null;
 		try {
-			File f = new File("E:\\sQtGenerated.txt");
+			File f = new File("./sQtGenerated.txt");
 			fw = new FileWriter(f, true);//true, continue to write
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -175,7 +175,7 @@ public class sQtgeneratedQlocalM {
 		for(int i=0; i<LocalMinCosts.length; i++) {
 			LocalMinCosts[i] = (double) LocalMinCostsList.get(i);
 			minGs[i] = (int) minGsList.get(i);
-			System.out.println(minGs[i] + "   "+LocalMinCosts[i]);
+			//System.out.println(minGs[i] + "   "+LocalMinCosts[i]);
 		}
 		
 		double minCost = LocalMinCosts[0];
@@ -205,13 +205,13 @@ public class sQtgeneratedQlocalM {
 
 		double tail = 0.00000001;
 
-		int minInventory = -120;
-		int maxInventory = 120;
+		int minInventory = -50;
+		int maxInventory = 150;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4,2,4};
+		int[] demandMean = {2,4,6,4};
 
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,

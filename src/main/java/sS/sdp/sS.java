@@ -210,7 +210,7 @@ public class sS {
 		}
 		long endTime=System.currentTimeMillis();
 		long timeConsumed = endTime - startTime;
-		System.out.println(timeConsumed);
+		System.out.println("Computation consumed " + timeConsumed +" ms.");
 		return new sSsolution(optimalAction, optimalCost, inventory, timeConsumed);
 	}
 
@@ -247,41 +247,10 @@ public class sS {
 										stdParameter
 										);
 
-		sSsolution solution = solveInstance(instance, false);	//with initial order 
+		sSsolution solution = solveInstance(instance, true);	//with initial order 
 
 		presentsSresults(solution, instance);
 
-		System.out.println();
-		for(int i=0-instance.minInventory; i<=200-instance.minInventory;i++) {
-			System.out.println(solution.optimalCost[i][0]);
-		}
-		for(int t=0; t<4; t++) {
-			System.out.println(solution.optimalAction[0-instance.minInventory][t]);
-		}
-		
-		/** Simulations **/
-		/*
-		int [] actionS 		= sSsolution.getSSDP(solution.optimalAction);
-		int [] reorderPoint = sSsolution.getsSDP(solution.optimalAction);
-		
-		sSsimInstance sSsystem = new sSsimInstance(
-				fixedOrderingCost,
-				unitCost,
-				holdingCost,
-				penaltyCost,
-				demandMean,
-				minInventory,
-				maxInventory,
-				actionS,
-				reorderPoint
-				);	
-		int count = 50000;
-		sSsim.simulationsQinstanceRuns(sSsystem, count);
-		
-		sSsystem.statCost.setConfidenceIntervalStudent();
-		System.out.println(sSsystem.statCost.report(0.9, 3));
-		System.out.println("Total CPU time: "+timer.format());
-		*/
 	}
 
 }

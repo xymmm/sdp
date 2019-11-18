@@ -140,7 +140,7 @@ public class sQminlp_oneRun{
 		}catch(IloException e){
 	         e.printStackTrace();
 	    }
-		System.out.println("Q = "+Q);
+		System.out.println("Q = "+Math.ceil(Q));
 	}
 	
 	

@@ -72,7 +72,7 @@ public class sQsimPoisson {
 		}
 	}
 	
-	public static double sQsimPoisson(sQsimInstanceDouble sQsimInstance, boolean print) {
+	public static double sQsimPoisson(sQsimInstanceDouble sQsimInstance, boolean print, boolean initialOrder) {
 
 		double inventoryLevel = sQsimInstance.getInitialInventory();
 		double cost = 0;
@@ -86,7 +86,7 @@ public class sQsimPoisson {
 			//1 & 2 check inventory
 			actionDecision = checkInventory(sQsimInstance.reorderPoint[currentStageIndex], inventoryLevel);
 			if(print == true) System.out.println((actionDecision == 1) ? "Replenishment order placed. ":"No order placed. ");
-			//if(currentStageIndex == 0) actionDecision =0;
+			if(!initialOrder == true) if(currentStageIndex == 0) actionDecision =0;
 			
 			//2. compute purchasing cost
 			cost += computePurchasingCost(actionDecision, currentStageIndex, sQsimInstance);
@@ -119,7 +119,7 @@ public class sQsimPoisson {
 	/** multiple run times **/
 	public static void sQsimPoissonMultiRuns(sQsimInstanceDouble sQsimInstance, int count) {
 		for(int i=0; i<count; i++) {
-			sQsimInstance.statCost.add(sQsimPoisson(sQsimInstance,false));
+			sQsimInstance.statCost.add(sQsimPoisson(sQsimInstance,false, false));
 		}
 	}
 
@@ -138,8 +138,8 @@ public class sQsimPoisson {
 		double coe = 0.25;
 		//1,28,108,164,106,20
 		double[] demandMean = {20,40,60,40};
-		double[] reorderPoint = {16,31,59,30};
-		double Q = 114.85;
+		double[] reorderPoint = {14, 35, 55, 25};
+		double Q = 82;
 		double[] actionQuantity = new double[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
 			actionQuantity[t] = Q;

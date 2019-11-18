@@ -135,19 +135,28 @@ public class sQgivenQ {
 		
 		double[] costLimit = {20000, 15000, 10000, 5200};
 				
-		for(int i=0; i<demandMean.length;i++) {
+		//for(int d=0; d<demandMean.length;d++) {
 
-			Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMeanInput[i], 
-					tail, minInventory, maxInventory, maxQuantity, stdParameter );
-			
+			/** create and resolve instance**/
+			Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMean, 
+					tail, minInventory, maxInventory, maxQuantity, stdParameter );	
 			//determine s by compare c(s) and c(s+Q)
-			sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
+			sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
+			
+			/**print and plot ETC**/
+			//System.out.println("cost with initial stock = "+instance.initialInventory+" is "+sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
+			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(sQgivenQ.costGivenQ[0], sQgivenQ.inventory, "inventory level", "expected cost", "t=1");//cost
+			for(int i=instance.initialInventory-instance.minInventory; i<sQgivenQ.inventory.length; i++) {
+				System.out.println((i+instance.minInventory)+"   "+sQgivenQ.costGivenQ[0][i]);
+			}
+			
+			/**resolve reorder points by cost differences**/
 			double[] costDifference = new double[maxInventory-minInventory+1-Q];
 			for(int j=0; j<costDifference.length; j++) {
 				costDifference[j] = sQgivenQ.costGivenQ[0][j] - sQgivenQ.costGivenQ[0][j+Q];
+				//System.out.println(costDifference[j]);
 			}
-			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, sQgivenQ.inventory, "inventory level", "cost difference", "t="+(i+1));//cost difference
-			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costGivenQ[0], inventory, "inventory level", "expected cost", "t=1");//cost
+			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, sQgivenQ.inventory, "inventory level", "cost difference", "t="+(d+1));//cost difference
 			for(int j=0; j<costDifference.length-1; j++) {
 				if(costDifference[j] <= fixedOrderingCost) {
 					System.out.println("BreakPoints = "+(j + minInventory));
@@ -155,13 +164,15 @@ public class sQgivenQ {
 				}
 			}
 			
-			//determine s by compare c(order) and c(no order)
+			/**determine s by compare c(order) and c(no order)**/
 			sQgivenQsolution sQgivenQorder = costVaryingWithInventory(Q,instance, true);
-			plotTwoCostGivenQ(sQgivenQorder.costOrder[0], sQgivenQorder.costNoOrder[0], Q, i, instance,costLimit[i]);
+			for(int t=0; t<instance.demandMean.length; t++) {
+				//plotTwoCostGivenQ(sQgivenQorder.costOrder[0], sQgivenQorder.costNoOrder[0], Q, t, instance,costLimit[t]);
+			}
 			int[] s = sQgivenQsolution.getsGivenQ(instance, sQgivenQorder);
 			System.out.println("reorder points by comparing actions = " + s[0]);
 		
-		}
+		//}
 
 
 		/* print costs for MATLAB plots

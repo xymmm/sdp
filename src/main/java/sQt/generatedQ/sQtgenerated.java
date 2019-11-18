@@ -29,7 +29,7 @@ public class sQtgenerated {
 		 */
 		FileWriter fw = null;
 		try {
-			File f = new File("E:\\sQtGenerated.txt");
+			File f = new File("\"./sQtGenerated.txt");
 			fw = new FileWriter(f, true);//true, continue to write
 		} catch (IOException e) {
 			e.printStackTrace();

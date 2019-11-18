@@ -169,7 +169,7 @@ public class sQTminlp_recursive {
 
 
 	public static void main(String[] args) {
-		int[] demandMean = {2, 4, 6, 4};
+		int[] demandMean = {4};
 		double fixedCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
