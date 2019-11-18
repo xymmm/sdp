@@ -150,7 +150,7 @@ public class sQ {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {50,50,50,50};
+		int[] demandMean = {20, 40, 60, 40};
 
 		Instance instance = new Instance(
 				fixedOrderingCost,

@@ -131,20 +131,20 @@ public class sQgivenQ {
 				{40}
 		};
 
-		int Q = 167;
+		int Q = 83;
 		
 		double[] costLimit = {20000, 15000, 10000, 5200};
 				
-		//for(int d=0; d<demandMean.length;d++) {
+		for(int d=0; d<demandMean.length;d++) {
 
 			/** create and resolve instance**/
-			Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMean, 
+			Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMeanInput[d], 
 					tail, minInventory, maxInventory, maxQuantity, stdParameter );	
 			//determine s by compare c(s) and c(s+Q)
-			sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
+			sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
 			
 			/**print and plot ETC**/
-			//System.out.println("cost with initial stock = "+instance.initialInventory+" is "+sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
+			System.out.println("cost with initial stock = "+instance.initialInventory+" is "+sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
 			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(sQgivenQ.costGivenQ[0], sQgivenQ.inventory, "inventory level", "expected cost", "t=1");//cost
 			for(int i=instance.initialInventory-instance.minInventory; i<sQgivenQ.inventory.length; i++) {
 				System.out.println((i+instance.minInventory)+"   "+sQgivenQ.costGivenQ[0][i]);
@@ -172,7 +172,7 @@ public class sQgivenQ {
 			int[] s = sQgivenQsolution.getsGivenQ(instance, sQgivenQorder);
 			System.out.println("reorder points by comparing actions = " + s[0]);
 		
-		//}
+		}
 
 
 		/* print costs for MATLAB plots
