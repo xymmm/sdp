@@ -205,13 +205,13 @@ public class sQtgeneratedQlocalM {
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 150;
+		int minInventory = -110;
+		int maxInventory = 110;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4};
+		int[] demandMean = {2,4,6,4,2,4,7};
 
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,

@@ -122,20 +122,20 @@ public class sQgivenQ {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {20, 40, 60, 40, 20, 40};
 		
 		int[][] demandMeanInput = {
-				{20, 40, 60, 40},
+				{20, 40, 60, 40, 20, 40},
 				{40, 60, 40},
 				{60, 40},
 				{40}
 		};
 
-		int Q = 83;
+		int Q = 77;
 		
 		double[] costLimit = {20000, 15000, 10000, 5200};
 				
-		for(int d=0; d<demandMean.length;d++) {
+		for(int d=0; d<1;d++) {
 
 			/** create and resolve instance**/
 			Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMeanInput[d], 
@@ -145,7 +145,7 @@ public class sQgivenQ {
 			
 			/**print and plot ETC**/
 			System.out.println("cost with initial stock = "+instance.initialInventory+" is "+sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
-			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(sQgivenQ.costGivenQ[0], sQgivenQ.inventory, "inventory level", "expected cost", "t=1");//cost
+			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(sQgivenQ.costGivenQ[0], sQgivenQ.inventory, "inventory level", "expected cost", "Expected cost without initial order t=1");//cost
 			for(int i=instance.initialInventory-instance.minInventory; i<sQgivenQ.inventory.length; i++) {
 				System.out.println((i+instance.minInventory)+"   "+sQgivenQ.costGivenQ[0][i]);
 			}
@@ -156,7 +156,7 @@ public class sQgivenQ {
 				costDifference[j] = sQgivenQ.costGivenQ[0][j] - sQgivenQ.costGivenQ[0][j+Q];
 				//System.out.println(costDifference[j]);
 			}
-			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, sQgivenQ.inventory, "inventory level", "cost difference", "t="+(d+1));//cost difference
+			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, sQgivenQ.inventory, "inventory level", "cost difference", "t="+(d+1));//cost difference
 			for(int j=0; j<costDifference.length-1; j++) {
 				if(costDifference[j] <= fixedOrderingCost) {
 					System.out.println("BreakPoints = "+(j + minInventory));

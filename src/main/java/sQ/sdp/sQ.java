@@ -130,7 +130,7 @@ public class sQ {
 		}
 		long endTime=System.currentTimeMillis();
 		long timeConsumedsQ = endTime - startTime;
-		System.out.println(timeConsumedsQ);
+		System.out.println(timeConsumedsQ + " ms");
 		return new sQsolution(totalCost, optimalAction, inventory, timeConsumedsQ);
 	}
 
@@ -151,7 +151,7 @@ public class sQ {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {20, 40, 60, 40};
+		int[] demandMean = {20, 40, 60, 40, 20, 40};
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -183,6 +183,8 @@ public class sQ {
 		
 		
 		System.out.println();
+		
+		
 		for(int t=0; t<instance.getStages();t++) {
 			System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t"
 								+ "t: "+ (t+1)+ "\t"  
@@ -190,10 +192,11 @@ public class sQ {
 		}
 		
 		
+		/*
 		for(int i=0; i<sQsolution.inventory.length;i++) {
 			System.out.println("i: "+ (i+instance.minInventory) + "\t" + sQsolution.totalCost[i][sQsolution.getOpt_aSQ(instance)+1][0]);
 		}
-		
+		*/
 		/*
 		for(int a=0; a<201;a++) {
 			System.out.println(sQsolution.totalCost[instance.initialInventory - instance.minInventory][a][0]);

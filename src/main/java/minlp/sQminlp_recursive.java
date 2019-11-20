@@ -156,7 +156,7 @@ public class sQminlp_recursive {
 	public static void writeToText(double value, boolean enter){
 		FileWriter fw = null;
 		try {
-			File f = new File("./sQrecursiveResults.txt"); // relative path, if no file then create a new output.txt
+			File f = new File("./sQrecursiveResults_reorderPoints.txt"); // relative path, if no file then create a new output.txt
 			fw = new FileWriter(f, true);//true, continue to write
 		}catch(IOException e) {
 			e.printStackTrace();
@@ -175,67 +175,72 @@ public class sQminlp_recursive {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}	 
+	}
 	
 	
 	public static void main(String[] args) {
 		
 		long startTime = System.currentTimeMillis();
 		
-		int[] demandMean = {40};
+		int[] demandMean = {60,40};
+		
+		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
+		
 		double fixedCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 		
 		int minInventory = 0;
-		int maxInventory = 200;
+		int maxInventory = 300;
 		int[] initialStock = new int[maxInventory - minInventory +1];
 		for(int i=0; i<initialStock.length;i++) {
 			initialStock[i] = i + minInventory;
 		}
 		
-		int maxQuantity = 200;
-		
 		int partitions = 10;
+		int Q = 82;
 		
-		double[][] cost_Qi = new double[maxQuantity+1][maxInventory - minInventory + 1];
+		int s;
+		double[] cost_i = new double[maxInventory - minInventory +1];
 		
-
-		//for(int q=0; q<=maxQuantity; q++) {
+		for(int t=0; t<demandMean.length; t++) {
 			//writeToText(q, false);
 			long singleStartTime = System.currentTimeMillis();
 			for(int i=0; i<initialStock.length; i++) {
 				try {
-					//System.out.println("Onging (i,Q) = ("+(i+minInventory)+", "+q+")");
 					sQminlp_recursive sQmodel = new sQminlp_recursive(
-							demandMean,
+							demandMeanInput[t],
 							holdingCost,
 							fixedCost,
 							unitCost,
 							penaltyCost,
 							initialStock[i],
 							partitions,
-							82,
+							Q,
 							"sQsinglePoisson_recursive"
 							);
 					double obj = sQmodel.solveMINLP_recursive("sQsinglePoisson_recursive");
-					cost_Qi[83][i] = obj;
-					System.out.println("c("+82+", "+initialStock[i]+") = " +cost_Qi[83][i]);
+					cost_i[i] = obj;
 
-					writeToText(obj,false);
+					if(i>=Q) {
+						if(cost_i[i-Q] - cost_i[i] <= fixedCost) {
+							s = i - Q;
+							writeToText(s,false);
+							System.out.println("s("+(t+1)+") = "+s);
+							break;
+						}
+					}
 				}catch(IloException e){
 					e.printStackTrace();
 				}
 
 			}
-			//long singleEndTime = System.currentTimeMillis();
-			//System.out.println("time for Q = "+q+" is "+(singleEndTime - singleStartTime)/1000+" s");
-			//writeToText(t,true);
-		//}
+			long singleEndTime = System.currentTimeMillis();
+			System.out.println("time for period "+(t+1)+" is "+(singleEndTime - singleStartTime)/1000+"s");
+		}
 		System.out.println();
-		
-		//System.out.println(Arrays.deepToString(cost_iQ));
+
 		/*
 		int[] s = new int[maxQuantity+1];
 		for(int q=0; q<=maxQuantity; q++) {

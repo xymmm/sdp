@@ -115,7 +115,7 @@ public class sQminlp_oneRun{
 	
 	
 	public static void main(String[] args) {
-		int[] demandMean = {20, 40, 60, 40};
+		int[] demandMean = {20, 40};
 		double fixedCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
