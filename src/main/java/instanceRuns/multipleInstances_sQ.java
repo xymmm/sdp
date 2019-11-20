@@ -24,7 +24,7 @@ public class multipleInstances_sQ{
 		results[0] = sSsolution.optimalCost[instance.initialInventory - instance.minInventory][0]; 
 		results[1] = sSsolution.timeConsumed;
 		//sQ
-		sQsolution sQsolution = sQ.solvesQInstance(instance,initialOrder);
+		sQsolution sQsolution = sQ.solvesQInstance(instance);
 		results[2] = sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][0];
 		results[3] = sQsolution.getOpt_aSQ(instance)+1;
 		results[4] = sQsolution.timeConsumedsQ;
