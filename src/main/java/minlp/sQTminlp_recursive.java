@@ -146,7 +146,7 @@ public class sQTminlp_recursive {
 	public static void writeToText(double value, boolean enter){
 		FileWriter fw = null;
 		try {
-			File f = new File("./sQtRecursiveResults.txt"); // relative path, if no file then create a new output.txt
+			File f = new File("./sQtRecursiveResults_reorderPoints.txt"); // relative path, if no file then create a new output.txt
 			fw = new FileWriter(f, true);//true, continue to write
 		}catch(IOException e) {
 			e.printStackTrace();
@@ -169,13 +169,14 @@ public class sQTminlp_recursive {
 
 
 	public static void main(String[] args) {
-		int[] demandMean = {4};
+		int[] demandMean = {2,4,6,4};
+		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		double fixedCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 5;
 		
-		int minInventory = -50;
+		int minInventory = -10;
 		int maxInventory = 50;
 		int[] initialStock = new int[maxInventory - minInventory +1];
 		for(int i=0; i<initialStock.length;i++) {
@@ -186,44 +187,52 @@ public class sQTminlp_recursive {
 		
 		double[] cost_i = new double[initialStock.length];
 		long startTime = System.currentTimeMillis();
-
-		for(int i=0; i<initialStock.length; i++) {
-			writeToText(initialStock[i], false);
-			try {
-				sQTminlp_recursive sQmodel = new sQTminlp_recursive(
-						demandMean,
-						holdingCost,
-						fixedCost,
-						unitCost,
-						penaltyCost,
-						initialStock[i],
-						partitions,
-						"sQtPoisson_recursive"
-						);
-				double obj = sQmodel.solveMINLP_recursive("sQtPoisson_recursive");
-				System.out.println("c("+initialStock[i]+") = " +obj);
-				cost_i[i] = obj;
-				writeToText(obj,false);
-			}catch(IloException e){
-				e.printStackTrace();
+		
+		for(int t=0; t<demandMean.length; t++) {
+			long singleStartTime = System.currentTimeMillis();
+			for(int i=0; i<initialStock.length; i++) {
+				//writeToText(initialStock[i], false);
+				try {
+					sQTminlp_recursive sQmodel = new sQTminlp_recursive(
+							demandMeanInput[t],
+							holdingCost,
+							fixedCost,
+							unitCost,
+							penaltyCost,
+							initialStock[i],
+							partitions,
+							"sQtPoisson_recursive"
+							);
+					double obj = sQmodel.solveMINLP_recursive("sQtPoisson_recursive");
+					//System.out.println("c("+initialStock[i]+") = " +obj);
+					cost_i[i] = obj;
+					//writeToText(obj,false);
+				}catch(IloException e){
+					e.printStackTrace();
+				}
+				//writeToText(initialStock[i],true);
 			}
-			writeToText(initialStock[i],true);
+			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(cost_i, initialStock, "Opening inventory level", "Approximated expected cost", "Approximated expected total cost by sQt-MINLP");
+			int s = 0;
+			int globalMinimumIndex = sdp.util.globalMinimum.getGlobalMinimumJavaIndex(cost_i);
+			double targetCost = cost_i[globalMinimumIndex] + fixedCost;
+			for(int i=0; i<cost_i.length;i++) {
+				if(cost_i[i]<targetCost) {
+					s = i + minInventory;
+					System.out.println("s("+(t+1)+") = "+s);
+					writeToText(s,false);
+					break;
+				}
+			}
+			long singleEndTime = System.currentTimeMillis();
+			System.out.println("time consumed = "+(singleEndTime - singleStartTime)/1000+" s");
+			System.out.println("cost(s="+s+") = "+ cost_i[s-minInventory]+", with global minimum = cost_i("+(globalMinimumIndex+minInventory)+") = "+cost_i[globalMinimumIndex]);
 		}
 		
-		sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(cost_i, initialStock, "Opening inventory level", "Approximated expected cost", "Approximated expected total cost by sQt-MINLP");
-		int s = 0;
-		int globalMinimumIndex = sdp.util.globalMinimum.getGlobalMinimumJavaIndex(cost_i);
-		double targetCost = cost_i[globalMinimumIndex] + fixedCost;
-		for(int i=0; i<cost_i.length;i++) {
-			if(cost_i[i]<targetCost) {
-				s = i + minInventory;
-				break;
-			}
-		}
+		System.out.println();
 		long endTime = System.currentTimeMillis();
-		
 		System.out.println("time consumed = "+(endTime - startTime)/1000+" s");
-		System.out.println("cost(s="+s+") = "+ cost_i[s-minInventory]+", with global minimum = cost_i("+(globalMinimumIndex+minInventory)+") = "+cost_i[globalMinimumIndex]);
+		
 		
 		
 		

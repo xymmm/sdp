@@ -261,6 +261,7 @@ public class sQminlp_recursive {
 		long endTime = System.currentTimeMillis();
 		System.out.println("timeConsumed = "+(endTime - startTime)/1000 +"s");
 	
+		/** for multiple instances, put writeToText(·,true) at the end**/
 	}
 
 	
