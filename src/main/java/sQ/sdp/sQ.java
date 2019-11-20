@@ -58,7 +58,7 @@ public class sQ {
 	}
 
 	/** main computation **/
-	public static sQsolution solvesQInstance(Instance instance, boolean initialOrder) {
+	public static sQsolution solvesQInstance(Instance instance) {
 
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
@@ -78,7 +78,8 @@ public class sQ {
 			for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 				for(int i=0;i<inventory.length;i++) { // Inventory   
 					/** a > 0 **/
-					Q = ((t==0)&&(!initialOrder))? 0: a;
+					//Q = ((t==0)&&(!initialOrder))? 0: a;
+					Q = a;
 					double totalCostOrder = sS.computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost); 
 					double scenarioProb = 0;
 					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
@@ -166,7 +167,7 @@ public class sQ {
 				);
 
 		/** Solve the classic instance **/
-		sQsolution sQsolution = solvesQInstance(instance,true);
+		sQsolution sQsolution = solvesQInstance(instance);
 		
 		/*
 		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];
