@@ -63,7 +63,7 @@ public class sQminlp_oneRun{
 	      return is;
 	}
 	
-	public double solveMINLP_oneRun (String model_name) throws IloException{
+	public double solveMINLP_oneRun (String model_name) throws IloException{		
 		IloOplFactory oplF = new IloOplFactory();
         IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
         IloCplex cplex = oplF.createCplex();
@@ -90,6 +90,7 @@ public class sQminlp_oneRun{
         	double time = end - start;
         	//System.out.println("OBJECTIVE: " + objective);  
         	double Q = cplex.getValue(opl.getElement("Q").asNumVar());
+        	System.out.println("time = "+time);
         	opl.postProcess();
         	//opl.printSolution(System.out);
         	//opl.end();
@@ -115,7 +116,10 @@ public class sQminlp_oneRun{
 	
 	
 	public static void main(String[] args) {
-		int[] demandMean = {20, 40};
+		
+		long startTime = System.currentTimeMillis();
+		
+		int[] demandMean = {91, 92, 93, 94, 95, 96, 97, 98, 99, 100};
 		double fixedCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
@@ -140,7 +144,9 @@ public class sQminlp_oneRun{
 		}catch(IloException e){
 	         e.printStackTrace();
 	    }
+		long endTime = System.currentTimeMillis();
 		System.out.println("Q = "+Math.ceil(Q));
+		System.out.println("time consumed = "+(endTime - startTime)/1000+"s");
 	}
 	
 	

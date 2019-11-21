@@ -182,8 +182,8 @@ public class sQminlp_recursive {
 		
 		long startTime = System.currentTimeMillis();
 		
-		int[] demandMean = {60,40};
-		
+		int[] demandMean = {91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102};
+		//int[] demandMean = {20,40,60,40};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		
 		double fixedCost = 100;
@@ -191,7 +191,7 @@ public class sQminlp_recursive {
 		double holdingCost = 1;
 		double penaltyCost = 10;
 		
-		int minInventory = 0;
+		int minInventory = -50;
 		int maxInventory = 300;
 		int[] initialStock = new int[maxInventory - minInventory +1];
 		for(int i=0; i<initialStock.length;i++) {
@@ -199,7 +199,7 @@ public class sQminlp_recursive {
 		}
 		
 		int partitions = 10;
-		int Q = 82;
+		int Q = 194;
 		
 		int s;
 		double[] cost_i = new double[maxInventory - minInventory +1];
@@ -222,10 +222,11 @@ public class sQminlp_recursive {
 							);
 					double obj = sQmodel.solveMINLP_recursive("sQsinglePoisson_recursive");
 					cost_i[i] = obj;
+					System.out.println("c("+initialStock[i]+", "+Q+") = " +cost_i[i]);
 
 					if(i>=Q) {
 						if(cost_i[i-Q] - cost_i[i] <= fixedCost) {
-							s = i - Q;
+							s = initialStock[i - Q];
 							writeToText(s,false);
 							System.out.println("s("+(t+1)+") = "+s);
 							break;
