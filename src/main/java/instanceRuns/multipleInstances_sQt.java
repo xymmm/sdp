@@ -64,7 +64,7 @@ public class multipleInstances_sQt {
 	public static void writeToTextParameters(int fixedOrderingCost, int penaltyCost, int unitCost, double stdParameter){
 		FileWriter fw = null;
 		try {
-			File f = new File("E:\\sQtpoissonInstances.txt");
+			File f = new File("./sQtpoissonInstances.txt");
 			fw = new FileWriter(f, true);//true, continue to write
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -87,7 +87,7 @@ public class multipleInstances_sQt {
 	public static void writeToTextCostResults(Instance instance, double[][] results, boolean initialOrder) {//int s
 		FileWriter fw = null;
 		try {
-			File f = new File("E:\\sQtpoissonInstances.txt");
+			File f = new File("./sQtpoissonInstances.txt");
 			fw = new FileWriter(f, true);//true, continue to write
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -113,7 +113,7 @@ public class multipleInstances_sQt {
 	public static void writeToTextReorderPoints(Instance instance, boolean initialOrder, int[][] s) {//int s
 		FileWriter fw = null;
 		try {
-			File f = new File("E:\\sQtpoissionInstances_reorderPoints.txt");
+			File f = new File("./sQtpoissonInstances_reorderPoints.txt");
 			fw = new FileWriter(f, true);//true, continue to write
 		} catch (IOException e) {
 			e.printStackTrace();
