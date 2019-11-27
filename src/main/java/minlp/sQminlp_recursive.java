@@ -200,10 +200,43 @@ public class sQminlp_recursive {
 		return  d;
 	}
 	
+	public static int computeMINLP_sGreaterThanK(sQminlpInstance sQminlpInstance, int i1) {
+		int s = Integer.MIN_VALUE;
+		System.out.println("case 1");
+		int i2 = i1 + 1;
+		double d2 = costDifference (sQminlpInstance, i2);
+		if(d2 < sQminlpInstance.fixedCost) {
+			System.out.println("case 1 ->1, s found");
+			s = i2;
+		}else {
+			System.out.println("case 1 ->2, continue");
+			computeMINLP_sGreaterThanK(sQminlpInstance, i1 + 1);
+		}
+		return s;
+	}
+	
+	public static int computeMINLP_sLessThanK(sQminlpInstance sQminlpInstance, int i1) {
+		int s = Integer.MIN_VALUE;
+		System.out.println("case 2");
+		int i2 = i1 - 1;
+		double d2 = costDifference (sQminlpInstance, i2);
+		if(d2 > sQminlpInstance.fixedCost) {
+			System.out.println("case 2 ->1, s found");
+			s = i2;
+		}else {
+			System.out.println("case 2 ->2, continue");
+			computeMINLP_sLessThanK(sQminlpInstance, i1 - 1);
+		}
+		return s;
+	}
+	
 	public static int computeMINLP_s(sQminlpInstance sQminlpInstance, int i1) {//before this, declare i1 = s_sdp[d]
 		int s = Integer.MIN_VALUE;
 		do {
 			if(costDifference (sQminlpInstance, i1) > sQminlpInstance.fixedCost) {
+				computeMINLP_sGreaterThanK(sQminlpInstance , i1);
+				break;
+				/*
 				System.out.println("case 1");
 				int i2 = i1 + 1;
 				double d2 = costDifference (sQminlpInstance, i2);
@@ -214,8 +247,10 @@ public class sQminlp_recursive {
 				}else {
 					System.out.println("case 1 ->2, continue");
 					computeMINLP_s(sQminlpInstance, i1 + 1);
-				}
+				}*/
 			}else {
+				computeMINLP_sLessThanK(sQminlpInstance, i1);
+				/*
 				System.out.println("case 2");
 				int i2 = i1 - 1;
 				double d2 = costDifference (sQminlpInstance, i2);
@@ -227,7 +262,7 @@ public class sQminlp_recursive {
 					System.out.println("case 2 ->2, continue");
 					computeMINLP_s(sQminlpInstance, i1 - 1);
 				}
-				System.out.println();
+				System.out.println();*/
 			}
 		}while(s != Integer.MIN_VALUE);
 		return s;
@@ -237,8 +272,8 @@ public class sQminlp_recursive {
 		
 		long startTime = System.currentTimeMillis();
 		
-		//int[] demandMean = {91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102};
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {91, 92, 93, 94, 95, 96, 97, 98, 99, 100};
+		//int[] demandMean = {20,40,60,40};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		
 		double fixedCost = 100;
@@ -247,12 +282,13 @@ public class sQminlp_recursive {
 		double penaltyCost = 10;
 	
 		int partitions = 10;
-		int[] s_sdp = {13, 33, 54, 24};
-		int Q_minlp = 82;
+		//int[] s_sdp = {13, 33, 54, 24};
+		int[] s_sdp = {74, 75, 76, 77, 78, 79, 80, 81, 82, 74};
+		int Q_minlp = 192;
 		
 		int[] s = new int[demandMean.length];
 		
-		for(int d=0; d<demandMeanInput.length; d++) {
+		for(int d=9; d<demandMeanInput.length; d++) {
 			long startSingleTime = System.currentTimeMillis();
 			sQminlpInstance sQminlpInstance = new sQminlpInstance(demandMeanInput[d], fixedCost, unitCost, holdingCost, penaltyCost, 
 					partitions, s_sdp,Q_minlp);
@@ -264,13 +300,6 @@ public class sQminlp_recursive {
 			System.out.println("---------------------------    time Consumed = "+ (endSingleTime - startSingleTime) +" ms");
 
 		}		
-		
-		
-
-		
-		
-		
-		
 		
 		/*
 		double[] cost_i = new double[maxInventory - minInventory +1];
