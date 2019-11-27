@@ -119,7 +119,7 @@ public class sQminlp_oneRun{
 		
 		long startTime = System.currentTimeMillis();
 		
-		int[] demandMean = {91, 92, 93, 94, 95, 96, 97, 98, 99, 100};
+		int[] demandMean = {65, 50, 40, 30};
 		//int[] demandMean = {20,40,60,40};
 		double fixedCost = 100;
 		double unitCost = 0;

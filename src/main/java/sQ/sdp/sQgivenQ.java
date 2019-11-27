@@ -125,11 +125,10 @@ public class sQgivenQ {
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {20, 40, 60, 40};
-		int[] demandMean = {91, 92, 93, 94, 95, 96, 97, 98, 99, 100};
+		int[] demandMean = {65, 50, 40, 30};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 
-
-		int Q = 194;
+		int Q = 189;
 		
 		//double[] costLimit = {20000, 15000, 10000, 5200};
 		

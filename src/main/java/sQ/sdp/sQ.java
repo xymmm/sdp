@@ -145,13 +145,13 @@ public class sQ {
 
 		double tail = 0.00000001;
 
-		int minInventory = -1500;
-		int maxInventory = 1500;
+		int minInventory = -500;
+		int maxInventory = 500;
 		int maxQuantity = 500;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {91, 92, 93, 94, 95, 96, 97, 98, 99, 100};
+		int[] demandMean = {65, 50, 40, 30};
 
 		Instance instance = new Instance(
 				fixedOrderingCost,

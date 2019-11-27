@@ -200,80 +200,49 @@ public class sQminlp_recursive {
 		return  d;
 	}
 	
-	public static int computeMINLP_sGreaterThanK(sQminlpInstance sQminlpInstance, int i1) {
-		int s = Integer.MIN_VALUE;
-		System.out.println("case 1");
+	public static int computeMINLP_sGreaterK(sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex) {
+		int s = sQminlpInstance.s_sdp[currentPeriodIndex];
 		int i2 = i1 + 1;
 		double d2 = costDifference (sQminlpInstance, i2);
 		if(d2 < sQminlpInstance.fixedCost) {
-			System.out.println("case 1 ->1, s found");
 			s = i2;
+			System.out.println("s found "+s);
+			writeToText(s, false);
 		}else {
-			System.out.println("case 1 ->2, continue");
-			computeMINLP_sGreaterThanK(sQminlpInstance, i1 + 1);
+			computeMINLP_sGreaterK(sQminlpInstance, i1 + 1, currentPeriodIndex);
 		}
 		return s;
 	}
 	
-	public static int computeMINLP_sLessThanK(sQminlpInstance sQminlpInstance, int i1) {
-		int s = Integer.MIN_VALUE;
-		System.out.println("case 2");
+	public static int computeMINLP_sLessK(sQminlpInstance sQminlpInstance, int i1 , int currentPeriodIndex) {
+		int s = sQminlpInstance.s_sdp[currentPeriodIndex];
 		int i2 = i1 - 1;
 		double d2 = costDifference (sQminlpInstance, i2);
-		if(d2 > sQminlpInstance.fixedCost) {
-			System.out.println("case 2 ->1, s found");
-			s = i2;
+		if(d2 > sQminlpInstance.fixedCost) {//next > K, found s
+			s = i2 +1;
+			System.out.println("s found = "+s);
+			writeToText(s, false);
 		}else {
-			System.out.println("case 2 ->2, continue");
-			computeMINLP_sLessThanK(sQminlpInstance, i1 - 1);
+			computeMINLP_sLessK(sQminlpInstance, i1 - 1, currentPeriodIndex);
 		}
 		return s;
 	}
 	
-	public static int computeMINLP_s(sQminlpInstance sQminlpInstance, int i1) {//before this, declare i1 = s_sdp[d]
-		int s = Integer.MIN_VALUE;
-		do {
-			if(costDifference (sQminlpInstance, i1) > sQminlpInstance.fixedCost) {
-				computeMINLP_sGreaterThanK(sQminlpInstance , i1);
-				break;
-				/*
-				System.out.println("case 1");
-				int i2 = i1 + 1;
-				double d2 = costDifference (sQminlpInstance, i2);
-				if(d2 < sQminlpInstance.fixedCost) {
-					System.out.println("case 1 ->1, s found");
-					s = i2;
-					break;
-				}else {
-					System.out.println("case 1 ->2, continue");
-					computeMINLP_s(sQminlpInstance, i1 + 1);
-				}*/
-			}else {
-				computeMINLP_sLessThanK(sQminlpInstance, i1);
-				/*
-				System.out.println("case 2");
-				int i2 = i1 - 1;
-				double d2 = costDifference (sQminlpInstance, i2);
-				if(d2 > sQminlpInstance.fixedCost) {
-					System.out.println("case 2 ->1, s found");
-					s = i2;
-					break;
-				}else {
-					System.out.println("case 2 ->2, continue");
-					computeMINLP_s(sQminlpInstance, i1 - 1);
-				}
-				System.out.println();*/
-			}
-		}while(s != Integer.MIN_VALUE);
-		return s;
+	public static int computeMINLP_s(sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex) {//before this, declare i1 = s_sdp[d]
+		if(costDifference (sQminlpInstance, i1) > sQminlpInstance.fixedCost) {
+			return computeMINLP_sGreaterK(sQminlpInstance , i1, currentPeriodIndex);
+		}else {
+			return computeMINLP_sLessK(sQminlpInstance, i1, currentPeriodIndex);
+		}
 	}
 	
 	public static void main(String[] args) {
+		writeToText(0,true);
 		
 		long startTime = System.currentTimeMillis();
 		
-		int[] demandMean = {91, 92, 93, 94, 95, 96, 97, 98, 99, 100};
-		//int[] demandMean = {20,40,60,40};
+		//int[] demandMean = {65, 50, 40, 30};
+		int[] demandMean = {20,40,60,40};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		
 		double fixedCost = 100;
@@ -282,91 +251,36 @@ public class sQminlp_recursive {
 		double penaltyCost = 10;
 	
 		int partitions = 10;
-		//int[] s_sdp = {13, 33, 54, 24};
-		int[] s_sdp = {74, 75, 76, 77, 78, 79, 80, 81, 82, 74};
-		int Q_minlp = 192;
+		int[] s_sdp = {11, 31, 56, 22};//{13, 33, 54, 24};
+		//int[] s_sdp = {48, 33, 23, 4};
+		int Q_minlp = 83;
+		//int Q_minlp = 189;
 		
 		int[] s = new int[demandMean.length];
 		
-		for(int d=9; d<demandMeanInput.length; d++) {
+		for(int d=0; d<demandMeanInput.length; d++) {
 			long startSingleTime = System.currentTimeMillis();
 			sQminlpInstance sQminlpInstance = new sQminlpInstance(demandMeanInput[d], fixedCost, unitCost, holdingCost, penaltyCost, 
 					partitions, s_sdp,Q_minlp);
 
 			int i1 = s_sdp[d];
-			s[d] = computeMINLP_s(sQminlpInstance, i1);
+			s[d] = computeMINLP_s(sQminlpInstance, i1, d);
 			long endSingleTime = System.currentTimeMillis();
-			System.out.println("---------------------------    s("+(d+1)+") = " + s[d]);
+			//System.out.println("---------------------------    s("+(d+1)+") = " + s[d]);
 			System.out.println("---------------------------    time Consumed = "+ (endSingleTime - startSingleTime) +" ms");
+			writeToText(endSingleTime - startSingleTime, false);
+			writeToText(0, true);
 
 		}		
 		
-		/*
-		double[] cost_i = new double[maxInventory - minInventory +1];
-		int minInventory = -50;
-		int maxInventory = 300;
-		int[] initialStock = new int[maxInventory - minInventory +1];
-		for(int i=0; i<initialStock.length;i++) {
-			initialStock[i] = i + minInventory;
-		}
-		for(int t=0; t<demandMean.length; t++) {
-			//writeToText(q, false);
-			long singleStartTime = System.currentTimeMillis();
-			for(int i=0; i<initialStock.length; i++) {
-				try {
-					sQminlp_recursive sQmodel = new sQminlp_recursive(
-							demandMeanInput[t],
-							holdingCost,
-							fixedCost,
-							unitCost,
-							penaltyCost,
-							initialStock[i],
-							partitions,
-							Q,
-							"sQsinglePoisson_recursive"
-							);
-					double obj = sQmodel.solveMINLP_recursive("sQsinglePoisson_recursive");
-					cost_i[i] = obj;
-					System.out.println("c("+initialStock[i]+", "+Q+") = " +cost_i[i]);
-
-					if(i>=Q) {
-						if(cost_i[i-Q] - cost_i[i] <= fixedCost) {
-							s = initialStock[i - Q];
-							writeToText(s,false);
-							System.out.println("s("+(t+1)+") = "+s);
-							break;
-						}
-					}
-				}catch(IloException e){
-					e.printStackTrace();
-				}
-
-			}
-			long singleEndTime = System.currentTimeMillis();
-			System.out.println("time for period "+(t+1)+" is "+(singleEndTime - singleStartTime)/1000+"s");
-		}
-		System.out.println();
-		
-		*/
-		/*
-		int[] s = new int[maxQuantity+1];
-		for(int q=0; q<=maxQuantity; q++) {
-			for(int i=0; i<initialStock.length-q; i++) {
-				if(cost_Qi[q][i] - cost_Qi[q][i+q] <= fixedCost) {
-					s[q] = i+minInventory;
-					break;
-				}
-			}		
-		}
-		writeToText(0,true);
-		for(int i=0; i<s.length; i++) {
-			writeToText(s[i],false);
-		}
-		System.out.println(Arrays.toString(s));
-		*/
-		
 		long endTime = System.currentTimeMillis();
 		System.out.println("timeConsumed = "+(endTime - startTime)/1000 +"s");
+		writeToText(endTime-startTime, false);
+		writeToText(0, true);
+
+		
+		//System.out.println();
+		//System.out.println(Arrays.toString(s));
 	
 		/** for multiple instances, put writeToText(·,true) at the end**/
 	}
