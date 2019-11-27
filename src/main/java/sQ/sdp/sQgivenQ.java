@@ -124,11 +124,10 @@ public class sQgivenQ {
 
 		double stdParameter = 0.25;
 
-		//int[] demandMean = {20, 40, 60, 40};
-		int[] demandMean = {65, 50, 40, 30};
+		int[] demandMean = {20, 40, 60, 40};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 
-		int Q = 189;
+		int Q = 83;
 		
 		//double[] costLimit = {20000, 15000, 10000, 5200};
 		
@@ -178,26 +177,6 @@ public class sQgivenQ {
 		System.out.println();
 		System.out.println(Arrays.toString(s_breakpoint));
 		System.out.println(Arrays.toString(s_breakpoint));
-
-
-		/* print costs for MATLAB plots
-		for(int t=0;t<instance.getStages();t++) {
-			System.out.println("t="+t+"===========================================================");
-			//for(int i=instance.initialInventory-instance.minInventory;i<instance.initialInventory-50-instance.minInventory+251;i++) {
-				//System.out.println(sQgivenQ.costOrder[t][i]);
-			//}System.out.println();
-			for(int i=instance.initialInventory-instance.minInventory;i<instance.initialInventory-50-instance.minInventory+251;i++) {
-				System.out.println(sQgivenQ.costNoOrder[t][i]);
-			}System.out.println();
-		}
-
-
-		System.out.print("reorderPoints = {");
-			for(int t=0; t<costGivenQ.length;t++) {
-				System.out.print(sGivenQ[t]);
-				if(t<costGivenQ.length-1)System.out.print(",");
-			}System.out.print("}");System.out.println();
-		 */
 
 		
 	}

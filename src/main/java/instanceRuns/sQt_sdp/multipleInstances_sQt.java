@@ -1,4 +1,4 @@
-package instanceRuns;
+package instanceRuns.sQt_sdp;
 
 import java.io.File;
 import java.io.FileWriter;

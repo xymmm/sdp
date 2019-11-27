@@ -1,10 +1,10 @@
-package instanceRuns;
+package instanceRuns.sQt_minlp;
 
 import sQ.simulation.sQsimInstanceDouble;
 import sQ.simulation.sQsimPoisson;
 import umontreal.ssj.util.Chrono;
 
-public class multipleInstancesSimulations {
+public class sQt_simulation {
 	
 	public static void main(String[] args) {
 
