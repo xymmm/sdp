@@ -122,7 +122,7 @@ public class sQgivenQ {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {20, 40, 60, 40, 20, 40};
+		int[] demandMean = {20, 40, 60, 40};
 		
 		int[][] demandMeanInput = {
 				{20, 40, 60, 40, 20, 40},
@@ -131,7 +131,7 @@ public class sQgivenQ {
 				{40}
 		};
 
-		int Q = 77;
+		int Q = 83;
 		
 		double[] costLimit = {20000, 15000, 10000, 5200};
 				
@@ -166,9 +166,9 @@ public class sQgivenQ {
 			
 			/**determine s by compare c(order) and c(no order)**/
 			sQgivenQsolution sQgivenQorder = costVaryingWithInventory(Q,instance, true);
-			for(int t=0; t<instance.demandMean.length; t++) {
-				//plotTwoCostGivenQ(sQgivenQorder.costOrder[0], sQgivenQorder.costNoOrder[0], Q, t, instance,costLimit[t]);
-			}
+			
+				plotTwoCostGivenQ(sQgivenQorder.costOrder[0], sQgivenQorder.costNoOrder[0], Q, 0, instance,costLimit[d]);
+			
 			int[] s = sQgivenQsolution.getsGivenQ(instance, sQgivenQorder);
 			System.out.println("reorder points by comparing actions = " + s[0]);
 		

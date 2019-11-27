@@ -178,32 +178,108 @@ public class sQminlp_recursive {
 	}
 	
 	
+	public static double costDifference (sQminlpInstance instance, int i1) {
+		double d = 0;
+		int i1_Q = i1 + instance.Q_minlp;
+		try {
+			sQminlp_recursive sQmodel1 = new sQminlp_recursive(
+					instance.demandMean, instance.holdingCost, instance.fixedCost, instance.unitCost, instance.penaltyCost,
+					i1, instance.partitions, instance.Q_minlp, "sQsinglePoisson_recursive"
+					);
+			double c1 = sQmodel1.solveMINLP_recursive("sQsinglePoisson_recursive");
+			sQminlp_recursive sQmodel2 = new sQminlp_recursive(
+					instance.demandMean, instance.holdingCost, instance.fixedCost, instance.unitCost, instance.penaltyCost,
+					i1_Q, instance.partitions, instance.Q_minlp, "sQsinglePoisson_recursive"
+					);
+			double c1_Q = sQmodel2.solveMINLP_recursive("sQsinglePoisson_recursive");
+			d = c1 - c1_Q;
+			System.out.println("c("+i1+") - c("+(i1_Q)+") = "+d);
+		}catch(IloException e){
+			e.printStackTrace();
+		}
+		return  d;
+	}
+	
+	public static int computeMINLP_s(sQminlpInstance sQminlpInstance, int i1) {//before this, declare i1 = s_sdp[d]
+		int s = Integer.MIN_VALUE;
+		do {
+			if(costDifference (sQminlpInstance, i1) > sQminlpInstance.fixedCost) {
+				System.out.println("case 1");
+				int i2 = i1 + 1;
+				double d2 = costDifference (sQminlpInstance, i2);
+				if(d2 < sQminlpInstance.fixedCost) {
+					System.out.println("case 1 ->1, s found");
+					s = i2;
+					break;
+				}else {
+					System.out.println("case 1 ->2, continue");
+					computeMINLP_s(sQminlpInstance, i1 + 1);
+				}
+			}else {
+				System.out.println("case 2");
+				int i2 = i1 - 1;
+				double d2 = costDifference (sQminlpInstance, i2);
+				if(d2 > sQminlpInstance.fixedCost) {
+					System.out.println("case 2 ->1, s found");
+					s = i2;
+					break;
+				}else {
+					System.out.println("case 2 ->2, continue");
+					computeMINLP_s(sQminlpInstance, i1 - 1);
+				}
+				System.out.println();
+			}
+		}while(s != Integer.MIN_VALUE);
+		return s;
+	}
+	
 	public static void main(String[] args) {
 		
 		long startTime = System.currentTimeMillis();
 		
-		int[] demandMean = {91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102};
-		//int[] demandMean = {20,40,60,40};
+		//int[] demandMean = {91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102};
+		int[] demandMean = {20,40,60,40};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		
 		double fixedCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
+	
+		int partitions = 10;
+		int[] s_sdp = {13, 33, 54, 24};
+		int Q_minlp = 82;
 		
+		int[] s = new int[demandMean.length];
+		
+		for(int d=0; d<demandMeanInput.length; d++) {
+			long startSingleTime = System.currentTimeMillis();
+			sQminlpInstance sQminlpInstance = new sQminlpInstance(demandMeanInput[d], fixedCost, unitCost, holdingCost, penaltyCost, 
+					partitions, s_sdp,Q_minlp);
+
+			int i1 = s_sdp[d];
+			s[d] = computeMINLP_s(sQminlpInstance, i1);
+			long endSingleTime = System.currentTimeMillis();
+			System.out.println("---------------------------    s("+(d+1)+") = " + s[d]);
+			System.out.println("---------------------------    time Consumed = "+ (endSingleTime - startSingleTime) +" ms");
+
+		}		
+		
+		
+
+		
+		
+		
+		
+		
+		/*
+		double[] cost_i = new double[maxInventory - minInventory +1];
 		int minInventory = -50;
 		int maxInventory = 300;
 		int[] initialStock = new int[maxInventory - minInventory +1];
 		for(int i=0; i<initialStock.length;i++) {
 			initialStock[i] = i + minInventory;
 		}
-		
-		int partitions = 10;
-		int Q = 194;
-		
-		int s;
-		double[] cost_i = new double[maxInventory - minInventory +1];
-		
 		for(int t=0; t<demandMean.length; t++) {
 			//writeToText(q, false);
 			long singleStartTime = System.currentTimeMillis();
@@ -241,7 +317,8 @@ public class sQminlp_recursive {
 			System.out.println("time for period "+(t+1)+" is "+(singleEndTime - singleStartTime)/1000+"s");
 		}
 		System.out.println();
-
+		
+		*/
 		/*
 		int[] s = new int[maxQuantity+1];
 		for(int q=0; q<=maxQuantity; q++) {
