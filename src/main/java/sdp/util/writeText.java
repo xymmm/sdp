@@ -99,5 +99,24 @@ public class writeText {
 		}
 	}
 	
+	public static void writeIntArray(int[] arr, String fileName) {
+		FileWriter fw = null;
+		try {
+			File f = new File(fileName);
+			fw = new FileWriter(f, true);//true, continue to write
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PrintWriter pw = new PrintWriter(fw);
+		pw.println(Arrays.toString(arr));
+		pw.flush();
+		try {
+			fw.flush();
+			pw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 }

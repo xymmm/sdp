@@ -78,7 +78,9 @@ public class sQtgeneratedQ_s {
 
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
 		//double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);//normal
-			
+		
+		long startTime = System.currentTimeMillis();
+		
 		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 			for(int i=0;i<inventory.length;i++) { // Inventory   
 				/** a = Q (given) **/
@@ -132,8 +134,11 @@ public class sQtgeneratedQ_s {
 				actionGivenQ[t][i] = totalCostNoOrder < totalCostOrder ? false : true;
 			}
 		}
+		
+		long endTime = System.currentTimeMillis();
+		long timeConsumed_sQtst = endTime - startTime;
 
-		return new sQtgeneratedQ_s_solution(costGivenQ, actionGivenQ, costOrder, costNoOrder);
+		return new sQtgeneratedQ_s_solution(costGivenQ, actionGivenQ, costOrder, costNoOrder, timeConsumed_sQtst);
 	}
 	
 	public static void main(String[] args) {
@@ -152,22 +157,17 @@ public class sQtgeneratedQ_s {
 		double stdParameter = 0.25;
 
 		int[] demandMean = {2,4,6,4};
-		int[][] demandMeanInput = {
-				{2,4,6,4},
-				{4,6,4},
-				{6,4},
-				{4}
-		};
+
 		
 		int[] Q = {8, 0, 9, 0};
 		
-		for(int d=0; d<demandMeanInput.length; d++) {
+
 		Instance instance = new Instance(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
 				penaltyCost,
-				demandMeanInput[d],
+				demandMean,
 				tail,
 				minInventory,
 				maxInventory,
@@ -185,18 +185,18 @@ public class sQtgeneratedQ_s {
 		    //System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q[t], t, instance);
 		}
-	    System.out.println(Arrays.toString(sQgivenQ.costGivenQ[0]));
+	    //System.out.println(Arrays.toString(sQgivenQ.costGivenQ[0]));
 		
-	    /*
+	    
 		System.out.print("reorderPoints = {");
 		for(int t=0; t<costGivenQ.length;t++) {
 			System.out.print(sGivenQ[t]);
 			if(t<costGivenQ.length-1)System.out.print(",");
 		}System.out.print("}");
 		System.out.println();
-		*/
+		
 
-	}
+	
 	}
 
 }

@@ -16,8 +16,8 @@ public class multipleInstances_sS {
 	 * sQ.sdp.sS 		-> cost and time
 	 * 
 	 * where to record results:
-	 * cost	-> "src/main/java/instanceRuns/sQ_sdp/sS_sdp_cost.txt"
-	 * time	-> "src/main/java/instanceRuns/sQ_sdp/sS_sdp_time.txt"
+	 * cost	-> "src/main/java/instanceRuns/sS_sdp/sS_sdp_cost.txt"
+	 * time	-> "src/main/java/instanceRuns/sS_sdp/sS_sdp_time.txt"
 	 */
 	
 	public static void main(String args[]) {
@@ -63,19 +63,29 @@ public class multipleInstances_sS {
 		int maxInventory = 1500;
 		int maxQuantity = 600;
 
+		System.out.println("total number of instances = "+demandMean.length * fixedCost.length * penaltyCost.length * unitCost.length);
+		System.out.println("number of parameter groups = "+fixedCost.length * penaltyCost.length * unitCost.length);
+		System.out.println("==========================");
+		
+		int count = 1;			//to capture computation progress
 		
 		for(int f=0; f<fixedCost.length; f++) {
 			for(int p=0; p<penaltyCost.length; p++) {
 				for(int u=0; u<unitCost.length; u++) {
 					
-					sdp.util.writeText.writeNewLine("src/main/java/instanceRuns/sQ_sdp/sS_sdp_cost.txt");
-					sdp.util.writeText.writeNewLine("src/main/java/instanceRuns/sQ_sdp/sS_sdp_time.txt");					
-					sdp.util.writeText.writeDouble(fixedCost[f], "src/main/java/instanceRuns/sQ_sdp/sS_sdp_cost.txt");
-					sdp.util.writeText.writeDouble(fixedCost[f], "src/main/java/instanceRuns/sQ_sdp/sS_sdp_time.txt");
-					sdp.util.writeText.writeDouble(penaltyCost[p], "src/main/java/instanceRuns/sQ_sdp/sS_sdp_cost.txt");
-					sdp.util.writeText.writeDouble(penaltyCost[p], "src/main/java/instanceRuns/sQ_sdp/sS_sdp_time.txt");
-					sdp.util.writeText.writeDouble(unitCost[u], "src/main/java/instanceRuns/sQ_sdp/sS_sdp_cost.txt");
-					sdp.util.writeText.writeDouble(unitCost[u], "src/main/java/instanceRuns/sQ_sdp/sS_sdp_time.txt");
+					//new parameter group
+					System.out.println("parameter group "+count);
+					long groupStartTime = System.currentTimeMillis();
+
+					//write up parameters
+					sdp.util.writeText.writeNewLine("src/main/java/instanceRuns/sS_sdp/sS_sdp_cost.txt");
+					sdp.util.writeText.writeNewLine("src/main/java/instanceRuns/sS_sdp/sS_sdp_time.txt");					
+					sdp.util.writeText.writeDouble(fixedCost[f], "src/main/java/instanceRuns/sS_sdp/sS_sdp_cost.txt");
+					sdp.util.writeText.writeDouble(fixedCost[f], "src/main/java/instanceRuns/sS_sdp/sS_sdp_time.txt");
+					sdp.util.writeText.writeDouble(penaltyCost[p], "src/main/java/instanceRuns/sS_sdp/sS_sdp_cost.txt");
+					sdp.util.writeText.writeDouble(penaltyCost[p], "src/main/java/instanceRuns/sS_sdp/sS_sdp_time.txt");
+					sdp.util.writeText.writeDouble(unitCost[u], "src/main/java/instanceRuns/sS_sdp/sS_sdp_cost.txt");
+					sdp.util.writeText.writeDouble(unitCost[u], "src/main/java/instanceRuns/sS_sdp/sS_sdp_time.txt");
 					
 					for(int d=0; d<demandMean.length; d++) {
 						
@@ -83,10 +93,16 @@ public class multipleInstances_sS {
 								fixedCost[f], unitCost[u], holdingCost,penaltyCost[p],demandMean[d],
 								0.00000001, minInventory, maxInventory, maxQuantity, 0.1 );
 						sSsolution solution = sS.solveInstance(instance, true);
-						sdp.util.writeText.writeDouble(solution.optimalCost[-instance.minInventory][0], "src/main/java/instanceRuns/sQ_sdp/sS_sdp_cost.txt");  
-						sdp.util.writeText.writeLong(solution.timeConsumed, "src/main/java/instanceRuns/sQ_sdp/sS_sdp_time.txt");
+						//write cost
+						sdp.util.writeText.writeDouble(solution.optimalCost[-instance.minInventory][0], "src/main/java/instanceRuns/sS_sdp/sS_sdp_cost.txt");  
+						//write time
+						sdp.util.writeText.writeLong(solution.timeConsumed, "src/main/java/instanceRuns/sS_sdp/sS_sdp_time.txt");
 					}
 					
+					//group ends
+					count++;
+					long groupEndTime = System.currentTimeMillis();
+					System.out.println("time Consumed for this group = "+(groupEndTime - groupStartTime)/1000+" s");
 				}
 			}
 		}

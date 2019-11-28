@@ -9,15 +9,18 @@ public class sQtgeneratedQ_s_solution {
 	public  boolean[][] actionGivenQ;
 	public double[][] costOrder;
 	public double[][] costNoOrder;
+	public long timeConsumed_sQtst;
 
 	public sQtgeneratedQ_s_solution(double[][] costGivenQ, 
 			boolean[][] actionGivenQ,
 			double[][] costOrder,
-			double[][] costNoOrder) {
+			double[][] costNoOrder,
+			long timeConsumed_sQtst) {
 		this.costGivenQ = costGivenQ;
 		this.actionGivenQ = actionGivenQ;
 		this.costOrder = costOrder;
 		this.costNoOrder = costNoOrder;
+		this.timeConsumed_sQtst = timeConsumed_sQtst;
 	}
 	
 	public int[] getsGivenQ(Instance instance, sQtgeneratedQ_s_solution sQtgeneratedQ_s_solution) {

@@ -35,21 +35,5 @@ public class sQsolution {
 		int opt_a = minIndex;
 		return opt_a-1;
 	}
-	
-
-	public int[] getsSQ(Instance instance, sQsolution sQsolution) {
-		int[] s = new int[instance.getStages()];
-		// Get the reorder points.
-		for(int t=0;t<instance.getStages();t++) { // Time
-			for(int i=0;i<inventory.length;i++) {  // Inventory   
-				if(sQsolution.optimalAction[i][sQsolution.getOpt_aSQ(instance)][t] == false) {
-					s[t] = i + instance.minInventory;
-					break;
-				}
-			}
-		}
-		return s;
-	}
-	
-	
+		
 }

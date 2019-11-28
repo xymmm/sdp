@@ -13,14 +13,6 @@ import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;
 
 public class sQ {
-
-	/** print reorder points **/
-	public static void printReorderPoints(Instance instance, sQsolution sQsolution) {
-		System.out.println("reorder points (s) under (s,Q) policy: ");
-		for(int t = 0;t<instance.getStages();t++){
-			System.out.print(sQsolution.getsSQ(instance, sQsolution)[t]+" ");
-		}System.out.println();
-	}
 	
 	/** print optimal quantity **/
 	public static void printOptimalQuantity(Instance instance, sQsolution sQsolution) {
@@ -151,7 +143,7 @@ public class sQ {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {65, 50, 40, 30};
+		int[] demandMean = {20, 40, 60, 40};
 
 		Instance instance = new Instance(
 				fixedOrderingCost,

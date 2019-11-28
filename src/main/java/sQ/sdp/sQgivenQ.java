@@ -14,30 +14,31 @@ import sS.sdp.sS;
 import sdp.data.Instance;
 
 public class sQgivenQ {
-	
+
 	/**plot TWO costs with a given Q - Reorder & Non-reorder**/
 	public static void plotTwoCostGivenQ(double[] costOrder, double[] costNoOrder, int Q, int stageIndex, Instance instance, double costLimit) {
-		  XYSeries series1 = new XYSeries("Cost with Reorder");
-	      for(int i=0;i<costOrder.length;i++) {
-	    	  if(costOrder[i]<costLimit) series1.add((i+instance.minInventory),costOrder[i]);
-	      }
-	      XYSeries series2 = new XYSeries("Cost with No Reorder");
-	      for(int i=0;i<costOrder.length;i++) {
-	    	  if(costNoOrder[i]<costLimit) series2.add((i+instance.minInventory),costNoOrder[i]);
-	      }
-		  XYSeriesCollection collection = new XYSeriesCollection();
-		  collection.addSeries(series1);
-		  collection.addSeries(series2);
-	      JFreeChart chart = ChartFactory.createXYLineChart("Expected Cost of Reordering and No Reordering with Given Q="+Q+" at period "+(stageIndex+1), "inventory level", "expected cost",
-	            collection, PlotOrientation.VERTICAL, true, true, false);
-	      ChartFrame frame = new ChartFrame("ETC Comparison",chart);
-	      frame.setVisible(true);
-			frame.setSize(1800,1500);
+		XYSeries series1 = new XYSeries("Cost with Reorder");
+		for(int i=0;i<costOrder.length;i++) {
+			if(costOrder[i]<costLimit) series1.add((i+instance.minInventory),costOrder[i]);
+		}
+		XYSeries series2 = new XYSeries("Cost with No Reorder");
+		for(int i=0;i<costOrder.length;i++) {
+			if(costNoOrder[i]<costLimit) series2.add((i+instance.minInventory),costNoOrder[i]);
+		}
+		XYSeriesCollection collection = new XYSeriesCollection();
+		collection.addSeries(series1);
+		collection.addSeries(series2);
+		JFreeChart chart = ChartFactory.createXYLineChart("Expected Cost of Reordering and No Reordering with Given Q="+Q+" at period "+(stageIndex+1), "inventory level", "expected cost",
+				collection, PlotOrientation.VERTICAL, true, true, false);
+		ChartFrame frame = new ChartFrame("ETC Comparison",chart);
+		frame.setVisible(true);
+		frame.setSize(1800,1500);
 	}
-	
+
 
 	/****compute cost function f(Q,t,i) with given t and Q****/
 	public static sQgivenQsolution costVaryingWithInventory(int Q, Instance instance, boolean initialOrder){
+		long startTime = System.currentTimeMillis();
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
@@ -45,13 +46,13 @@ public class sQgivenQ {
 
 		double[][] costGivenQ = new double [instance.getStages()][inventory.length];
 		boolean[][] actionGivenQ = new boolean[instance.getStages()][inventory.length];
-		
+
 		double[][] costOrder = new double[instance.getStages()][inventory.length];
 		double[][] costNoOrder = new double[instance.getStages()][inventory.length];
 
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
 		//double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
-		
+
 		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 			for(int i=0;i<inventory.length;i++) { // Inventory   
 				/** a = Q (given) **/
@@ -103,12 +104,15 @@ public class sQgivenQ {
 				actionGivenQ[t][i] = totalCostNoOrder < totalCostOrder ? false : true;
 			}
 		}
+		
+		long endTime = System.currentTimeMillis();
+		long timeConsumed = endTime - startTime;
 
-		return new sQgivenQsolution(inventory, costGivenQ, actionGivenQ, costOrder, costNoOrder);
+		return new sQgivenQsolution(inventory, costGivenQ, actionGivenQ, costOrder, costNoOrder, timeConsumed);
 	}
-	
-	
-	
+
+
+
 	public static void main(String[] args) {
 
 		double fixedOrderingCost = 100;
@@ -128,12 +132,12 @@ public class sQgivenQ {
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 
 		int Q = 83;
-		
+
 		//double[] costLimit = {20000, 15000, 10000, 5200};
-		
+
 		int[] s_compare = new int[demandMean.length];
 		int[] s_breakpoint = new int[demandMean.length];
-				
+
 		for(int d=0; d<demandMeanInput.length;d++) {
 
 			/** create and resolve instance**/
@@ -141,14 +145,14 @@ public class sQgivenQ {
 					tail, minInventory, maxInventory, maxQuantity, stdParameter );	
 			//determine s by compare c(s) and c(s+Q)
 			sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
-			
+
 			/**print and plot ETC**/
 			//System.out.println("cost with initial stock = "+instance.initialInventory+" is "+sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
 			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(sQgivenQ.costGivenQ[0], sQgivenQ.inventory, "inventory level", "expected cost", "Expected cost without initial order t=1");//cost
 			//for(int i=instance.initialInventory-instance.minInventory; i<sQgivenQ.inventory.length; i++) {
-				//System.out.println((i+instance.minInventory)+"   "+sQgivenQ.costGivenQ[0][i]);
+			//System.out.println((i+instance.minInventory)+"   "+sQgivenQ.costGivenQ[0][i]);
 			//}
-			
+
 			/**resolve reorder points by cost differences**/
 			double[] costDifference = new double[maxInventory-minInventory+1-Q];
 			for(int j=0; j<costDifference.length; j++) {
@@ -163,22 +167,22 @@ public class sQgivenQ {
 					break;
 				}
 			}
-			
+
 			/**determine s by compare c(order) and c(no order)**/
-			sQgivenQsolution sQgivenQorder = costVaryingWithInventory(Q,instance, true);
-			
-				//plotTwoCostGivenQ(sQgivenQorder.costOrder[0], sQgivenQorder.costNoOrder[0], Q, 0, instance,costLimit[d]);
-			
+			sQgivenQsolution sQgivenQorder = costVaryingWithInventory(Q, instance, true);
+
+			//plotTwoCostGivenQ(sQgivenQorder.costOrder[0], sQgivenQorder.costNoOrder[0], Q, 0, instance,costLimit[d]);
+
 			int[] s = sQgivenQsolution.getsGivenQ(instance, sQgivenQorder);
 			s_compare[d] = s[0];
 			System.out.println("reorder points by comparing actions = " + s[0]);
-		
+
 		}
 		System.out.println();
-		System.out.println(Arrays.toString(s_breakpoint));
+		System.out.println(Arrays.toString(s_compare));
 		System.out.println(Arrays.toString(s_breakpoint));
 
-		
+
 	}
 
 }

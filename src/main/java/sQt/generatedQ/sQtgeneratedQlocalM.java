@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import sS.sdp.sS;
+import sdp.data.Instance;
 import sdp.data.InstanceDouble;
 
 public class sQtgeneratedQlocalM {
@@ -90,7 +91,7 @@ public class sQtgeneratedQlocalM {
 	}
 
 
-	public static double sQtgeneratedSingle(InstanceDouble instance, int g, double[][] demandProbabilities) {		
+	public static double sQtgeneratedSingle(Instance instance, int g, double[][] demandProbabilities) {		
 		
 		double[] inventory = new double[(int) (instance.maxInventory - instance.minInventory + 1)];
 		for(int i=0;i<inventory.length;i++) {
@@ -131,7 +132,7 @@ public class sQtgeneratedQlocalM {
 		return totalCost[(int)(instance.initialInventory -instance.minInventory)][0];
 	}
 	
-	public static sQtgeneratedQlocalMsolution sQtMultipleG(InstanceDouble instance) {
+	public static sQtgeneratedQlocalMsolution sQtMultipleG(Instance instance) {
 		
 		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
@@ -165,7 +166,7 @@ public class sQtgeneratedQlocalM {
 				LocalMinCostsList.add(costCurrent);
 				minGsList.add(g-1);
 			}
-			if(g%1000 == 0) System.out.println("Computation completed for generator = "+g);
+			if(g%100000 == 0) System.out.println("Computation completed for generator = "+g);
 			g = g+1;
 		}while(g < maxG);
 		
@@ -211,9 +212,9 @@ public class sQtgeneratedQlocalM {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4,2,4,7};
+		int[] demandMean = {2,4,6,4};
 
-		InstanceDouble instance = new InstanceDouble(
+		Instance instance = new Instance(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
