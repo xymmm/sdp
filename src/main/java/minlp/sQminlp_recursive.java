@@ -3,13 +3,17 @@ package minlp;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import ilog.concert.IloException;
 import ilog.opl.IloCplex;
@@ -153,10 +157,10 @@ public class sQminlp_recursive {
 		
 	}
 	
-	public static void writeToText(double value, boolean enter){
+	public static void writeToText(double value, boolean enter, String fileName){
 		FileWriter fw = null;
 		try {
-			File f = new File("./sQrecursiveResults_reorderPoints.txt"); // relative path, if no file then create a new output.txt
+			File f = new File(fileName); // relative path, if no file then create a new output.txt
 			fw = new FileWriter(f, true);//true, continue to write
 		}catch(IOException e) {
 			e.printStackTrace();
@@ -200,48 +204,53 @@ public class sQminlp_recursive {
 		return  d;
 	}
 	
-	public static int computeMINLP_sGreaterK(sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex) {
+	public static int computeMINLP_sGreaterK(sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex, File FileName) throws Exception {
 		int s = sQminlpInstance.s_sdp[currentPeriodIndex];
 		int i2 = i1 + 1;
 		double d2 = costDifference (sQminlpInstance, i2);
 		if(d2 < sQminlpInstance.fixedCost) {
 			s = i2;
 			System.out.println("s found "+s);
-			writeToText(s, false);
+			//writeToText((int) s, false,FileName);
+			String s_string = Integer.toString(s);
+			boolean flag = writeTxtFile(s_string, FileName);
+
 		}else {
-			computeMINLP_sGreaterK(sQminlpInstance, i1 + 1, currentPeriodIndex);
+			computeMINLP_sGreaterK(sQminlpInstance, i1 + 1, currentPeriodIndex, FileName);
 		}
 		return s;
 	}
 	
-	public static int computeMINLP_sLessK(sQminlpInstance sQminlpInstance, int i1 , int currentPeriodIndex) {
+	public static int computeMINLP_sLessK(sQminlpInstance sQminlpInstance, int i1 , int currentPeriodIndex, File FileName) throws Exception {
 		int s = sQminlpInstance.s_sdp[currentPeriodIndex];
 		int i2 = i1 - 1;
 		double d2 = costDifference (sQminlpInstance, i2);
 		if(d2 > sQminlpInstance.fixedCost) {//next > K, found s
 			s = i2 +1;
 			System.out.println("s found = "+s);
-			writeToText(s, false);
+			//writeToText((int) s, false,FileName);
+			String s_string = Integer.toString(s);
+			boolean flag = writeTxtFile(s_string, FileName);
 		}else {
-			computeMINLP_sLessK(sQminlpInstance, i1 - 1, currentPeriodIndex);
+			computeMINLP_sLessK(sQminlpInstance, i1 - 1, currentPeriodIndex, FileName);
 		}
 		return s;
 	}
 	
-	public static int computeMINLP_s(sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex) {//before this, declare i1 = s_sdp[d]
+	public static int computeMINLP_s(sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex, File FileName) throws Exception {//before this, declare i1 = s_sdp[d]
 		if(costDifference (sQminlpInstance, i1) > sQminlpInstance.fixedCost) {
-			return computeMINLP_sGreaterK(sQminlpInstance , i1, currentPeriodIndex);
+			return computeMINLP_sGreaterK(sQminlpInstance , i1, currentPeriodIndex, FileName);
 		}else {
-			return computeMINLP_sLessK(sQminlpInstance, i1, currentPeriodIndex);
+			return computeMINLP_sLessK(sQminlpInstance, i1, currentPeriodIndex,FileName);
 		}
 	}
 	
-	public static void main(String[] args) {
-		writeToText(0,true);
+	public static void main(String[] args) throws Exception {
 		
-		long startTime = System.currentTimeMillis();
+		String writeFileName = "src/main/java/instanceRuns/sQ_minlp/temp.txt";
 		
-		//int[] demandMean = {65, 50, 40, 30};
+		//writeToText(0,true, writeFileName);
+			
 		int[] demandMean = {20,40,60,40};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		
@@ -251,41 +260,45 @@ public class sQminlp_recursive {
 		double penaltyCost = 10;
 	
 		int partitions = 10;
-		int[] s_sdp = {11, 31, 56, 22};//{13, 33, 54, 24};
-		//int[] s_sdp = {48, 33, 23, 4};
+		int[] s_sdp = {12, 32, 55, 23};//{13, 33, 54, 24};
+
 		int Q_minlp = 83;
-		//int Q_minlp = 189;
 		
 		int[] s = new int[demandMean.length];
-		
+		File file = new File("src/main/java/instanceRuns/sQ_minlp/temp.txt");
 		for(int d=0; d<demandMeanInput.length; d++) {
-			long startSingleTime = System.currentTimeMillis();
 			sQminlpInstance sQminlpInstance = new sQminlpInstance(demandMeanInput[d], fixedCost, unitCost, holdingCost, penaltyCost, 
 					partitions, s_sdp,Q_minlp);
 
 			int i1 = s_sdp[d];
-			s[d] = computeMINLP_s(sQminlpInstance, i1, d);
-			long endSingleTime = System.currentTimeMillis();
-			//System.out.println("---------------------------    s("+(d+1)+") = " + s[d]);
-			System.out.println("---------------------------    time Consumed = "+ (endSingleTime - startSingleTime) +" ms");
-			writeToText(endSingleTime - startSingleTime, false);
-			writeToText(0, true);
+			s[d] = computeMINLP_s(sQminlpInstance, i1, d, file);
 
-		}		
-		
-		long endTime = System.currentTimeMillis();
-		System.out.println("timeConsumed = "+(endTime - startTime)/1000 +"s");
-		writeToText(endTime-startTime, false);
-		writeToText(0, true);
+			//writeToText(0, true,writeFileName);
+
+		}
+		System.out.println(Arrays.toString(s));
 
 		
-		//System.out.println();
-		//System.out.println(Arrays.toString(s));
+		//writeToText(0, true,writeFileName);
 	
 		/** for multiple instances, put writeToText(·,true) at the end**/
 	}
 
 	
+    public static boolean writeTxtFile(String content,File fileName)throws Exception{
+        RandomAccessFile mm=null;
+        boolean flag=false;
+        FileOutputStream fileOutputStream=null;
+        try {
+            fileOutputStream = new FileOutputStream(fileName);
+            fileOutputStream.write(content.getBytes("gbk"));
+            fileOutputStream.close();
+            flag=true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return flag;
+    }
 
 
 }

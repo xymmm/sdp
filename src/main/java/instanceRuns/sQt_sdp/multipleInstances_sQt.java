@@ -120,7 +120,7 @@ public class multipleInstances_sQt {
 						//record
 						sdp.util.writeText.writeLong(sQtsolution.timeConsumed_sQt, "src/main/java/instanceRuns/sQt_sdp/sQt_sdp_time_QandCost.txt");		//time for Q & cost
 						sdp.util.writeText.writeDouble(sQtsolution.minCost, "src/main/java/instanceRuns/sQt_sdp/sQt_sdp_cost.txt");						//cost
-						sdp.util.writeText.writeIntArray(Q, "src/main/java/instanceRuns/sQt_sdp/sQt_sdp_Q.txt");										//Q
+						sdp.util.writeText.writeIntArray(Q, "src/main/java/instanceRuns/sQt_sdp/sQt_sdp_Qarr.txt");										//Q
 						
 						//solve sQ - s_t
 						sQtgeneratedQ_s_solution sQtgivenQ = sQtgeneratedQ_s.costVaryingWithInventory(Q,instance,true);

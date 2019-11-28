@@ -10,7 +10,7 @@ public class multipleInstances_sS {
 	 * Aim to resolve SDP for s,S policy as benchmarks: with I0 = 0
 	 * 
 	 * cost (initial order = 1)
-	 * time_Q, 
+	 * time, 
 	 * 
 	 * Class needed: (to compute)
 	 * sQ.sdp.sS 		-> cost and time

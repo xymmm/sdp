@@ -4,7 +4,6 @@ import java.util.Random;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 
-import umontreal.ssj.probdist.NormalDist;
 import umontreal.ssj.probdist.PoissonDist;
 import umontreal.ssj.randvar.PoissonGen;
 import umontreal.ssj.randvar.RandomVariateGenInt;
@@ -33,7 +32,7 @@ public class sQsimPoisson {
 	}
 	
 	/** 2. compute purchasing cost according to action decision **/
-	static double computePurchasingCost(int actionDecision, int currentStageIndex, sQsimInstanceDouble sQsimInstance) {
+	static double computePurchasingCost(int actionDecision, int currentStageIndex, sQsimInstanceInt sQsimInstance) {
 		return actionDecision*(
 				sQsimInstance.fixedOrderingCost 
 				+ sQsimInstance.unitCost*sQsimInstance.getActionQuantity(currentStageIndex)
@@ -53,7 +52,7 @@ public class sQsimPoisson {
 	   randomStream.setSeed(seed);
 	}
 	
-	static double generateDemand(double inventoryLevel, int actionDecision, sQsimInstanceDouble sQsimInstance, int currentStageIndex) {
+	static int generateDemand(double inventoryLevel, int actionDecision, sQsimInstanceInt sQsimInstance, int currentStageIndex) {
 		RandomVariateGenInt genDemand;
 		  
 		genDemand = new PoissonGen(randomStream, new PoissonDist(sQsimInstance.demandMean[currentStageIndex])); 
@@ -64,7 +63,7 @@ public class sQsimPoisson {
 	
 	
 	/** 5. compute holding or penalty cost **/
-	static double computeClosingCost(double inventoryLevel, sQsimInstanceDouble sQsimInstance) {
+	static double computeClosingCost(double inventoryLevel, sQsimInstanceInt sQsimInstance) {
 		if(inventoryLevel >= 0) {//return holding cost
 			return inventoryLevel*sQsimInstance.holdingCost;
 		}else {//return penalty cost
@@ -72,7 +71,7 @@ public class sQsimPoisson {
 		}
 	}
 	
-	public static double sQsimPoisson(sQsimInstanceDouble sQsimInstance, boolean print, boolean initialOrder) {
+	public static double sQsimPoisson(sQsimInstanceInt sQsimInstance, boolean print, boolean initialOrder) {
 
 		double inventoryLevel = sQsimInstance.getInitialInventory();
 		double cost = 0;
@@ -117,9 +116,9 @@ public class sQsimPoisson {
 	}
 	
 	/** multiple run times **/
-	public static void sQsimPoissonMultiRuns(sQsimInstanceDouble sQsimInstance, int count) {
+	public static void sQsimPoissonMultiRuns(sQsimInstanceInt sQsystem1, int count) {
 		for(int i=0; i<count; i++) {
-			sQsimInstance.statCost.add(sQsimPoisson(sQsimInstance,false, false));
+			sQsystem1.statCost.add(sQsimPoisson(sQsystem1,false, false));
 		}
 	}
 
@@ -133,19 +132,19 @@ public class sQsimPoisson {
 
 		double tail = 0.00000001;
 
-		double minInventory = -1000;
-		double maxInventory = 1000;
+		int minInventory = -1000;
+		int maxInventory = 1000;
 		double coe = 0.25;
 		//1,28,108,164,106,20
-		double[] demandMean = {20,40,60,40};
-		double[] reorderPoint = {14, 35, 55, 25};
-		double Q = 82;
-		double[] actionQuantity = new double[reorderPoint.length];
+		int[] demandMean = {20,40,60,40};
+		int[] reorderPoint = {14, 35, 55, 25};
+		int Q = 82;
+		int[] actionQuantity = new int[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
 			actionQuantity[t] = Q;
 		}
 
-		sQsimInstanceDouble sQsystem1 = new sQsimInstanceDouble(
+		sQsimInstanceInt sQsystem1 = new sQsimInstanceInt(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
@@ -165,9 +164,10 @@ public class sQsimPoisson {
 		sQsimPoisson.sQsimPoissonMultiRuns(sQsystem1, count);
 		
 		sQsystem1.statCost.setConfidenceIntervalStudent();
-		System.out.println(sQsystem1.statCost.report(0.9, 3));
-		System.out.println("Total CPU time: "+timer.format());
+		//System.out.println(sQsystem1.statCost.report(0.9, 3));
+		//System.out.println("Total CPU time: "+timer.format());
 
+		System.out.println(sQsystem1.statCost.average());
 	}
 
 }
