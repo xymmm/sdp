@@ -116,7 +116,7 @@ public class sQsimNormal {
 		double coe = 0.25;
 		
 		//instance classic
-		double[] demandMean = {20,40,60,40};
+		int[] demandMean = {20,40,60,40};
 		//double[] reorderPoint = {16,30,57,30};	//MINLP p4
 		//double[] reorderPoint = {16, 30, 58, 29}; //MINLP p10
 		//double Q = 83.743;						//MINLP

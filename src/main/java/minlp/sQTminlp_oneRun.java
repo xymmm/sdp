@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import ilog.concert.IloException;
 import ilog.opl.IloCplex;
@@ -56,7 +57,7 @@ public class sQTminlp_oneRun {
 		return is;
 	}
 
-	public double solveMINLP_recursive (String model_name) throws IloException{
+	public double[] solveMINLP_recursive (String model_name) throws IloException{
 		IloOplFactory oplF = new IloOplFactory();
 		IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
 		IloCplex cplex = oplF.createCplex();
@@ -80,17 +81,22 @@ public class sQTminlp_oneRun {
 			double[] Q = new double[demandMean.length];
             for(int t = 0; t < Q.length; t++){
                 Q[t] = cplex.getValue(opl.getElement("Q").asNumVarMap().get(t+1));
-                System.out.println("Q["+(t+1)+"] = "+Q[t]);
+                //System.out.println("Q["+(t+1)+"] = "+Q[t]);
              }
 			opl.postProcess();
 			oplF.end();
 			System.gc();
-			return objective;
+			//return objective;
+			return Q;
 		} else {
+			double[] Q = new double[demandMean.length];
 			System.out.println("No solution!");
 			oplF.end();
 			System.gc();
-			return Double.NaN;
+            for(int t = 0; t < Q.length; t++){
+                Q[t] = Double.NaN;
+                }
+			return Q;
 		} 
 
 	}
@@ -155,6 +161,8 @@ public class sQTminlp_oneRun {
 
 		long startTime = System.currentTimeMillis();
 
+		double[] Q = new double[demandMean.length];
+		
 		try {
 			sQTminlp_oneRun sQmodel = new sQTminlp_oneRun(
 					demandMean,
@@ -166,9 +174,9 @@ public class sQTminlp_oneRun {
 					partitions,
 					"sQtPoisson"
 					);
-			double obj = sQmodel.solveMINLP_recursive("sQtPoisson");
-			System.out.println("c("+initialStock+") = " +obj);
-
+			Q = sQmodel.solveMINLP_recursive("sQtPoisson");
+			//System.out.println("c("+initialStock+") = " +obj);
+			
 		}catch(IloException e){
 			e.printStackTrace();
 		}
@@ -177,6 +185,7 @@ public class sQTminlp_oneRun {
 
 		System.out.println("time consumed = "+(endTime - startTime)/1000+" s");		
 
+		System.out.println(Arrays.toString(Q));
 	}
 
 

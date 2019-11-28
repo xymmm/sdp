@@ -175,7 +175,7 @@ public class sQTminlp_recursive {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 5;
-		
+		int partitions = 10;
 		int minInventory = -10;
 		int maxInventory = 50;
 		int[] initialStock = new int[maxInventory - minInventory +1];
@@ -183,7 +183,7 @@ public class sQTminlp_recursive {
 			initialStock[i] = i + minInventory;
 		}
 		
-		int partitions = 10;
+
 		
 		double[] cost_i = new double[initialStock.length];
 		long startTime = System.currentTimeMillis();

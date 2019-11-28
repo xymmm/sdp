@@ -57,7 +57,10 @@ public class multipleInstances_sQ{
 		double[] fixedCost = {5, 10, 20};
 		double[] unitCost = {0,1};
 		double holdingCost = 1;
-		double[] penaltyCost = {2,3};*/
+		double[] penaltyCost = {2,3};
+		int minInventory = -150;
+		int maxInventory = 150;
+		int maxQuantity = 9;*/
 		
 		/*demand - 10 periods*/
 		int demandMean[][] = {

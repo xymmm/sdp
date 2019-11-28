@@ -32,7 +32,7 @@ public class sQsimPoisson {
 	}
 	
 	/** 2. compute purchasing cost according to action decision **/
-	static double computePurchasingCost(int actionDecision, int currentStageIndex, sQsimInstanceInt sQsimInstance) {
+	static double computePurchasingCost(int actionDecision, int currentStageIndex, sQsimInstanceDouble sQsimInstance) {
 		return actionDecision*(
 				sQsimInstance.fixedOrderingCost 
 				+ sQsimInstance.unitCost*sQsimInstance.getActionQuantity(currentStageIndex)
@@ -52,7 +52,7 @@ public class sQsimPoisson {
 	   randomStream.setSeed(seed);
 	}
 	
-	static int generateDemand(double inventoryLevel, int actionDecision, sQsimInstanceInt sQsimInstance, int currentStageIndex) {
+	static int generateDemand(double inventoryLevel, int actionDecision, sQsimInstanceDouble sQsimInstance, int currentStageIndex) {
 		RandomVariateGenInt genDemand;
 		  
 		genDemand = new PoissonGen(randomStream, new PoissonDist(sQsimInstance.demandMean[currentStageIndex])); 
@@ -63,7 +63,7 @@ public class sQsimPoisson {
 	
 	
 	/** 5. compute holding or penalty cost **/
-	static double computeClosingCost(double inventoryLevel, sQsimInstanceInt sQsimInstance) {
+	static double computeClosingCost(double inventoryLevel, sQsimInstanceDouble sQsimInstance) {
 		if(inventoryLevel >= 0) {//return holding cost
 			return inventoryLevel*sQsimInstance.holdingCost;
 		}else {//return penalty cost
@@ -71,7 +71,7 @@ public class sQsimPoisson {
 		}
 	}
 	
-	public static double sQsimPoisson(sQsimInstanceInt sQsimInstance, boolean print, boolean initialOrder) {
+	public static double sQsimPoisson(sQsimInstanceDouble sQsimInstance, boolean print) {
 
 		double inventoryLevel = sQsimInstance.getInitialInventory();
 		double cost = 0;
@@ -85,7 +85,7 @@ public class sQsimPoisson {
 			//1 & 2 check inventory
 			actionDecision = checkInventory(sQsimInstance.reorderPoint[currentStageIndex], inventoryLevel);
 			if(print == true) System.out.println((actionDecision == 1) ? "Replenishment order placed. ":"No order placed. ");
-			if(!initialOrder == true) if(currentStageIndex == 0) actionDecision =0;
+			//if(!initialOrder == true) if(currentStageIndex == 0) actionDecision =0;
 			
 			//2. compute purchasing cost
 			cost += computePurchasingCost(actionDecision, currentStageIndex, sQsimInstance);
@@ -116,9 +116,9 @@ public class sQsimPoisson {
 	}
 	
 	/** multiple run times **/
-	public static void sQsimPoissonMultiRuns(sQsimInstanceInt sQsystem1, int count) {
+	public static void sQsimPoissonMultiRuns(sQsimInstanceDouble sQsystem1, int count) {
 		for(int i=0; i<count; i++) {
-			sQsystem1.statCost.add(sQsimPoisson(sQsystem1,false, false));
+			sQsystem1.statCost.add(sQsimPoisson(sQsystem1,false));
 		}
 	}
 
@@ -132,19 +132,19 @@ public class sQsimPoisson {
 
 		double tail = 0.00000001;
 
-		int minInventory = -1000;
-		int maxInventory = 1000;
+		double minInventory = -1000;
+		double maxInventory = 1000;
 		double coe = 0.25;
 		//1,28,108,164,106,20
 		int[] demandMean = {20,40,60,40};
-		int[] reorderPoint = {14, 35, 55, 25};
-		int Q = 82;
-		int[] actionQuantity = new int[reorderPoint.length];
+		double[] reorderPoint = {14, 35, 55, 25};
+		double Q = 82;
+		double[] actionQuantity = new double[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
 			actionQuantity[t] = Q;
 		}
 
-		sQsimInstanceInt sQsystem1 = new sQsimInstanceInt(
+		sQsimInstanceDouble sQsystem1 = new sQsimInstanceDouble(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,

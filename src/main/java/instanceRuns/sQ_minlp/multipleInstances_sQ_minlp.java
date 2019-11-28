@@ -8,6 +8,7 @@ import ilog.concert.IloException;
 import minlp.sQminlpInstance;
 import minlp.sQminlp_oneRun;
 import minlp.sQminlp_recursive;
+import sQ.simulation.sQsimInstanceDouble;
 import sQ.simulation.sQsimInstanceInt;
 import sQ.simulation.sQsimPoisson;
 import umontreal.ssj.util.Chrono;
@@ -18,7 +19,6 @@ public class multipleInstances_sQ_minlp {
 	 * Aim to resolve MINLP for s,Q with single Q: with I0 = 0
 	 * And simulation
 	 * 
-	 * cost (initial order = 1)
 	 * Q-minlp, 
 	 * s_t-minlp, 
 	 * time_Q, 
@@ -58,11 +58,13 @@ public class multipleInstances_sQ_minlp {
 		double[] unitCost = {0,1};
 		double holdingCost = 1;
 		double[] penaltyCost = {2,3};
+		double minInventory = -150;
+		double maxInventory = 150;
 		double initialInventoryLevel = 0;
 		int partitions = 10;
 		int[][] s_sdp = {};*/
 
-		/*demand - 10 periods
+		/*demand - 10 periods*/
 		int demandMean[][] = {
 				{23		,42		,70		,103	,136	,161	,170	,161	,136	,103},
 				{103	,136	,161	,170	,161	,136	,103	,70		,42		,23},
@@ -74,26 +76,29 @@ public class multipleInstances_sQ_minlp {
 				{391	,754	,694	,261	,195	,320	,111	,191	,160	,55},
 				{290	,204	,114	,165	,318	,119	,482	,534	,136	,260},
 				{279	,453	,224	,223	,517	,291	,547	,646	,224	,215}
-		};	*/	
-		/* parameter - 10 periods
+		};		
+		/* parameter - 10 periods*/
 		double[] fixedCost = {100,200,500};
 		double[] penaltyCost = {5, 10, 20};
 		double[] unitCost = {0,1};
 		double holdingCost = 1;
+		double minInventory = -1500;
+		double maxInventory = 1500;
 		double initialInventoryLevel = 0;
 		int partitions = 10;
-		int[][] s_sdp = {};*/
+		int[][] s_sdp = {};
 		
+		/*classic instance
 		int[][] demandMean = {{20,40,60,40}};
 		double[] fixedCost = {100};
 		double[] penaltyCost = {10};
 		double[] unitCost = {0};
 		double holdingCost = 1;
-		int minInventory = -1500;
-		int maxInventory = 1500;
+		double minInventory = -1500;
+		double maxInventory = 1500;
 		double initialInventoryLevel = 0;
 		int partitions = 10;
-		int[][] s_sdp = {{10, 32, 57, 20}};
+		int[][] s_sdp = {{10, 32, 57, 20}};*/
 		
 		File file = new File("src/main/java/instanceRuns/sQ_minlp/temp.txt");
 
@@ -194,13 +199,15 @@ public class multipleInstances_sQ_minlp {
 								"src/main/java/instanceRuns/sQ_minlp/sQ_minlp_time_s.txt");												//time-st-minlp
 						
 						/*3. simulation ********************************************************************************************************/
-						int[] actions = new int[demandMean[d].length];
+						double[] actions = new double[demandMean[d].length];
+						double[] sd = new double[demandMean[d].length];
 						for(int t=0; t<demandMean[d].length; t++) {
 							actions[t] = Q_minlpInt;
+							sd[t] = s_minlp[t];
 						}
-						sQsimInstanceInt sQ_Poisson = new sQsimInstanceInt(
+						sQsimInstanceDouble sQ_Poisson = new sQsimInstanceDouble(
 								fixedCost[f], unitCost[u], holdingCost,penaltyCost[p], demandMean[d],
-								0.00000001, minInventory, maxInventory, actions, s_minlp, 0.1);	
+								0.00000001, minInventory, maxInventory, actions, sd, 0.1);	
 						Chrono timer = new Chrono();
 						sQsimPoisson.sQsimPoissonMultiRuns(sQ_Poisson, 100000);
 						sQ_Poisson.statCost.setConfidenceIntervalStudent();
