@@ -48,8 +48,8 @@ public class multipleInstances_sQ_inAll {
 		double[] unitCost = {0,1};
 		double holdingCost = 1;
 		double[] penaltyCost = {2,3};
-		int minInventory = -150;
-		int maxInventory = 150;
+		int[] minInventory = {-250, -250, -300, -300, -200, -200, -500, -500, -500, -500};
+		int[] maxInventory = {250, 250, 300, 300, 200, 200, 500, 500, 500, 500};
 		int maxQuantity = 9;
 		int partitions = 10;
 		double initialInventoryLevel = 0;
