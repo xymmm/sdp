@@ -1,5 +1,6 @@
 package minlp;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -197,7 +198,7 @@ public class sQminlp_recursive {
 					);
 			double c1_Q = sQmodel2.solveMINLP_recursive("sQsinglePoisson_recursive");
 			d = c1 - c1_Q;
-			//System.out.println("c("+i1+") - c("+(i1_Q)+") = "+d);
+			System.out.println("c("+i1+") - c("+(i1_Q)+") = "+d);
 		}catch(IloException e){
 			e.printStackTrace();
 		}
@@ -208,7 +209,7 @@ public class sQminlp_recursive {
 		int s = sQminlpInstance.s_sdp[currentPeriodIndex];
 		int i2 = i1 + 1;
 		double d2 = costDifference (sQminlpInstance, i2);
-		if(d2 < sQminlpInstance.fixedCost) {
+		if(d2 < sQminlpInstance.fixedCost + sQminlpInstance.unitCost * sQminlpInstance.Q_minlp) {
 			s = i2;
 			//System.out.println("s found "+s);
 			//writeToText((int) s, false,FileName);
@@ -225,7 +226,7 @@ public class sQminlp_recursive {
 		int s = sQminlpInstance.s_sdp[currentPeriodIndex];
 		int i2 = i1 - 1;
 		double d2 = costDifference (sQminlpInstance, i2);
-		if(d2 > sQminlpInstance.fixedCost) {//next > K, found s
+		if(d2 > sQminlpInstance.fixedCost + sQminlpInstance.unitCost * sQminlpInstance.Q_minlp) {//next > K, found s
 			s = i2 +1;
 			//System.out.println("s found = "+s);
 			//writeToText((int) s, false,FileName);
@@ -255,14 +256,14 @@ public class sQminlp_recursive {
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		
 		double fixedCost = 100;
-		double unitCost = 0;
+		double unitCost = 1;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 	
 		int partitions = 10;
-		int[] s_sdp = {12, 32, 55, 23};//{13, 33, 54, 24};
+		int[] s_sdp = {13, 33, 54, 17};
 
-		int Q_minlp = 83;
+		int Q_minlp = 82;
 		
 		int[] s = new int[demandMean.length];
 		File file = new File("src/main/java/instanceRuns/sQ_minlp/temp.txt");
@@ -275,6 +276,11 @@ public class sQminlp_recursive {
 
 			//writeToText(0, true,writeFileName);
 
+	        FileReader fr = new FileReader("src/main/java/instanceRuns/sQ_minlp/temp.txt");
+	        BufferedReader br = new BufferedReader(fr);
+	        String read = "";
+	        read = br.readLine();
+	        s[d] = Integer.parseInt(read);
 		}
 		System.out.println(Arrays.toString(s));
 

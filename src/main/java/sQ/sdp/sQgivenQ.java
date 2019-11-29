@@ -116,7 +116,7 @@ public class sQgivenQ {
 	public static void main(String[] args) {
 
 		double fixedOrderingCost = 100;
-		double unitCost = 0;
+		double unitCost = 1;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 
@@ -131,7 +131,7 @@ public class sQgivenQ {
 		int[] demandMean = {20, 40, 60, 40};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 
-		int Q = 83;
+		int Q = 82;
 
 		//double[] costLimit = {20000, 15000, 10000, 5200};
 
@@ -161,7 +161,7 @@ public class sQgivenQ {
 			}
 			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, sQgivenQ.inventory, "inventory level", "cost difference", "t="+(d+1));//cost difference
 			for(int j=0; j<costDifference.length-1; j++) {
-				if(costDifference[j] <= fixedOrderingCost) {
+				if(costDifference[j] <= fixedOrderingCost + unitCost*Q) {
 					System.out.println("BreakPoints = "+(j + minInventory));
 					s_breakpoint[d] = j+minInventory;
 					break;

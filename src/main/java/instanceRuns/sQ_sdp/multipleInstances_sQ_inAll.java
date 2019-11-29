@@ -55,7 +55,7 @@ public class multipleInstances_sQ_inAll {
 		double initialInventoryLevel = 0;
 */
 		
-		/*demand - 10 periods
+		/*demand - 10 periods*/
 		int demandMean[][] = {
 				{23		,42		,70		,103	,136	,161	,170	,161	,136	,103},
 				{103	,136	,161	,170	,161	,136	,103	,70		,42		,23},
@@ -67,19 +67,19 @@ public class multipleInstances_sQ_inAll {
 				{391	,754	,694	,261	,195	,320	,111	,191	,160	,55},
 				{290	,204	,114	,165	,318	,119	,482	,534	,136	,260},
 				{279	,453	,224	,223	,517	,291	,547	,646	,224	,215}
-		};*/		
-		/* parameter - 10 periods
+		};		
+		/* parameter - 10 periods*/
 		double[] fixedCost = {100,200,500};
 		double[] penaltyCost = {5, 10, 20};
 		double[] unitCost = {0,1};
 		double holdingCost = 1;
-		int minInventory = -1500;
-		int maxInventory = 1500;
-		int maxQuantity = 600;
+		int[] minInventory = {-2000, -2000, -2000, -2000, -2000, -2000, -3000, -5000, -5000, -5000};
+		int[] maxInventory = {2000, 2000, 2000, 2000, 2000, 2000, 3000, 5000, 5000, 5000};
+		int[] maxQuantity = {600, 600,  500, 500, 800, 800, 1500, 1500, 1500, 1500};
 		int partitions = 10;
-		double initialInventoryLevel = 0;*/
+		double initialInventoryLevel = 0;
 		
-		/*classic instance*/
+		/*classic instance
 		int[][] demandMean = {{20,40,60,40}};
 		double[] fixedCost = {100};
 		double[] penaltyCost = {10};
@@ -89,12 +89,13 @@ public class multipleInstances_sQ_inAll {
 		int maxInventory = 500;
 		int maxQuantity = 500;
 		double initialInventoryLevel = 0;
-		int partitions = 10;
+		int partitions = 10;*/
 
 
 		System.out.println("total number of instances = "+demandMean.length * fixedCost.length * penaltyCost.length * unitCost.length);
 		System.out.println("number of parameter groups = "+fixedCost.length * penaltyCost.length * unitCost.length);
 		System.out.println("==========================");
+		System.out.println();
 		
 		int count = 1;			//to capture computation progress
 		
@@ -106,7 +107,7 @@ public class multipleInstances_sQ_inAll {
 				for(int u=0; u<unitCost.length; u++) {
 					
 					//new parameter group
-					System.out.println("parameter group "+count);
+					System.out.println("------------------------------ parameter group "+count);
 					long groupStartTime = System.currentTimeMillis();
 
 					//sdp record parameters*******************************************************************************
@@ -168,7 +169,7 @@ public class multipleInstances_sQ_inAll {
 						//create instance
 						Instance instance = new Instance(
 								fixedCost[f], unitCost[u], holdingCost,penaltyCost[p],demandMean[d],
-								0.00000001, minInventory, maxInventory, maxQuantity, 0.1 );
+								0.00000001, minInventory[d], maxInventory[d], maxQuantity[d], 0.1 );
 						//solve sQ - sdp
 						sQsolution sQsolution = sQ.solvesQInstance(instance);
 						//record
@@ -258,7 +259,7 @@ public class multipleInstances_sQ_inAll {
 						}
 						sQsimInstanceDouble sQ_Poisson = new sQsimInstanceDouble(
 								fixedCost[f], unitCost[u], holdingCost,penaltyCost[p], demandMean[d],
-								0.00000001, minInventory, maxInventory, actions, sd, 0.1);	
+								0.00000001, minInventory[d], maxInventory[d], actions, sd, 0.1);	
 						Chrono timer = new Chrono();
 						sQsimPoisson.sQsimPoissonMultiRuns(sQ_Poisson, 100000);
 						sQ_Poisson.statCost.setConfidenceIntervalStudent();
@@ -268,6 +269,12 @@ public class multipleInstances_sQ_inAll {
 
 					}//d
 					
+					
+					//group ends
+					count++;
+					long groupEndTime = System.currentTimeMillis();
+					System.out.println("------------------------------ time Consumed for this group = "+(groupEndTime - groupStartTime)/1000+" s");
+
 					
 				}//u
 			}//p

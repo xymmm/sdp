@@ -131,7 +131,7 @@ public class sQ {
 		Chrono timer = new Chrono();
 
 		double fixedOrderingCost = 100;
-		double unitCost = 0;
+		double unitCost = 1;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 
