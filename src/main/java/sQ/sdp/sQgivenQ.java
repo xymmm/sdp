@@ -116,22 +116,22 @@ public class sQgivenQ {
 	public static void main(String[] args) {
 
 		double fixedOrderingCost = 100;
-		double unitCost = 1;
+		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		double penaltyCost = 5;
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
-		int maxQuantity = 500;
+		int minInventory = -2000;
+		int maxInventory = 2000;
+		int maxQuantity = 600;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {20, 40, 60, 40};
+		int[] demandMean = {23		,42		,70		,103	,136	,161	,170	,161	,136	,103};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 
-		int Q = 82;
+		int Q = 184;
 
 		//double[] costLimit = {20000, 15000, 10000, 5200};
 
@@ -155,11 +155,12 @@ public class sQgivenQ {
 
 			/**resolve reorder points by cost differences**/
 			double[] costDifference = new double[maxInventory-minInventory+1-Q];
+			//System.out.println("=============================================== t="+(d+1));
 			for(int j=0; j<costDifference.length; j++) {
 				costDifference[j] = sQgivenQ.costGivenQ[0][j] - sQgivenQ.costGivenQ[0][j+Q];
-				//System.out.println(costDifference[j]);
+				//if(j+instance.minInventory >= 0) System.out.println(costDifference[j]);
 			}
-			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, sQgivenQ.inventory, "inventory level", "cost difference", "t="+(d+1));//cost difference
+			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, sQgivenQ.inventory, "inventory level", "cost difference", "t="+(d+1));//cost difference
 			for(int j=0; j<costDifference.length-1; j++) {
 				if(costDifference[j] <= fixedOrderingCost + unitCost*Q) {
 					System.out.println("BreakPoints = "+(j + minInventory));
