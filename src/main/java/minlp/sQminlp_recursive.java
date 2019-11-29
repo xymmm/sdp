@@ -197,7 +197,7 @@ public class sQminlp_recursive {
 					);
 			double c1_Q = sQmodel2.solveMINLP_recursive("sQsinglePoisson_recursive");
 			d = c1 - c1_Q;
-			System.out.println("c("+i1+") - c("+(i1_Q)+") = "+d);
+			//System.out.println("c("+i1+") - c("+(i1_Q)+") = "+d);
 		}catch(IloException e){
 			e.printStackTrace();
 		}
@@ -210,7 +210,7 @@ public class sQminlp_recursive {
 		double d2 = costDifference (sQminlpInstance, i2);
 		if(d2 < sQminlpInstance.fixedCost) {
 			s = i2;
-			System.out.println("s found "+s);
+			//System.out.println("s found "+s);
 			//writeToText((int) s, false,FileName);
 			String s_string = Integer.toString(s);
 			boolean flag = writeTxtFile(s_string, FileName);
@@ -227,7 +227,7 @@ public class sQminlp_recursive {
 		double d2 = costDifference (sQminlpInstance, i2);
 		if(d2 > sQminlpInstance.fixedCost) {//next > K, found s
 			s = i2 +1;
-			System.out.println("s found = "+s);
+			//System.out.println("s found = "+s);
 			//writeToText((int) s, false,FileName);
 			String s_string = Integer.toString(s);
 			boolean flag = writeTxtFile(s_string, FileName);

@@ -210,7 +210,7 @@ public class sS {
 		}
 		long endTime=System.currentTimeMillis();
 		long timeConsumed = endTime - startTime;
-		System.out.println("Computation consumed " + timeConsumed +" ms.");
+		//System.out.println("Computation consumed " + timeConsumed +" ms.");
 		return new sSsolution(optimalAction, optimalCost, inventory, timeConsumed);
 	}
 

@@ -238,7 +238,7 @@ public class multipleInstances_sQ_inAll {
 					        String read = "";
 					        read = br.readLine();
 					        s_minlp[t] = Integer.parseInt(read);
-					        System.out.println("reorder point s_minlp["+(t+1)+"] in the loop = " + s_minlp[t]);
+					        //System.out.println("reorder point s_minlp["+(t+1)+"] in the loop = " + s_minlp[t]);
 						}//save s and time
 						sdp.util.writeText.writeIntArray(
 								s_minlp, 

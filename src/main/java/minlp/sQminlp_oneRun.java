@@ -90,7 +90,7 @@ public class sQminlp_oneRun{
         	double time = end - start;
         	//System.out.println("OBJECTIVE: " + objective);  
         	double Q = cplex.getValue(opl.getElement("Q").asNumVar());
-        	System.out.println("time = "+time);
+        	//System.out.println("time = "+time);
         	opl.postProcess();
         	//opl.printSolution(System.out);
         	//opl.end();
