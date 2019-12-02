@@ -183,7 +183,7 @@ public class sQminlp_recursive {
 	}
 	
 	
-	public static double costDifference (sQminlpInstance instance, int i1) {
+	public static double costDifference (sQminlpInstance instance, int i1, String consoleFileName) {
 		double d = 0;
 		int i1_Q = i1 + instance.Q_minlp;
 		try {
@@ -199,6 +199,7 @@ public class sQminlp_recursive {
 			double c1_Q = sQmodel2.solveMINLP_recursive("sQsinglePoisson_recursive");
 			d = c1 - c1_Q;
 			System.out.println("c("+i1+") - c("+(i1_Q)+") = "+d);
+			sdp.util.writeText.writeString("c("+i1+") - c("+(i1_Q)+") = "+d, consoleFileName);
 		}catch(IloException e){
 			e.printStackTrace();
 		}
@@ -206,10 +207,10 @@ public class sQminlp_recursive {
 	}
 
 	/** by identifing direction increase or decrease ****************************************************************************/
-	public static int computeMINLP_sGreaterK(sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex, File FileName) throws Exception {
+	public static int computeMINLP_sGreaterK(sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex, File FileName, String ConsoleFileName) throws Exception {
 		int s = sQminlpInstance.s_sdp[currentPeriodIndex];
 		int i2 = i1 + 1;
-		double d2 = costDifference (sQminlpInstance, i2);
+		double d2 = costDifference (sQminlpInstance, i2, ConsoleFileName);
 		if(d2 < sQminlpInstance.fixedCost + sQminlpInstance.unitCost * sQminlpInstance.Q_minlp) {
 			s = i2;
 			//System.out.println("s found "+s);
@@ -218,14 +219,14 @@ public class sQminlp_recursive {
 			boolean flag = writeTxtFile(s_string, FileName);
 
 		}else {
-			computeMINLP_sGreaterK(sQminlpInstance, i1 + 1, currentPeriodIndex, FileName);
+			computeMINLP_sGreaterK(sQminlpInstance, i1 + 1, currentPeriodIndex, FileName, ConsoleFileName);
 		}
 		return s;
 	}	
-	public static int computeMINLP_sLessK(sQminlpInstance sQminlpInstance, int i1 , int currentPeriodIndex, File FileName) throws Exception {
+	public static int computeMINLP_sLessK(sQminlpInstance sQminlpInstance, int i1 , int currentPeriodIndex, File FileName, String ConsoleFileName) throws Exception {
 		int s = sQminlpInstance.s_sdp[currentPeriodIndex];
 		int i2 = i1 - 1;
-		double d2 = costDifference (sQminlpInstance, i2);
+		double d2 = costDifference (sQminlpInstance, i2, ConsoleFileName);
 		if(d2 > sQminlpInstance.fixedCost + sQminlpInstance.unitCost * sQminlpInstance.Q_minlp) {//next > K, found s
 			s = i2 +1;
 			//System.out.println("s found = "+s);
@@ -233,38 +234,42 @@ public class sQminlp_recursive {
 			String s_string = Integer.toString(s);
 			boolean flag = writeTxtFile(s_string, FileName);
 		}else {
-			computeMINLP_sLessK(sQminlpInstance, i1 - 1, currentPeriodIndex, FileName);
+			computeMINLP_sLessK(sQminlpInstance, i1 - 1, currentPeriodIndex, FileName, ConsoleFileName);
 		}
 		return s;
 	}	
-	public static int computeMINLP_s(double costDifference_s_sdp, sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex, File FileName) throws Exception {//before this, declare i1 = s_sdp[d]
+	public static int computeMINLP_s(double costDifference_s_sdp, sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex, File FileName, String consoleFileName) throws Exception {//before this, declare i1 = s_sdp[d]
 		if(costDifference_s_sdp > sQminlpInstance.fixedCost + sQminlpInstance.unitCost * sQminlpInstance.Q_minlp) {
-			return computeMINLP_sGreaterK(sQminlpInstance , i1, currentPeriodIndex, FileName);
+			return computeMINLP_sGreaterK(sQminlpInstance , i1, currentPeriodIndex, FileName, consoleFileName);
 		}else {
-			return computeMINLP_sLessK(sQminlpInstance, i1, currentPeriodIndex,FileName);
+			return computeMINLP_sLessK(sQminlpInstance, i1, currentPeriodIndex,FileName, consoleFileName);
 		}
 	}
 	/** by identifing direction increase or decrease ****************************************************************************/
 
 	/**by approximating slope==================================================================================================**/
-	public static int computeMINLP_s_bySlope(double costDifference_s_sdp, sQminlpInstance instance, int i1, File FileName, int currentPeriodIndex) throws Exception {
-		double value_i2 =  costDifference (instance, i1+1);
+	public static int computeMINLP_s_bySlope(double costDifference_s_sdp, sQminlpInstance instance, int i1, File FileName, int currentPeriodIndex, String consoleFileName) throws Exception {
+		double value_i2 =  costDifference (instance, i1+1, consoleFileName);
 		double slope = value_i2 - costDifference_s_sdp;
 		System.out.println("slope = "+slope);
+		sdp.util.writeText.writeString("slope = "+slope, consoleFileName);
 		if((instance.holdingCost + instance.partitions - 0.5 < -slope)&&(-slope < instance.holdingCost + instance.penaltyCost + 0.5)) {
 			System.out.println("slope within interval");
-			return computeMINLP_s(costDifference_s_sdp, instance, i1, currentPeriodIndex, FileName);
+			sdp.util.writeText.writeString("slope within interval", consoleFileName);
+			return computeMINLP_s(costDifference_s_sdp, instance, i1, currentPeriodIndex, FileName, consoleFileName);
 		}else {
 			//approximated start point by slope
 			//first, judge the approximated start point is larger or smaller
 			if(costDifference_s_sdp > instance.fixedCost + instance.unitCost * instance.Q_minlp) {
 				int startPoint = (int) (i1 - Math.round((costDifference_s_sdp - instance.fixedCost + instance.unitCost * instance.Q_minlp)/slope));
 				System.out.println("approximated start point = " + startPoint);
-				return computeMINLP_s(costDifference_s_sdp, instance, startPoint, currentPeriodIndex, FileName);
+				sdp.util.writeText.writeString("approximated start point = " + startPoint, consoleFileName);
+				return computeMINLP_s(costDifference_s_sdp, instance, startPoint, currentPeriodIndex, FileName, consoleFileName);
 			}else {
 				int startPoint = (int) (i1 + Math.round((instance.fixedCost + instance.unitCost * instance.Q_minlp - costDifference_s_sdp)/slope));
 				System.out.println("approximated start point = " + startPoint);
-				return computeMINLP_s(costDifference_s_sdp, instance, startPoint, currentPeriodIndex, FileName);
+				sdp.util.writeText.writeString("approximated start point = " + startPoint, consoleFileName);
+				return computeMINLP_s(costDifference_s_sdp, instance, startPoint, currentPeriodIndex, FileName, consoleFileName);
 			}
 		}
 	}
@@ -279,31 +284,31 @@ public class sQminlp_recursive {
 		
 		//writeToText(0,true, writeFileName);
 			
-		int[] demandMean = {23		,42		,70		,103	,136	,161	,170	,161	,136	,103};
-		//int[] demandMean = {20, 40, 60, 40};
+		//int[] demandMean = {23		,42		,70		,103	,136	,161	,170	,161	,136	,103};
+		int[] demandMean = {20, 40, 60, 40};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		
 		double fixedCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 10;
 	
 		int partitions = 10;
-		//int[] s_sdp = {13,33, 57, 30};
-		int[] s_sdp = {-7, 12, 40, 73, 106, 132, 140, 131, 106, 56};
+		int[] s_sdp = {13,33, 57, 30};
+		//int[] s_sdp = {-7, 12, 40, 73, 106, 132, 140, 131, 106, 56};
 
-		int Q_minlp = 145;
+		int Q_minlp = 84;
 		
 		int[] s = new int[demandMean.length];
 		File file = new File("src/main/java/instanceRuns/sQ_minlp/temp.txt");
 		for(int d=0; d<demandMeanInput.length; d++) {
 			sQminlpInstance sQminlpInstance = new sQminlpInstance(demandMeanInput[d], fixedCost, unitCost, holdingCost, penaltyCost, 
 					partitions, s_sdp,Q_minlp);
-			double costDifference_s_sdp = costDifference(sQminlpInstance, s_sdp[d]);
+			double costDifference_s_sdp = costDifference(sQminlpInstance, s_sdp[d], "src/main/java/instanceRuns/main/sQ_console.txt");
 
 			int i1 = s_sdp[d];
-			//s[d] = computeMINLP_s(costDifference_s_sdp, sQminlpInstance, i1, d, file);
-			s[d] = computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, file, d);
+			//s[d] = computeMINLP_s(costDifference_s_sdp, sQminlpInstance, i1, d, file, "src/main/java/instanceRuns/main/sQ_console.txt");
+			s[d] = computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, file, d, "src/main/java/instanceRuns/main/sQ_console.txt");
 			System.out.println("==================");
 			
 

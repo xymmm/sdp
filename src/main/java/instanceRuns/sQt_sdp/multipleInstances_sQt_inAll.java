@@ -39,6 +39,13 @@ public class multipleInstances_sQt_inAll {
 					System.out.println("parameter group "+count);
 					long groupStartTime = System.currentTimeMillis();
 					
+					//record console for costDifference iterations
+					sdp.util.writeText.writeNewLine("src/main/java/instanceRuns/main/sQt_console.txt");								//console
+					sdp.util.writeText.writeDouble(fixedCost[f], "src/main/java/instanceRuns/main/sQt_console.txt");					//console
+					sdp.util.writeText.writeDouble(penaltyCost[p], "src/main/java/instanceRuns/main/sQt_console.txt");				//console
+					sdp.util.writeText.writeDouble(unitCost[u], "src/main/java/instanceRuns/main/sQt_console.txt");					//console
+
+					
 					//sdp record parameters*******************************************************************************
 					//start a new line and write up parameters
 					sdp.util.writeText.writeNewLine("src/main/java/instanceRuns/sQt_sdp/sQt_sdp_cost.txt");							//cost

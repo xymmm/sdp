@@ -28,6 +28,7 @@ public class multi_sQt_main {
 		int partitions = 10;
 		int initialInventoryLevel = 0;
 		
+		//sQt-sdp, minlp, simulation
 		instanceRuns.sQt_sdp.multipleInstances_sQt_inAll.multi_sQt(
 				demandMean, fixedCost, penaltyCost, unitCost, holdingCost, 
 				minInventory, maxInventory, maxQuantity, 
