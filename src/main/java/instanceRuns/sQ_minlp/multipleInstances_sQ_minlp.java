@@ -178,8 +178,10 @@ public class multipleInstances_sQ_minlp {
 							sQminlpInstance sQminlpInstance = new sQminlpInstance(
 									demandMeanInput[t], fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], 
 									partitions, s_sdp[d], Q_minlpInt);
-							int i1 = s_sdp[d][t];												
-							s_minlp[t] = sQminlp_recursive.computeMINLP_s(sQminlpInstance, i1, t, file);
+							int i1 = s_sdp[d][t];
+							double costDifference_s_sdp = minlp.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[d][t]);
+							//s_minlp[t] = sQminlp_recursive.computeMINLP_s(costDifference_s_sdp, sQminlpInstance, i1, t, file);
+							s_minlp[t] = sQminlp_recursive.computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, file, t);
 							//Due to the unpublicarisation s in origian class, s is overwritten in a temporary file
 							
 							//s in the temporary file is now read and saved to the array: s_minlp

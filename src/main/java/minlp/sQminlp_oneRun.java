@@ -119,11 +119,11 @@ public class sQminlp_oneRun{
 		
 		long startTime = System.currentTimeMillis();
 		
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {23		,42		,70		,103	,136	,161	,170	,161	,136	,103};
 		double fixedCost = 100;
-		double unitCost = 1;
+		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		double penaltyCost = 5;
 		double initialInventoryLevel = 0;
 		int partitions = 10;
 		
