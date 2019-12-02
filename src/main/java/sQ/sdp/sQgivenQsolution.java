@@ -28,7 +28,7 @@ public class sQgivenQsolution {
 	public static int[] getsGivenQ(Instance instance, sQgivenQsolution sQgivenQsolution) {
 		int[] s = new int[instance.getStages()];
 		for(int t=0;t<instance.getStages();t++) { // Time
-			for(int i=0;i<(instance.maxInventory - instance.minInventory+1);i++) {  // Inventory   
+			for(int i=-instance.minInventory-100;i<(instance.maxInventory - instance.minInventory+1);i++) {  // Inventory   
 				if(sQgivenQsolution.actionGivenQ[t][i] == false) {
 					s[t] = i + instance.minInventory;
 					break;
