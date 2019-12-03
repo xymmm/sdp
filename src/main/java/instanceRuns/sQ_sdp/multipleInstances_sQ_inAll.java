@@ -32,7 +32,8 @@ public class multipleInstances_sQ_inAll {
 	
 	public static void multi_sQ (int[][] demandMean, double[] fixedCost, double[] penaltyCost, double[] unitCost, double holdingCost, 
 								 int[] minInventory, int[] maxInventory, int[] maxQuantity,
-								 int partitions, double initialInventoryLevel) throws Exception {
+								 int partitions, double initialInventoryLevel,
+								 boolean rangeQ) throws Exception {
 		
 		System.out.println("total number of instances = "+demandMean.length * fixedCost.length * penaltyCost.length * unitCost.length);
 		System.out.println("number of parameter groups = "+fixedCost.length * penaltyCost.length * unitCost.length);
@@ -153,7 +154,12 @@ public class multipleInstances_sQ_inAll {
 							sQminlp_oneRun sQmodel = new sQminlp_oneRun(
 									demandMean[d], holdingCost, fixedCost[f], unitCost[u], penaltyCost[p],
 									initialInventoryLevel, partitions, null);
-							Q_minlp = sQmodel.solveMINLP_oneRun("sQsinglePoisson");
+							if(rangeQ == false) {
+								Q_minlp = sQmodel.solveMINLP_oneRun("sQsinglePoisson");
+							}else {
+								Q_minlp = sQmodel.solveMINLP_oneRun("sQsinglePoisson_Qranged");	
+							}
+							
 						}catch(IloException e){
 							e.printStackTrace();
 						}
@@ -178,9 +184,13 @@ public class multipleInstances_sQ_inAll {
 									demandMeanInput[t], fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], 
 									partitions, s_sdp, Q_minlpInt);
 							int i1 = s_sdp[t];
-							double costDifference_s_sdp = minlp.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[t], "src/main/java/instanceRuns/main/sQ_console.txt");
+							double costDifference_s_sdp = 
+									minlp.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[t], 
+																		   "src/main/java/instanceRuns/main/sQ_console.txt", rangeQ);
 							//s_minlp[t] = sQminlp_recursive.computeMINLP_s(costDifference_s_sdp, sQminlpInstance, i1, t, file, "src/main/java/instanceRuns/main/sQ_console.txt");
-							s_minlp[t] = sQminlp_recursive.computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, file, t, "src/main/java/instanceRuns/main/sQ_console.txt");
+							s_minlp[t] = 
+									sQminlp_recursive.computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, file, t, 
+																			 "src/main/java/instanceRuns/main/sQ_console.txt", rangeQ);
 							//Due to the unpublicarisation s in origian class, s is overwritten in a temporary file
 							
 							//s in the temporary file is now read and saved to the array: s_minlp

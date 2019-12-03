@@ -87,6 +87,7 @@ public class multipleInstances_sQ_minlp {
 		double initialInventoryLevel = 0;
 		int partitions = 10;
 		int[][] s_sdp = {};
+		boolean rangedQ = false;
 		
 		/*classic instance
 		int[][] demandMean = {{20,40,60,40}};
@@ -179,9 +180,11 @@ public class multipleInstances_sQ_minlp {
 									demandMeanInput[t], fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], 
 									partitions, s_sdp[d], Q_minlpInt);
 							int i1 = s_sdp[d][t];
-							double costDifference_s_sdp = minlp.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[d][t], "src/main/java/instanceRuns/main/sQ_console.txt");
+							double costDifference_s_sdp = minlp.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[d][t], 
+									"src/main/java/instanceRuns/main/sQ_console.txt", rangedQ);
 							//s_minlp[t] = sQminlp_recursive.computeMINLP_s(costDifference_s_sdp, sQminlpInstance, i1, t, file);
-							s_minlp[t] = sQminlp_recursive.computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, file, t, "src/main/java/instanceRuns/main/sQ_console.txt");
+							s_minlp[t] = sQminlp_recursive.computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, file, t, 
+									"src/main/java/instanceRuns/main/sQ_console.txt", rangedQ);
 							//Due to the unpublicarisation s in origian class, s is overwritten in a temporary file
 							
 							//s in the temporary file is now read and saved to the array: s_minlp

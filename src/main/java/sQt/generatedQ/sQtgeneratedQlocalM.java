@@ -166,7 +166,7 @@ public class sQtgeneratedQlocalM {
 				LocalMinCostsList.add(costCurrent);
 				minGsList.add(g-1);
 			}
-			if(g%100000 == 0) System.out.println("Computation completed for generator = "+g);
+			if(g%10000 == 0) System.out.println("Computation completed for generator = "+g);
 			g = g+1;
 		}while(g < maxG);
 		

@@ -169,12 +169,12 @@ public class sQTminlp_recursive {
 
 
 	public static void main(String[] args) {
-		int[] demandMean = {2,4,6,4};
+		int[] demandMean = {10	,12	,10	,6	,5	,2	};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
-		double fixedCost = 10;
+		double fixedCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 2;
 		int partitions = 10;
 		int minInventory = -10;
 		int maxInventory = 50;

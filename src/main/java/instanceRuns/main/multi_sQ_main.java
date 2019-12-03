@@ -35,7 +35,8 @@ public class multi_sQ_main {
 		instanceRuns.sQ_sdp.multipleInstances_sQ_inAll.multi_sQ (
 				demandMean, fixedCost, penaltyCost, unitCost, holdingCost, 
 				minInventory, maxInventory, maxQuantity,
-				partitions, initialInventoryLevel);
+				partitions, initialInventoryLevel,
+				false);
 		
 		/*demand - 6 periods*/
 		int demandMean_6period [][] = {
@@ -57,7 +58,7 @@ public class multi_sQ_main {
 		double holdingCost_6period = 1;
 		int[] minInventory_6period = {-250, -250, -300, -300, -200, -200, -500, -500, -500, -500};
 		int[] maxInventory_6period = {250, 250, 300, 300, 200, 200, 500, 500, 500, 500};
-		int[] maxQuantity_6period = {9, 9, 9, 9, 9, 9, 9, 9, 9};
+		int[] maxQuantity_6period = {9, 9, 9, 9, 9, 9, 9, 9, 9, 9};
 
 		//sS
 		instanceRuns.sS_sdp.multipleInstances_sS.multi_sS(demandMean_6period, fixedCost_6period, penaltyCost_6period, unitCost_6period, holdingCost_6period, 
@@ -67,7 +68,8 @@ public class multi_sQ_main {
 		instanceRuns.sQ_sdp.multipleInstances_sQ_inAll.multi_sQ (
 				demandMean_6period, fixedCost_6period, penaltyCost_6period, unitCost_6period, holdingCost_6period, 
 				minInventory_6period, maxInventory_6period, maxQuantity_6period,
-				partitions, initialInventoryLevel);
+				partitions, initialInventoryLevel,
+				true);
 		//sQt-sdp, minlp, simulation are in multi-sQt_main.java
 	}
 	

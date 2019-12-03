@@ -126,7 +126,7 @@ public class multipleInstances_sQt_inAll {
 						/*================================================================================================*/
 						/*MINLP*/
 						/*================================================================================================*/
-						int[] inventory = new int[maxInventory[d] - minInventory[d] +1];
+						int[] inventory = new int[50 - -10 +1];
 						for(int i=0; i<inventory.length;i++) {
 							inventory[i] = i + minInventory[d];
 						}
