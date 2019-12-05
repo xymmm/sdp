@@ -131,7 +131,7 @@ public class sQ {
 		Chrono timer = new Chrono();
 
 		double fixedOrderingCost = 100;
-		double unitCost = 1;
+		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 
@@ -189,10 +189,10 @@ public class sQ {
 			System.out.println("i: "+ (i+instance.minInventory) + "\t" + sQsolution.totalCost[i][sQsolution.getOpt_aSQ(instance)+1][0]);
 		}
 		*/
-		/*
+		
 		for(int a=0; a<201;a++) {
 			System.out.println(sQsolution.totalCost[instance.initialInventory - instance.minInventory][a][0]);
-		}*/
+		}
 		
 		
 		

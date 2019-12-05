@@ -128,7 +128,7 @@ public class multipleInstances_sQt_inAll {
 						/*================================================================================================*/
 						int[] inventory = new int[50 - -10 +1];
 						for(int i=0; i<inventory.length;i++) {
-							inventory[i] = i + minInventory[d];
+							inventory[i] = i -10;//*****************
 						}
 						/*1. sQt minlp solve Qt*************************************************************************************************************/
 						long oneRunMINLPstartTime = System.currentTimeMillis();
@@ -171,7 +171,7 @@ public class multipleInstances_sQt_inAll {
 							double targetCost = cost_i[globalMinimumIndex] + fixedCost[f];
 							for(int i=0; i<cost_i.length;i++) {
 								if(cost_i[i]<targetCost) {
-									s_minlp[t] = i + minInventory[d];
+									s_minlp[t] = i -10; //****************
 									break;
 								}
 							}//i for s
