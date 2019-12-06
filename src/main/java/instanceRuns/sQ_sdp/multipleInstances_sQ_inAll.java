@@ -67,25 +67,25 @@ public class multipleInstances_sQ_inAll {
 
 						//sdp record parameters*******************************************************************************
 						//start a new line and write up parameters
-						//sdp.util.writeText.writeNewLine(fileSDPcost);							//cost
+						sdp.util.writeText.writeNewLine(fileSDPcost);							//cost
 						//sdp.util.writeText.writeNewLine(fileSDPQ);								//Q
 						//sdp.util.writeText.writeNewLine(fileSDPs);								//s_t
 						//sdp.util.writeText.writeNewLine(fileTimeSDPcost);						//time for Q and cost
 						//sdp.util.writeText.writeNewLine(fileTimest);							//time for s_t
 						//fixed cost
-						//sdp.util.writeText.writeDouble(fixedCost[f], fileSDPcost);				//cost
+						sdp.util.writeText.writeDouble(fixedCost[f], fileSDPcost);				//cost
 						//sdp.util.writeText.writeDouble(fixedCost[f], fileSDPQ);					//Q
 						//sdp.util.writeText.writeDouble(fixedCost[f], fileSDPs);					//s_t
 						//sdp.util.writeText.writeDouble(fixedCost[f], fileTimeSDPcost);			//time for Q and cost
 						//sdp.util.writeText.writeDouble(fixedCost[f], fileTimest);				//time for s_t
 						//penalty cost
-						//sdp.util.writeText.writeDouble(penaltyCost[p], fileSDPcost);			//cost
+						sdp.util.writeText.writeDouble(penaltyCost[p], fileSDPcost);			//cost
 						//sdp.util.writeText.writeDouble(penaltyCost[p], fileSDPQ);				//Q
 						//sdp.util.writeText.writeDouble(penaltyCost[p], fileSDPs);				//s_t
 						//sdp.util.writeText.writeDouble(penaltyCost[p], fileTimeSDPcost);		//time for Q and cost
 						//sdp.util.writeText.writeDouble(penaltyCost[p], fileTimest);				//time for s_t
 						//unit cost
-						//sdp.util.writeText.writeDouble(unitCost[u], fileSDPcost);				//cost 				  "src/main/java/instanceRuns/sQ_sdp/sQ_sdp_cost.txt"
+						sdp.util.writeText.writeDouble(unitCost[u], fileSDPcost);				//cost 				  "src/main/java/instanceRuns/sQ_sdp/sQ_sdp_cost.txt"
 						//sdp.util.writeText.writeDouble(unitCost[u], fileSDPQ);					//Q    				  "src/main/java/instanceRuns/sQ_sdp/sQ_sdp_Q.txt"
 						//sdp.util.writeText.writeDouble(unitCost[u], fileSDPs);					//s_t  				  "src/main/java/instanceRuns/sQ_sdp/sQ_sdp_reorderPoints.txt"
 						//sdp.util.writeText.writeDouble(unitCost[u], fileTimeSDPcost);			//time for Q and cost "src/main/java/instanceRuns/sQ_sdp/sQ_sdp_time_QandCost.txt"
