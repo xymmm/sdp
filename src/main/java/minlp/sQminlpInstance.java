@@ -7,6 +7,8 @@ public class sQminlpInstance {
 	public double unitCost;
 	public double holdingCost;
 	public double penaltyCost;
+	public int minInventory;
+	public int maxInventory;
 
 	
 	public int partitions;
@@ -19,6 +21,8 @@ public class sQminlpInstance {
 			double unitCost,
 			double holdingCost,
 			double penaltyCost,
+			int minInventory,
+			int maxInventory,
 
 			int partitions,
 			int[] s_sdp,
@@ -32,6 +36,8 @@ public class sQminlpInstance {
 		this.partitions = partitions;
 		this.s_sdp = s_sdp;
 		this.Q_minlp = Q_minlp;
+		this.minInventory = minInventory;
+		this.maxInventory = maxInventory;
 	}
 		   
 	   

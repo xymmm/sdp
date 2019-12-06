@@ -224,7 +224,6 @@ public class sQminlp_recursive {
 			//writeToText((int) s, false,FileName);
 			String s_string = Integer.toString(s);
 			boolean flag = writeTxtFile(s_string, FileName);
-
 		}else {
 			computeMINLP_sGreaterK(sQminlpInstance, i1 + 1, currentPeriodIndex, FileName, ConsoleFileName, rangedQ);
 		}
@@ -248,6 +247,7 @@ public class sQminlp_recursive {
 	}	
 	public static int computeMINLP_s(double costDifference_s_sdp, sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex, 
 									 File FileName, String consoleFileName, boolean rangedQ) throws Exception {//before this, declare i1 = s_sdp[d]
+		if((i1<=sQminlpInstance.minInventory) ||(i1>=sQminlpInstance.maxInventory)) return i1;
 		if(costDifference_s_sdp > sQminlpInstance.fixedCost + sQminlpInstance.unitCost * sQminlpInstance.Q_minlp) {
 			return computeMINLP_sGreaterK(sQminlpInstance , i1, currentPeriodIndex, FileName, consoleFileName, rangedQ);
 		}else {
@@ -286,7 +286,7 @@ public class sQminlp_recursive {
 	
 	/**by approximating slope==================================================================================================**/
 
-	
+	/*
 	
 	public static void main(String[] args) throws Exception {
 		long start = System.currentTimeMillis();
@@ -302,6 +302,7 @@ public class sQminlp_recursive {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
+		int minInventory = -500;
 	
 		int partitions = 10;
 		int[] s_sdp = {13,33, 57, 30};
@@ -314,7 +315,7 @@ public class sQminlp_recursive {
 		int[] s = new int[demandMean.length];
 		File file = new File("src/main/java/instanceRuns/sQ_minlp/temp.txt");
 		for(int d=0; d<demandMeanInput.length; d++) {
-			sQminlpInstance sQminlpInstance = new sQminlpInstance(demandMeanInput[d], fixedCost, unitCost, holdingCost, penaltyCost, 
+			sQminlpInstance sQminlpInstance = new sQminlpInstance(demandMeanInput[d], fixedCost, unitCost, holdingCost, penaltyCost, minInventory,
 					partitions, s_sdp, Q_minlp);
 			double costDifference_s_sdp = costDifference(sQminlpInstance, s_sdp[d], "src/main/java/instanceRuns/main/sQ_console.txt", rangedQ);
 
@@ -338,10 +339,10 @@ public class sQminlp_recursive {
 		System.out.println(end-start);
 		//writeToText(0, true,writeFileName);
 	
-		/** for multiple instances, put writeToText(·,true) at the end**/
+		** for multiple instances, put writeToText(·,true) at the end**
 	}
 
-	
+	*/
     public static boolean writeTxtFile(String content,File fileName)throws Exception{
         RandomAccessFile mm=null;
         boolean flag=false;

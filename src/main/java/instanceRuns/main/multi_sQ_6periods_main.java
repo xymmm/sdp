@@ -17,9 +17,9 @@ public class multi_sQ_6periods_main {
 				{3	,3	, 14	,14	,3	,2	}
 		};
 		/* parameter - 10 periods*/
-		double[] fixedCost_6period = {5, 10, 20};
-		double[] unitCost_6period = {0,1};
-		double[] penaltyCost_6period = {2,3};
+		double[] fixedCost_6period = {20};//{5, 10, 20};
+		double[] unitCost_6period = {0};//{0,1};
+		double[] penaltyCost_6period = {3};//{2,3};
 		double holdingCost_6period = 1;
 		int[] minInventory_6period = {-250, -250, -300, -300, -200, -200, -500, -500, -500, -500};
 		int[] maxInventory_6period = {250, 250, 300, 300, 200, 200, 500, 500, 500, 500};

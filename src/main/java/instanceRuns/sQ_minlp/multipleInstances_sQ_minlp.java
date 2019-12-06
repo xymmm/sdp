@@ -177,7 +177,7 @@ public class multipleInstances_sQ_minlp {
 						
 						for(int t=0; t<demandMean[d].length; t++) {
 							sQminlpInstance sQminlpInstance = new sQminlpInstance(
-									demandMeanInput[t], fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], 
+									demandMeanInput[t], fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], (int)minInventory, (int)maxInventory,
 									partitions, s_sdp[d], Q_minlpInt);
 							int i1 = s_sdp[d][t];
 							double costDifference_s_sdp = minlp.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[d][t], 
