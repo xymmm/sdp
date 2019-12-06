@@ -40,13 +40,13 @@ public class multipleInstances_sS {
 					long groupStartTime = System.currentTimeMillis();
 
 					//write up parameters
-					sdp.util.writeText.writeNewLine(filesScost);
+					//sdp.util.writeText.writeNewLine(filesScost);
 					sdp.util.writeText.writeNewLine(filesStime);					
-					sdp.util.writeText.writeDouble(fixedCost[f], filesScost);
+					//sdp.util.writeText.writeDouble(fixedCost[f], filesScost);
 					sdp.util.writeText.writeDouble(fixedCost[f], filesStime);
-					sdp.util.writeText.writeDouble(penaltyCost[p], filesScost);
+					//sdp.util.writeText.writeDouble(penaltyCost[p], filesScost);
 					sdp.util.writeText.writeDouble(penaltyCost[p], filesStime);
-					sdp.util.writeText.writeDouble(unitCost[u], filesScost);
+					//sdp.util.writeText.writeDouble(unitCost[u], filesScost);
 					sdp.util.writeText.writeDouble(unitCost[u], filesStime);
 					
 					for(int d=0; d<demandMean.length; d++) {
