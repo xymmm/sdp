@@ -119,11 +119,11 @@ public class sQminlp_oneRun{
 		
 		long startTime = System.currentTimeMillis();
 		
-		int[] demandMean = {23		,42		,70		,103	,136	,161	,170	,161	,136	,103};
-		double fixedCost = 100;
-		double unitCost = 0;
+		int[] demandMean = {12	,7	, 10	,13	,7	,12};
+		double fixedCost = 10;//5,10,20
+		double unitCost = 1;//0,1
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 3;//2,3
 		double initialInventoryLevel = 0;
 		int partitions = 10;
 		
@@ -140,7 +140,7 @@ public class sQminlp_oneRun{
 					partitions,
 					null
 					);
-			Q = sQmodel.solveMINLP_oneRun("sQsinglePoisson");
+			Q = sQmodel.solveMINLP_oneRun("sQsinglePoisson_Qranged");
 		}catch(IloException e){
 	         e.printStackTrace();
 	    }

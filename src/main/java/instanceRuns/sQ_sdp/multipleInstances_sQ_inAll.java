@@ -119,6 +119,7 @@ public class multipleInstances_sQ_inAll {
 						/*================================================================================================*/
 						/*sdp*/
 						/*================================================================================================*/
+						/*
 						//create instance
 						Instance instance = new Instance(
 								fixedCost[f], unitCost[u], holdingCost,penaltyCost[p],demandMean[d],
@@ -152,7 +153,7 @@ public class multipleInstances_sQ_inAll {
 						/*MINLP*/
 						/*================================================================================================*/
 						/* 1. solve sQ-minlp oneRun for Q**************************************************************************************************/
-						long oneRunMINLPstartTime = System.currentTimeMillis();
+						/*long oneRunMINLPstartTime = System.currentTimeMillis();
 						double Q_minlp = Double.NaN;						
 						try {
 							sQminlp_oneRun sQmodel = new sQminlp_oneRun(
@@ -175,14 +176,14 @@ public class multipleInstances_sQ_inAll {
 								oneRunMINLPendTime - oneRunMINLPstartTime, 
 								fileMtime);													//time-Q-minlp
 						System.out.println("instance "+(d+1)+" Q-minlp done.");
-
+*/
 						
 						/*2. solve sQ-minlp recursive for st **********************************************************************************************/
 						long reMINLPstartTime = System.currentTimeMillis();
-						int Q_minlpInt = (int) Math.ceil(Q_minlp);
+						int Q_minlpInt = 9;//(int) Math.ceil(Q_minlp);
 						int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean[d]);
 						int[] s_minlp = new int[demandMean[d].length];
-						
+						int[] s_sdp = {10, 10, 10, 10, 10, 10, 10, 10,10,10};
 						for(int t=0; t<demandMean[d].length; t++) {
 							sQminlpInstance sQminlpInstance = new sQminlpInstance(
 									demandMeanInput[t], fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], 
@@ -191,10 +192,10 @@ public class multipleInstances_sQ_inAll {
 							double costDifference_s_sdp = 
 									minlp.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[t], 
 											fileConsole, rangeQ);
-							//s_minlp[t] = sQminlp_recursive.computeMINLP_s(costDifference_s_sdp, sQminlpInstance, i1, t, tempFile, "src/main/java/instanceRuns/main/sQ_console.txt");
-							s_minlp[t] = 
-									sQminlp_recursive.computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, tempFile, t, 
-											fileConsole, rangeQ);
+							s_minlp[t] = sQminlp_recursive.computeMINLP_s(costDifference_s_sdp, sQminlpInstance, i1, t, tempFile, fileConsole, rangeQ);
+							//s_minlp[t] = 
+									//sQminlp_recursive.computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, tempFile, t, 
+											//fileConsole, rangeQ);
 							//Due to the unpublicarisation s in origian class, s is overwritten in a temporary file
 							
 							//s in the temporary file is now read and saved to the array: s_minlp

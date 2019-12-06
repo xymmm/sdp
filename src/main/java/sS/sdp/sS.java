@@ -247,9 +247,13 @@ public class sS {
 										stdParameter
 										);
 
-		sSsolution solution = solveInstance(instance, true);	//with initial order 
+		sSsolution solution = solveInstance(instance, false);	//with initial order 
 
 		presentsSresults(solution, instance);
+		
+		for(int i=0; i<solution.inventory.length; i++) {
+			System.out.println(solution.optimalCost[i][0]);
+		}
 
 	}
 

@@ -45,9 +45,9 @@ public class multi_sQ_6periods_main {
 		 String fileSimCost = 		"./instanceResults/6periods/sQ_minlp_simCost.txt";
 
 		//sS
-		instanceRuns.sS_sdp.multipleInstances_sS.multi_sS(demandMean_6period, fixedCost_6period, penaltyCost_6period, unitCost_6period, holdingCost_6period, 
-				minInventory_6period, maxInventory_6period, maxQuantity_6period, 
-				filesScost, filesStime);
+		//instanceRuns.sS_sdp.multipleInstances_sS.multi_sS(demandMean_6period, fixedCost_6period, penaltyCost_6period, unitCost_6period, holdingCost_6period, 
+				//minInventory_6period, maxInventory_6period, maxQuantity_6period, 
+				//filesScost, filesStime);
 
 		//sQ-sdp, sQ-minlp, sQ-simulation
 		instanceRuns.sQ_sdp.multipleInstances_sQ_inAll.multi_sQ (
