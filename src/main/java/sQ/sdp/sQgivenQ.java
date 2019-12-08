@@ -118,27 +118,27 @@ public class sQgivenQ {
 		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 10;
 
 		double tail = 0.00000001;
 
-		int minInventory = -2000;
-		int maxInventory = 2000;
-		int maxQuantity = 600;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {103	,136	,161	,170	,161	,136	,103	,70		,42		,23};
+		int[] demandMean = {20,40,60,40};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 
-		int Q = 150;
+		int Q = 83;
 
 		//double[] costLimit = {20000, 15000, 10000, 5200};
 
 		int[] s_compare = new int[demandMean.length];
 		int[] s_breakpoint = new int[demandMean.length];
 
-		for(int d=0; d<demandMeanInput.length;d++) {
+		for(int d=0; d<1;d++) {
 
 			/** create and resolve instance**/
 			Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMeanInput[d], 
@@ -149,9 +149,9 @@ public class sQgivenQ {
 			/**print and plot ETC**/
 			//System.out.println("cost with initial stock = "+instance.initialInventory+" is "+sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
 			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(sQgivenQ.costGivenQ[0], sQgivenQ.inventory, "inventory level", "expected cost", "Expected cost without initial order t=1");//cost
-			//for(int i=instance.initialInventory-instance.minInventory; i<sQgivenQ.inventory.length; i++) {
-			//System.out.println((i+instance.minInventory)+"   "+sQgivenQ.costGivenQ[0][i]);
-			//}
+			for(int i=501; i<701; i++) {
+			System.out.println(sQgivenQ.costGivenQ[0][i]);
+			}
 
 			/**resolve reorder points by cost differences**/
 			double[] costDifference = new double[maxInventory-minInventory+1-Q];

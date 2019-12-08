@@ -150,7 +150,7 @@ public class sQtgeneratedQ_s {
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
+		int minInventory = -10;
 		int maxInventory = 50;
 		int maxQuantity = 9;
 
@@ -175,17 +175,19 @@ public class sQtgeneratedQ_s {
 				stdParameter
 				);
 		
-		sQtgeneratedQ_s_solution sQgivenQ = costVaryingWithInventory(Q,instance,true);
+		sQtgeneratedQ_s_solution sQgivenQ = costVaryingWithInventory(Q,instance,false);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		
 		
-		for(int t=0; t<costGivenQ.length;t++) {
-		    //System.out.println("t: "+ (t+1)+ "\t"+ sQgivenQ.costGivenQ[t][instance.initialInventory-instance.minInventory]);
+		for(int t=0; t<1;t++) {
+			for(int i=0; i<costGivenQ[t].length; i++) {
+		    System.out.println(sQgivenQ.costGivenQ[t][i]);
+			}
+			System.out.println();
 			//plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q[t], t, instance);
 		}
-	    //System.out.println(Arrays.toString(sQgivenQ.costGivenQ[0]));
 		
 	    
 		System.out.print("reorderPoints = {");

@@ -134,11 +134,11 @@ public class possionPiecewisePartitions {
 				{2,5,4,8,3},
 				{4,4,8,8,3}
 		};*/
-		int [] demandMeanInput = {20,40,60,40};
+		int [] demandMeanInput = {2,4,6,4};
 		int nbSamples = 100000;
 		int partitions = 10;
 		//for(int d=0; d<demandMeanInput.length; d++) {
-			for(int i=0; i<demandMeanInput.length; i++) {
+			for(int i=0; i<1; i++) {
 				int[] demandMean = getDemandMeanArray(demandMeanInput, i);
 				double[][][] coefficients = lamdaMatrix(demandMean, partitions, nbSamples);
 				System.out.println(Arrays.deepToString(coefficients));	

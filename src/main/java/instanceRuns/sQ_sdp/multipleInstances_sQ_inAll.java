@@ -15,6 +15,8 @@ import sQ.sdp.sQgivenQsolution;
 import sQ.sdp.sQsolution;
 import sQ.simulation.sQsimInstanceDouble;
 import sQ.simulation.sQsimPoisson;
+import sS.sdp.sS;
+import sS.sdp.sSsolution;
 import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;
 
@@ -41,7 +43,7 @@ public class multipleInstances_sQ_inAll {
 
 		System.out.println("total number of instances = "+demandMean.length * fixedCost.length * penaltyCost.length * unitCost.length);
 		System.out.println("number of parameter groups = "+fixedCost.length * penaltyCost.length * unitCost.length);
-		System.out.println("==========================");
+		System.out.println("===================================================");
 		System.out.println();
 
 		int count = 1;			//to capture computation progress
@@ -58,8 +60,6 @@ public class multipleInstances_sQ_inAll {
 					//new parameter group
 					System.out.println("------------------------------ parameter group "+count);
 					long groupStartTime = System.currentTimeMillis();
-
-					for(int d=0; d<demandMean.length; d++) {
 
 						//record console for costDifference iterations
 						sdp.util.writeText.writeNewLine(fileConsole);								//console
@@ -97,31 +97,43 @@ public class multipleInstances_sQ_inAll {
 						//start a new line and write up parameters
 						//sdp.util.writeText.writeNewLine(fileMQ);							//Q-minlp
 						//sdp.util.writeText.writeNewLine(fileMtime);							//time_Q
-						sdp.util.writeText.writeNewLine(fileMst);							//st-minlp
-						sdp.util.writeText.writeNewLine(fileMtimest);						//time st
-						sdp.util.writeText.writeNewLine(fileSimCost);						//sim cost
+						//sdp.util.writeText.writeNewLine(fileMst);							//st-minlp
+						//sdp.util.writeText.writeNewLine(fileMtimest);						//time st
+						//sdp.util.writeText.writeNewLine(fileSimCost);						//sim cost
 						//fixed cost
 						//sdp.util.writeText.writeDouble(fixedCost[f], fileMQ);				//Q-minlp
 						//sdp.util.writeText.writeDouble(fixedCost[f], fileMtime);			//time_Q
-						sdp.util.writeText.writeDouble(fixedCost[f], fileMst);				//st-minlp
-						sdp.util.writeText.writeDouble(fixedCost[f], fileMtimest);			//time st
-						sdp.util.writeText.writeDouble(fixedCost[f], fileSimCost);			//sim cost
+						//sdp.util.writeText.writeDouble(fixedCost[f], fileMst);				//st-minlp
+						//sdp.util.writeText.writeDouble(fixedCost[f], fileMtimest);			//time st
+						//sdp.util.writeText.writeDouble(fixedCost[f], fileSimCost);			//sim cost
 						//penalty cost
 						//sdp.util.writeText.writeDouble(penaltyCost[p], fileMQ);				//Q-minlp
 						//sdp.util.writeText.writeDouble(penaltyCost[p], fileMtime);			//time_Q
-						sdp.util.writeText.writeDouble(penaltyCost[p], fileMst);			//st-minlp
-						sdp.util.writeText.writeDouble(penaltyCost[p], fileMtimest);		//time st
-						sdp.util.writeText.writeDouble(penaltyCost[p], fileSimCost);		//sim cost
+						//sdp.util.writeText.writeDouble(penaltyCost[p], fileMst);			//st-minlp
+						//sdp.util.writeText.writeDouble(penaltyCost[p], fileMtimest);		//time st
+						//sdp.util.writeText.writeDouble(penaltyCost[p], fileSimCost);		//sim cost
 						//unit cost
 						//sdp.util.writeText.writeDouble(unitCost[u], fileMQ);				//Q-minlp  "src/main/java/instanceRuns/sQ_minlp/sQ_minlp_Q.txt"
 						//sdp.util.writeText.writeDouble(unitCost[u], fileMtime);				//time_Q   "src/main/java/instanceRuns/sQ_minlp/sQ_minlp_time_solveMINLP.txt"
-						sdp.util.writeText.writeDouble(unitCost[u], fileMst);				//st-minlp "src/main/java/instanceRuns/sQ_minlp/sQ_minlp_reorderPoints.txt"
-						sdp.util.writeText.writeDouble(unitCost[u], fileMtimest);			//time st  "src/main/java/instanceRuns/sQ_minlp/sQ_minlp_time_s.txt"
-						sdp.util.writeText.writeDouble(unitCost[u], fileSimCost);			//sim cost "src/main/java/instanceRuns/sQ_minlp/sQ_minlp_simCost.txt"
-
+						//sdp.util.writeText.writeDouble(unitCost[u], fileMst);				//st-minlp "src/main/java/instanceRuns/sQ_minlp/sQ_minlp_reorderPoints.txt"
+						//sdp.util.writeText.writeDouble(unitCost[u], fileMtimest);			//time st  "src/main/java/instanceRuns/sQ_minlp/sQ_minlp_time_s.txt"
+						//sdp.util.writeText.writeDouble(unitCost[u], fileSimCost);			//sim cost "src/main/java/instanceRuns/sQ_minlp/sQ_minlp_simCost.txt"
+						
+						for(int d=0; d<demandMean.length; d++) {
+						/*================================================================================================*/
+						/*sS*/
+						/*================================================================================================*/
+						Instance sSinstance = new Instance(
+								fixedCost[f], unitCost[u], holdingCost,penaltyCost[p],demandMean[d],
+								0.00000001, minInventory[d], maxInventory[d], maxQuantity[d], 0.1 );
+						sSsolution solution = sS.solveInstance(sSinstance, true);
+						//write cost
+						sdp.util.writeText.writeDouble(solution.optimalCost[-sSinstance.minInventory][0], fileSDPcost);  
+						//write time
+						sdp.util.writeText.writeLong(solution.timeConsumed, fileSDPcost);
 
 						/*================================================================================================*/
-						/*sdp*/
+						/*sdp sQ*/ 
 						/*================================================================================================*/
 
 						//create instance
@@ -151,7 +163,6 @@ public class multipleInstances_sQ_inAll {
 								s_sdp, 
 								fileSDPs);																//s_t
 						System.out.println("instance "+(d+1)+" st-sdp done.");
-
 
 						/*================================================================================================*/
 						/*MINLP*/
@@ -233,7 +244,7 @@ public class multipleInstances_sQ_inAll {
 						sdp.util.writeText.writeDouble(cost_sim, fileSimCost); 			//cost_simulated			
 						System.out.println("instance "+(d+1)+" simulation done.");
 
-
+						sdp.util.writeText.writeString("--------------------------- instance "+(d+0)+" done", fileSDPcost);
 
 
 					}//d

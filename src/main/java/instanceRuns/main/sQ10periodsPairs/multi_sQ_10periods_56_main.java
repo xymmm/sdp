@@ -14,9 +14,9 @@ public class multi_sQ_10periods_56_main {
 		double[] penaltyCost = {5, 10, 20};
 		double[] unitCost = {0,1};
 		double holdingCost = 1;
-		int[] minInventory = {-2000, -2000};
-		int[] maxInventory = {2000, 2000};
-		int[] maxQuantity = {800, 800};
+		int[] minInventory = {-1500, -1500};
+		int[] maxInventory = {1500, 1500};
+		int[] maxQuantity = {500, 500};
 		int partitions = 10;
 		double initialInventoryLevel = 0;
 		
@@ -25,11 +25,6 @@ public class multi_sQ_10periods_56_main {
 
 		String fileRecord =  "./instanceResults/sQinstance56.txt";
 		
-		//sS
-		instanceRuns.sS_sdp.multipleInstances_sS.multi_sS(demandMean, fixedCost, penaltyCost, unitCost, holdingCost, 
-				minInventory, maxInventory, maxQuantity, fileRecord, fileRecord);
-		
-		System.out.println("task 1 sS done!!!!!");
 		
 		//sQ-sdp, sQ-minlp, sQ-simulation
 		instanceRuns.sQ_sdp.multipleInstances_sQ_inAll.multi_sQ (

@@ -206,8 +206,8 @@ public class sQtgeneratedQlocalM {
 
 		double tail = 0.00000001;
 
-		int minInventory = -110;
-		int maxInventory = 110;
+		int minInventory = -10;
+		int maxInventory = 50;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
