@@ -266,10 +266,13 @@ public class sQminlp_recursive {
 				||
 				((costDifference_s_sdp < instance.fixedCost + instance.unitCost * instance.Q_minlp)&&(value_i2 > instance.fixedCost + instance.unitCost * instance.Q_minlp))
 				) {
+			String s_string = Integer.toString(i2);
+			boolean flag = writeTxtFile(s_string, FileName);
 			return i2;
 		//--------------------check done. If not, continue
 		}else {
-			double slope = Math.abs(value_i2 - costDifference_s_sdp);;
+			double slope = Math.abs(value_i2 - costDifference_s_sdp);
+			if(slope <1) {slope = instance.holdingCost +instance.penaltyCost;}
 			System.out.println("slope = "+slope);
 			sdp.util.writeText.writeString("slope = "+slope, consoleFileName);
 			System.out.println("costDifference_s_sdp = " + costDifference_s_sdp);

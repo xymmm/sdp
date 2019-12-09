@@ -128,7 +128,7 @@ public class sQsimPoisson {
 		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		double penaltyCost = 20;
 
 		double tail = 0.00000001;
 
@@ -136,9 +136,9 @@ public class sQsimPoisson {
 		double maxInventory = 1000;
 		double coe = 0.25;
 		//1,28,108,164,106,20
-		int[] demandMean = {20,40,60,40};
-		double[] reorderPoint = {14, 35, 55, 25};
-		double Q = 82;
+		int[] demandMean = {97		,129	,79		,173	,192	,39		,106	,60		,31		,56};
+		double[] reorderPoint = {88, 120, 69, 163, 184, 29, 98, 51, 20, 41};
+		double Q = 242;
 		double[] actionQuantity = new double[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
 			actionQuantity[t] = Q;
@@ -160,7 +160,7 @@ public class sQsimPoisson {
 		
 		Chrono timer = new Chrono();
 		
-		int count = 50000;
+		int count = 500000;
 		sQsimPoisson.sQsimPoissonMultiRuns(sQsystem1, count);
 		
 		sQsystem1.statCost.setConfidenceIntervalStudent();

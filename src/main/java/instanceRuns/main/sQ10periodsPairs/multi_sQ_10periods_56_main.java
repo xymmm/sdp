@@ -10,8 +10,8 @@ public class multi_sQ_10periods_56_main {
 				{97		,129	,79		,173	,192	,39		,106	,60		,31		,56}
 		};		
 		/* parameter - 10 periods*/
-		double[] fixedCost = {100,200,500};
-		double[] penaltyCost = {5, 10, 20};
+		double[] fixedCost = {200,500};
+		double[] penaltyCost = {5,10,20};
 		double[] unitCost = {0,1};
 		double holdingCost = 1;
 		int[] minInventory = {-1500, -1500};
