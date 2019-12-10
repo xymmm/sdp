@@ -85,7 +85,7 @@ public class sQsimPoisson {
 			//1 & 2 check inventory
 			actionDecision = checkInventory(sQsimInstance.reorderPoint[currentStageIndex], inventoryLevel);
 			if(print == true) System.out.println((actionDecision == 1) ? "Replenishment order placed. ":"No order placed. ");
-			//if(!initialOrder == true) if(currentStageIndex == 0) actionDecision =0;
+			//if(currentStageIndex == 0) actionDecision = 0;
 			
 			//2. compute purchasing cost
 			cost += computePurchasingCost(actionDecision, currentStageIndex, sQsimInstance);
@@ -125,24 +125,25 @@ public class sQsimPoisson {
 	public static void main(String[] args) {
 
 		/** declare instance parameters **/
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 20;
+		double penaltyCost = 5;
 
 		double tail = 0.00000001;
 
-		double minInventory = -1000;
-		double maxInventory = 1000;
+		double minInventory = -10;
+		double maxInventory = 50;
 		double coe = 0.25;
 		//1,28,108,164,106,20
-		int[] demandMean = {97		,129	,79		,173	,192	,39		,106	,60		,31		,56};
-		double[] reorderPoint = {88, 120, 69, 163, 184, 29, 98, 51, 20, 41};
+		int[] demandMean = {2,4,6,4};
+		double[] reorderPoint = {2,4,7,2};
+		/*
 		double Q = 242;
 		double[] actionQuantity = new double[reorderPoint.length];
 		for(int t=0; t<actionQuantity.length;t++) {
 			actionQuantity[t] = Q;
-		}
+		}*/double[] actionQuantity = {7.914, 0, 9, 0};
 
 		sQsimInstanceDouble sQsystem1 = new sQsimInstanceDouble(
 				fixedOrderingCost,
@@ -164,8 +165,8 @@ public class sQsimPoisson {
 		sQsimPoisson.sQsimPoissonMultiRuns(sQsystem1, count);
 		
 		sQsystem1.statCost.setConfidenceIntervalStudent();
-		//System.out.println(sQsystem1.statCost.report(0.9, 3));
-		//System.out.println("Total CPU time: "+timer.format());
+		System.out.println(sQsystem1.statCost.report(0.9, 3));
+		System.out.println("Total CPU time: "+timer.format());
 
 		System.out.println(sQsystem1.statCost.average());
 	}
