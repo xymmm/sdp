@@ -313,8 +313,8 @@ public class sQminlp_recursive {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
-		int minInventory = -500;
-		int maxInventory = 500;
+		int minInventory = -100;
+		int maxInventory = 100;
 	
 		int partitions = 10;
 		int[] s_sdp = {10,20,70,10};
@@ -324,6 +324,7 @@ public class sQminlp_recursive {
 		boolean rangedQ = false;
 		
 		int[] s = new int[demandMean.length];
+		
 		File file = new File("src/main/java/instanceRuns/sQ_minlp/temp.txt");
 		for(int d=0; d<demandMeanInput.length; d++) {
 			sQminlpInstance sQminlpInstance = new sQminlpInstance(demandMeanInput[d], fixedCost, unitCost, holdingCost, penaltyCost, minInventory, maxInventory,
@@ -344,6 +345,7 @@ public class sQminlp_recursive {
 	        read = br.readLine();
 	        s[d] = Integer.parseInt(read);
 		}
+
 		System.out.println(Arrays.toString(s));
 
 		long end = System.currentTimeMillis();
