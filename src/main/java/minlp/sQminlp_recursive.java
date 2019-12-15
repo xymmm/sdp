@@ -317,7 +317,7 @@ public class sQminlp_recursive {
 		int maxInventory = 100;
 	
 		int partitions = 10;
-		int[] s_sdp = {10,20,70,10};
+		int[] s_sdp = {13,33,54,24};
 
 		int Q_minlp = 84;
 		
