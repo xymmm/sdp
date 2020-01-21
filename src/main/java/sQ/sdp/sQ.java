@@ -1,5 +1,11 @@
 package sQ.sdp;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
@@ -70,7 +76,6 @@ public class sQ {
 			for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 				for(int i=0;i<inventory.length;i++) { // Inventory   
 					/** a > 0 **/
-					//Q = ((t==0)&&(!initialOrder))? 0: a;
 					Q = a;
 					double totalCostOrder = sS.computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost); 
 					double scenarioProb = 0;
@@ -130,7 +135,7 @@ public class sQ {
 
 		Chrono timer = new Chrono();
 
-		double fixedOrderingCost = 0;
+		double fixedOrderingCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 5;
@@ -190,7 +195,32 @@ public class sQ {
 			System.out.println();
 		}
 		
+		writeToText(sQsolution.totalCost);
+		
 
+	}
+	
+	
+	
+	public static void writeToText(double[][][] totalCost){
+		FileWriter fw = null;
+		try {
+			File f = new File("E:\\sQresultCheck.txt");
+			fw = new FileWriter(f, true);//true, continue to write
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PrintWriter pw = new PrintWriter(fw);
+		pw.println(Arrays.deepToString(totalCost));
+		pw.println();
+		pw.flush();
+		try {
+			fw.flush();
+			pw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 

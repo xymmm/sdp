@@ -102,8 +102,7 @@ public class sQtgeneratedQlocalM {
 		double totalCost[][] = new double[inventory.length][instance.getStages()];
 
 		//initial Qs
-		double[] Q = generateQ(instance.getStages(), g);
-		
+		double[] Q = generateQ(instance.getStages(), g);		
 		
 		//compute cost for each combination
 		for(int t=instance.getStages()-1; t>=0; t--) {			
