@@ -219,20 +219,20 @@ public class sS {
 
 		Chrono timer = new Chrono();
 		
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		double penaltyCost = 5;
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
-		int maxQuantity = 500;
+		int minInventory = -50;
+		int maxInventory = 50;
+		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {2,4,6,4};
 
 		Instance instance = new Instance(
 										fixedOrderingCost,
@@ -252,9 +252,12 @@ public class sS {
 		presentsSresults(solution, instance);
 		
 		for(int i=0; i<solution.inventory.length; i++) {
-			System.out.println(solution.optimalCost[i][0]);
+			System.out.print("i: "+ (i+instance.minInventory) + "\t");
+			for(int t=0; t<instance.demandMean.length; t++) {
+				System.out.print(solution.optimalCost[i][t] + "\t");
+			}
+			System.out.println();
 		}
-
 	}
 
 }

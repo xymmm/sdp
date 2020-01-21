@@ -24,10 +24,10 @@ public class sQsolution {
 		// Determine the optimal a. What is the optimal a?
 		int a = 1;
 		int minIndex = a;
-		double minCost = totalCost[instance.initialInventory - instance.minInventory][minIndex][0]; //Time zero
+		double minCost = totalCost[minIndex][instance.initialInventory - instance.minInventory][0]; //Time zero
 		do {
-			if(minCost > totalCost[instance.initialInventory - instance.minInventory][a+1][0]) {
-				minCost = totalCost[instance.initialInventory - instance.minInventory][a+1][0];
+			if(minCost > totalCost[a+1][instance.initialInventory - instance.minInventory][0]) {
+				minCost = totalCost[a+1][instance.initialInventory - instance.minInventory][0];
 				minIndex = a+1;
 			}
 			a = a + 1;

@@ -91,7 +91,7 @@ public class sQtgeneratedQlocalM {
 	}
 
 
-	public static double sQtgeneratedSingle(Instance instance, int g, double[][] demandProbabilities) {		
+	public static double sQtgeneratedSingle(Instance instance, int g, double[][] demandProbabilities, boolean print) {		
 		
 		double[] inventory = new double[(int) (instance.maxInventory - instance.minInventory + 1)];
 		for(int i=0;i<inventory.length;i++) {
@@ -103,6 +103,7 @@ public class sQtgeneratedQlocalM {
 
 		//initial Qs
 		double[] Q = generateQ(instance.getStages(), g);
+		
 		
 		//compute cost for each combination
 		for(int t=instance.getStages()-1; t>=0; t--) {			
@@ -129,6 +130,29 @@ public class sQtgeneratedQlocalM {
 				totalCost[i][t] /= scenarioProb;					
 			}//i
 		}//t
+		
+		//************************************************print cost by stage
+		if(print) {
+			for(int t=0; t<instance.demandMean.length; t++) {
+				System.out.println(
+						"a: " + Q[t] + "\t" + 
+						"t: " + (t+1)+ "\t"  +
+						totalCost[(int)(instance.initialInventory -instance.minInventory)][t]
+						);
+			}
+			System.out.println();
+			
+			for(int i=0; i<inventory.length; i++) {
+				System.out.print("i: " + (i+instance.minInventory) + "\t");
+				for(int t=0; t<instance.demandMean.length;t++) {
+					System.out.print(totalCost[i][t]+ "\t");
+				}
+				System.out.println();
+			}
+		}
+		//*********************************************************************
+		
+		
 		return totalCost[(int)(instance.initialInventory -instance.minInventory)][0];
 	}
 	
@@ -150,9 +174,9 @@ public class sQtgeneratedQlocalM {
 		long startTime = System.currentTimeMillis();
 		
 		//SPECIAL CASE: g = 0,1,2
-		costPrevious = sQtgeneratedSingle(instance, 0, demandProbabilities);
-		costCurrent  = sQtgeneratedSingle(instance, 1, demandProbabilities);
-		costLater    = sQtgeneratedSingle(instance, 2, demandProbabilities);
+		costPrevious = sQtgeneratedSingle(instance, 0, demandProbabilities,false);
+		costCurrent  = sQtgeneratedSingle(instance, 1, demandProbabilities,false);
+		costLater    = sQtgeneratedSingle(instance, 2, demandProbabilities,false);
 		if((costPrevious > costCurrent)&&(costCurrent < costLater)) {
 			LocalMinCostsList.add(costCurrent);
 			minGsList.add(1);
@@ -161,7 +185,7 @@ public class sQtgeneratedQlocalM {
 		do {
 			costPrevious = costCurrent;
 			costCurrent = costLater;
-			costLater = sQtgeneratedSingle(instance, g, demandProbabilities);
+			costLater = sQtgeneratedSingle(instance, g, demandProbabilities,false);
 			if((costPrevious > costCurrent)&&(costCurrent < costLater)) {
 				LocalMinCostsList.add(costCurrent);
 				minGsList.add(g-1);
@@ -169,8 +193,7 @@ public class sQtgeneratedQlocalM {
 			if(g%10000 == 0) System.out.println("Computation completed for generator = "+g);
 			g = g+1;
 		}while(g < maxG);
-		
-		
+				
 		double[] LocalMinCosts = new double[LocalMinCostsList.size()];
 		int[] minGs	  = new int[minGsList.size()];
 		for(int i=0; i<LocalMinCosts.length; i++) {
@@ -191,11 +214,13 @@ public class sQtgeneratedQlocalM {
 		
 		long endTime = System.currentTimeMillis();
 		long timeConsumed_sQt = endTime - startTime;
+		
+		/* calculate ETC by stages */
+		sQtgeneratedSingle(instance, optG, demandProbabilities, true);
+
 	
 		return new sQtgeneratedQlocalMsolution(minCost, optQ, optG, timeConsumed_sQt);		
 	}
-
-	
 
 	public static void main(String[] args) {
 
@@ -206,7 +231,7 @@ public class sQtgeneratedQlocalM {
 
 		double tail = 0.00000001;
 
-		int minInventory = -10;
+		int minInventory = -50;
 		int maxInventory = 50;
 		int maxQuantity = 9;
 
