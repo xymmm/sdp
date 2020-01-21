@@ -130,20 +130,20 @@ public class sQ {
 
 		Chrono timer = new Chrono();
 
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 10;
 
 		double tail = 0.00000001;
 
-		int minInventory = -10;
-		int maxInventory = 50;
-		int maxQuantity = 9;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 500;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {4};
+		int[] demandMean = {20, 40, 60, 40};
 
 		Instance instance = new Instance(
 				fixedOrderingCost,
@@ -176,7 +176,7 @@ public class sQ {
 		
 		System.out.println();
 		
-		/*
+		//present ETC of inventory 0 with the optimal quantity
 		for(int t=0; t<instance.getStages();t++) {
 			System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t"
 								+ "t: "+ (t+1)+ "\t"  
@@ -184,7 +184,7 @@ public class sQ {
 		}
 		
 		
-		
+		/*
 		for(int i=0; i<sQsolution.inventory.length;i++) {
 			//System.out.println("i: "+ (i+instance.minInventory) + "\t" + sQsolution.totalCost[i][sQsolution.getOpt_aSQ(instance)+1][0]);
 			System.out.println(sQsolution.totalCost[i][sQsolution.getOpt_aSQ(instance)+1][0]);
