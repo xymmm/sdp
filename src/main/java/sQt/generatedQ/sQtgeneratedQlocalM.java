@@ -130,7 +130,7 @@ public class sQtgeneratedQlocalM {
 			}//i
 		}//t
 		
-		//************************************************print cost by stage
+		//************************************************print cost by stage**********************************************
 		if(print) {
 			for(int t=0; t<instance.demandMean.length; t++) {
 				System.out.println(
@@ -149,7 +149,7 @@ public class sQtgeneratedQlocalM {
 				System.out.println();
 			}
 		}
-		//*********************************************************************
+		//****************************************************************************************************************
 		
 		
 		return totalCost[(int)(instance.initialInventory -instance.minInventory)][0];

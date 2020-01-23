@@ -20,9 +20,9 @@ public class sQsolution {
 	}
 
 	
-	public int getOpt_aSQ(Instance instance) {
+	public int getOpt_a(Instance instance) {
 		// Determine the optimal a. What is the optimal a?
-		int a = 1;
+		int a = 0;
 		int minIndex = a;
 		double minCost = totalCost[minIndex][instance.initialInventory - instance.minInventory][0]; //Time zero
 		do {
@@ -33,7 +33,7 @@ public class sQsolution {
 			a = a + 1;
 		}while(a < instance.maxQuantity - 1);
 		int opt_a = minIndex;
-		return opt_a-1;
+		return opt_a;
 	}
 		
 }

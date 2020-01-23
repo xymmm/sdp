@@ -23,13 +23,13 @@ public class sQ {
 	/** print optimal quantity **/
 	public static void printOptimalQuantity(Instance instance, sQsolution sQsolution) {
 		System.out.println("Optimal Q for all periods is: ");
-		System.out.println(sQsolution.getOpt_aSQ(instance)+1);
+		System.out.println(sQsolution.getOpt_a(instance)+1);
 	}
 	
 	/** print cost of optimal quantity **/
 	public static void printOpitmalCost(Instance instance, sQsolution sQsolution){
 		System.out.println("Optimal cost with initial inventory level " +(instance.initialInventory)+" is: ");
-		System.out.println(sQsolution.totalCost[sQsolution.getOpt_aSQ(instance)+1][instance.initialInventory - instance.minInventory][0]);
+		System.out.println(sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][instance.initialInventory - instance.minInventory][0]);
 	}
 
 	/** Plot costs - cost with no action and with a given Q for a given stage**/
@@ -188,15 +188,15 @@ public class sQ {
 		//present ETC of inventory 0 with the optimal quantity
 		System.out.println();
 		for(int t=0; t<instance.getStages();t++) {
-			System.out.println("a: " + (sQsolution.getOpt_aSQ(instance)+1) + "\t"
+			System.out.println("a: " + (sQsolution.getOpt_a(instance)+1) + "\t"
 								+ "t: "+ (t+1)+ "\t"  
-								+sQsolution.totalCost[sQsolution.getOpt_aSQ(instance)+1][instance.initialInventory - instance.minInventory][t]);
+								+sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][instance.initialInventory - instance.minInventory][t]);
 		}
 		
 		for(int i=0; i<sQsolution.inventory.length;i++) {
 			System.out.print("i: "+ (i+instance.minInventory) + "\t");
 			for(int t=0; t<instance.demandMean.length; t++) {
-				System.out.print(sQsolution.totalCost[sQsolution.getOpt_aSQ(instance)+1][i][t] + "\t");
+				System.out.print(sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][i][t] + "\t");
 			}
 			System.out.println();
 		}

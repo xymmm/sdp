@@ -135,9 +135,9 @@ public class multipleInstances_sQ{
 								sQsolution.timeConsumedsQ, 
 								"src/main/java/instanceRuns/sQ_sdp/sQ_sdp_time_QandCost.txt");														//time for Q & cost
 						sdp.util.writeText.writeDouble(
-								sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_aSQ(instance)+1][0], 
+								sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_a(instance)+1][0], 
 								"src/main/java/instanceRuns/sQ_sdp/sQ_sdp_cost.txt");																//cost
-						int Q = sQsolution.getOpt_aSQ(instance)+1;
+						int Q = sQsolution.getOpt_a(instance)+1;
 						sdp.util.writeText.writeInt(Q, "src/main/java/instanceRuns/sQ_sdp/sQ_sdp_Q.txt");											//Q
 						
 						//solve sQ - s_t
