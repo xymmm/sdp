@@ -131,8 +131,8 @@ public class sQ {
 		long timeConsumedsQ = endTime - startTime;
 		System.out.println(timeConsumedsQ + " ms");
 		
-		writeToText(costOrder);
-		writeToText(costNoOrder);
+		//writeToText(costOrder);
+		//writeToText(costNoOrder);
 		
 		return new sQsolution(totalCost, optimalAction, inventory, timeConsumedsQ);
 	}
@@ -201,7 +201,7 @@ public class sQ {
 			System.out.println();
 		}
 		
-		writeToText(sQsolution.totalCost);
+		//writeToText(sQsolution.totalCost);
 		
 
 	}
