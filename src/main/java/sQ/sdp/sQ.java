@@ -70,38 +70,37 @@ public class sQ {
 		double totalCost[][][] = new double[instance.maxQuantity+1][inventory.length][instance.getStages()];
 		boolean optimalAction[][][] = new boolean [instance.maxQuantity + 1][inventory.length][instance.getStages()];
 		
-		int Q;
-		long startTime=System.currentTimeMillis();
+		/** for check **/
+		double[][][] costOrder = new double[instance.maxQuantity+1][inventory.length][instance.getStages()];
+		double[][][] costNoOrder = new double[instance.maxQuantity+1][inventory.length][instance.getStages()];
+
+		long startTime = System.currentTimeMillis();
 		for(int a=0; a<=instance.maxQuantity;a++) { //"a" represents the action index, so the actual action volume is a+1
 			for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 				for(int i=0;i<inventory.length;i++) { // Inventory   
-					/** a > 0 **/
-					Q = a;
+					
 					double totalCostOrder = sS.computePurchasingCost(a, instance.fixedOrderingCost, instance.unitCost); 
-					double scenarioProb = 0;
+					double totalCostNoOrder = 0;
+					double scenarioProbOrder = 0;
+					double scenarioProbNo = 0;
+					
 					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
-						if((inventory[i] + Q - d <= instance.maxInventory) && (inventory[i] + Q - d >= instance.minInventory)) {
+						/** a > 0**/
+						if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
 							totalCostOrder += demandProbabilities[t][d]*(
-									sS.computeImmediateCost(
+											sS.computeImmediateCost(
 											inventory[i], 
-											Q, 
+											a, 
 											d, 
 											instance.holdingCost, 
 											instance.penaltyCost, 
 											instance.fixedOrderingCost, 
 											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : totalCost[Q][i+Q-d][t+1]) 
+											+ ((t==instance.getStages()-1) ? 0 : totalCost[a][i+a-d][t+1]) 
 									);
-							scenarioProb += demandProbabilities[t][d];
+							scenarioProbOrder += demandProbabilities[t][d];
 						}
-					}
-					totalCostOrder /= scenarioProb;
-					//if((a==0)&&(i==-instance.minInventory)) System.out.println("t="+t+" cost order = "+totalCostOrder);//check if a=0 == costNoOrder
-
-					/** a = 0**/
-					double totalCostNoOrder = 0;
-					scenarioProb = 0;
-					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+						/** a = 0**/
 						if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {
 							totalCostNoOrder += demandProbabilities[t][d]*(
 									sS.computeImmediateCost(
@@ -112,13 +111,16 @@ public class sQ {
 											instance.penaltyCost, 
 											instance.fixedOrderingCost, 
 											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : totalCost[a][i-d][t+1]) /** changed from totalCost[i-d][0][t+1] **/
+									+ ((t==instance.getStages()-1) ? 0 : totalCost[a][i-d][t+1]) 
 									);
-							scenarioProb += demandProbabilities[t][d];
+							scenarioProbNo += demandProbabilities[t][d];
 						}
 					}
-					totalCostNoOrder /= scenarioProb;
-					//if((a==0)&&(i==-instance.minInventory)) System.out.println("t="+t+" cost no order = "+totalCostNoOrder);//check if a=0 == costNoOrder
+					totalCostOrder /= scenarioProbOrder;
+					totalCostNoOrder /= scenarioProbNo;
+					
+					costOrder[a][i][t] 		= totalCostOrder;
+					costNoOrder[a][i][t] 	= totalCostNoOrder;
 					
 					totalCost[a][i][t] = Math.min(totalCostNoOrder, totalCostOrder);
 					optimalAction[a][i][t] = totalCostNoOrder < totalCostOrder ? false : true;
@@ -128,6 +130,10 @@ public class sQ {
 		long endTime=System.currentTimeMillis();
 		long timeConsumedsQ = endTime - startTime;
 		System.out.println(timeConsumedsQ + " ms");
+		
+		writeToText(costOrder);
+		writeToText(costNoOrder);
+		
 		return new sQsolution(totalCost, optimalAction, inventory, timeConsumedsQ);
 	}
 
@@ -212,7 +218,7 @@ public class sQ {
 		}
 		PrintWriter pw = new PrintWriter(fw);
 		pw.println(Arrays.deepToString(totalCost));
-		pw.println();
+		pw.println();pw.println();pw.println();
 		pw.flush();
 		try {
 			fw.flush();
