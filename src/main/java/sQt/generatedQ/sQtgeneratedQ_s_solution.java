@@ -30,6 +30,8 @@ public class sQtgeneratedQ_s_solution {
 				if(sQtgeneratedQ_s_solution.actionGivenQ[t][i] == false) {
 					s[t] = i + instance.minInventory;
 					break;
+				}else {
+				   s[t] = instance.minInventory;
 				}
 			}
 		}

@@ -84,7 +84,7 @@ public class sQtgeneratedQ_s {
 		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 			for(int i=0;i<inventory.length;i++) { // Inventory   
 				/** a = Q (given) **/
-				Q[t] = ((t==0)&&(!initialOrder)) ?  0 : Q[t];
+				//Q[t] = ((t==0)&&(!initialOrder)) ?  0 : Q[t];
 				double totalCostOrder = sS.computePurchasingCost(Q[t], instance.fixedOrderingCost, instance.unitCost); 
 				double scenarioProb = 0;
 				for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
@@ -183,7 +183,7 @@ public class sQtgeneratedQ_s {
 		
 		for(int t=0; t<1;t++) {
 			for(int i=0; i<costGivenQ[t].length; i++) {
-		    System.out.println(sQgivenQ.costGivenQ[t][i]);
+		    System.out.println(i+minInventory + "\t" + sQgivenQ.costGivenQ[t][i]);
 			}
 			System.out.println();
 			plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q[t], t, instance);

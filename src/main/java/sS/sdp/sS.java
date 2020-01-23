@@ -51,6 +51,7 @@ public class sS {
 			double penaltyCost, 
 			double fixedOrderingCost, 
 			double unitCost) {
+	   assert holdingCost*Math.max(0, inventoryLevel + Actions - demand) + penaltyCost *Math.max(0, demand - inventoryLevel - Actions) >= 0;
 		return holdingCost*Math.max(0, inventoryLevel + Actions - demand) + penaltyCost *Math.max(0, demand - inventoryLevel - Actions);
 	}
 
@@ -187,8 +188,10 @@ public class sS {
 					totalCost[i][a] = computePurchasingCost(a, 
 															instance.fixedOrderingCost, 
 															instance.unitCost);
+					assert totalCost[i][a] >= 0;
 					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
 						if((inventory[i] + a - d <= instance.maxInventory) && (inventory[i] + a - d >= instance.minInventory)) {
+						   assert optimalCost[i+a-d][t+1] >= 0;
 							totalCost[i][a] += demandProbabilities[t][d]*(
 											computeImmediateCost(inventory[i], 
 																 a, 
