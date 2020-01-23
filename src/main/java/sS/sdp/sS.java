@@ -247,7 +247,7 @@ public class sS {
 										stdParameter
 										);
 
-		sSsolution solution = solveInstance(instance, false);	//with initial order 
+		sSsolution solution = solveInstance(instance, true);	//with initial order 
 
 		presentsSresults(solution, instance);
 		
