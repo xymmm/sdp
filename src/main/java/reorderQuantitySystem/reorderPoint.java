@@ -121,7 +121,7 @@ public class reorderPoint {
 		/**if the optimal schedule does not contain a replenishment at period t**/
 		for(int t=0; t<instance.getStages();t++) {
 			if(solution.optimalSchedule[t] == 0) {
-				reorderPoint[t] = instance.maxInventory;
+				reorderPoint[t] = instance.minInventory;
 			}else {
 				for(int i=0; i<inventory.length; i++) {  // Inventory   
 					if(optimalActionByInventory[t][i] == false) {
@@ -180,12 +180,12 @@ public class reorderPoint {
 				stdParameter
 				);
 
-		sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance);
+		sQsystemSolution sQtsolution = reorderQuantitySystem.optimalSchedule_sQt.optimalSchedule_sQt(instance);
 		
-		System.out.println(sQsolution.optimalCost);
-		System.out.println(Arrays.toString(sQsolution.optimalSchedule));
+		System.out.println(sQtsolution.optimalCost);
+		System.out.println(Arrays.toString(sQtsolution.optimalSchedule));
 		
-		int[] reorderPoint = computeReorderPoint(instance, sQsolution);
+		int[] reorderPoint = computeReorderPoint(instance, sQtsolution);
 		System.out.println(Arrays.toString(reorderPoint));
 
 	}

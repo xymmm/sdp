@@ -74,7 +74,7 @@ public class optimalSchedule_sQt {
 		return new sQsystemSolution(optimalSchedule, optimalCost, demandProbabilities);		
 	}
 	
-/*	
+	
 	public static void main(String args[]) {
 		double fixedOrderingCost = 10;
 		double unitCost = 0;
@@ -105,12 +105,12 @@ public class optimalSchedule_sQt {
 				stdParameter
 				);
 
-		sQsystemSolution sQsolution = optimalSchedule_sQt(instance);
+		sQsystemSolution sQtsolution = optimalSchedule_sQt(instance);
 		
-		System.out.println(sQsolution.optimalCost);
-		System.out.println(Arrays.toString(sQsolution.optimalSchedule));
+		System.out.println(sQtsolution.optimalCost);
+		System.out.println(Arrays.toString(sQtsolution.optimalSchedule));
 
 	}
-*/
+
 
 }
