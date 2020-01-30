@@ -115,23 +115,23 @@ public class sQgivenQ {
 
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
-		int maxQuantity = 500;
+		int minInventory = -50;
+		int maxInventory = 50;
+		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {20,40,60,40};
+		int[] demandMean = {2,4,6,4};
 		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 
-		int Q = 83;
+		int Q = 84;
 
 		//double[] costLimit = {20000, 15000, 10000, 5200};
 

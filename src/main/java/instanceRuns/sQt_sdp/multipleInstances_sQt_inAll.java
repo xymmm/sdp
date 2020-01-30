@@ -167,7 +167,7 @@ public class multipleInstances_sQt_inAll {
 									e.printStackTrace();
 								}
 							}//i for cost
-							int globalMinimumIndex = sdp.util.globalMinimum.getGlobalMinimumJavaIndex(cost_i);
+							int globalMinimumIndex = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(cost_i);
 							double targetCost = cost_i[globalMinimumIndex] + fixedCost[f];
 							for(int i=0; i<cost_i.length;i++) {
 								if(cost_i[i]<targetCost) {

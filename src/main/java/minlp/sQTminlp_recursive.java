@@ -215,7 +215,7 @@ public class sQTminlp_recursive {
 			}
 			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(cost_i, initialStock, "Opening inventory level", "Approximated expected cost", "Approximated expected total cost by sQt-MINLP");
 			int s = 0;
-			int globalMinimumIndex = sdp.util.globalMinimum.getGlobalMinimumJavaIndex(cost_i);
+			int globalMinimumIndex = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(cost_i);
 			double targetCost = cost_i[globalMinimumIndex] + fixedCost;
 			for(int i=0; i<cost_i.length;i++) {
 				if(cost_i[i]<targetCost) {

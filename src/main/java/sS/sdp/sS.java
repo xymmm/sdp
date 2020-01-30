@@ -56,7 +56,7 @@ public class sS {
 	}
 
 	/** compute purchasing cost according to order quantity (action) **/
-	public static double computePurchasingCost(int a, double fixedOrderingCost, double unitCost) {
+	public static double computePurchasingCost(double a, double fixedOrderingCost, double unitCost) {
 		return a > 0 ? fixedOrderingCost + a*unitCost : 0;
 	}
 
