@@ -13,7 +13,6 @@ public class mainComputation {
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 5;
-
 		double tail = 0.00000001;
 
 		int minInventory = -50;
