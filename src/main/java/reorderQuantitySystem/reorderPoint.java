@@ -116,7 +116,7 @@ public class reorderPoint {
 		}
 		*/
 		
-		/*print all actions by inventory level and time period*/
+		/*print all actions by inventory level and time period
 		System.out.println();
 		for(int i=0; i<inventory.length; i++) {
 			System.out.print((i+instance.minInventory)+" \t");
@@ -124,7 +124,7 @@ public class reorderPoint {
 				System.out.print(optimalCostByInventory[i][t]+ "\t");
 			}
 			System.out.println();
-		}
+		}*/
 		
 		
 		//print cost given a schedule

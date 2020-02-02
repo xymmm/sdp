@@ -36,7 +36,7 @@ public class optimalSchedule_sQ {
 		return new sQsystemSolution(optimalSchedule, optimalCost, demandProbabilities);		
 	}
 
-	
+	/*
 	public static void main(String args[]) {
 		double fixedOrderingCost = 10;
 		double unitCost = 0;
@@ -73,6 +73,6 @@ public class optimalSchedule_sQ {
 		System.out.println(Arrays.toString(sQsolution.optimalSchedule));
 
 	}
-	
+	*/
 
 }

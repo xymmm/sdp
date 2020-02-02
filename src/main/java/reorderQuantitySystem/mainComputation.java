@@ -3,6 +3,7 @@ package reorderQuantitySystem;
 import java.util.Arrays;
 
 import sdp.data.Instance;
+import umontreal.ssj.stat.Tally;
 import umontreal.ssj.util.Chrono;
 
 public class mainComputation {
@@ -34,36 +35,15 @@ public class mainComputation {
 		System.out.println("Optimal reordering schedule under (s,Qt) policy is: "+Arrays.toString(sQtsolution.optimalSchedule));
 		int[] reorderPointsQt = reorderQuantitySystem.reorderPoint.computeReorderPoint(instance, sQtsolution);
 		System.out.println("Reorder point = "+Arrays.toString(reorderPointsQt));
-		
-		simInstance sQtsystem = new simInstance(fixedOrderingCost, unitCost, holdingCost, penaltyCost,
-				demandMean, tail, minInventory, maxInventory, stdParameter,
-				reorderPointsQt, sQtsolution.optimalSchedule);			
-		Chrono timer = new Chrono();		
-		int count = 50000;
-		sQsystemSimulation.sQsimPoissonMultiRuns(sQtsystem, count);
-		sQtsystem.statCost.setConfidenceIntervalStudent();
-		System.out.println(sQtsystem.statCost.average());
 
 		/**sQ**/
-		System.out.println();
-		
+		System.out.println();		
 		sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance);		
 		System.out.println("Optimal cost under (s,Q) policy is: "+sQsolution.optimalCost);
 		System.out.println("Optimal reordering schedule under (s,Q) policy is: "+Arrays.toString(sQsolution.optimalSchedule));
 		int[] reorderPointsQ = reorderQuantitySystem.reorderPoint.computeReorderPoint(instance, sQsolution);
 		System.out.println("Reorder point = "+Arrays.toString(reorderPointsQ));
-		
-		
-		simInstance sQsystem = new simInstance(fixedOrderingCost, unitCost, holdingCost, penaltyCost,
-				demandMean, tail, minInventory, maxInventory, stdParameter,
-				reorderPointsQ, sQsolution.optimalSchedule);	
-		Chrono timer2 = new Chrono();		
-		int count2 = 50000;
-		sQsystemSimulation.sQsimPoissonMultiRuns(sQsystem, count2);
-		sQsystem.statCost.setConfidenceIntervalStudent();
-		System.out.println(sQsystem.statCost.average());
-
-		
+				
 	}
 
 }

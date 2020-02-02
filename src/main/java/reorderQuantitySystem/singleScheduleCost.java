@@ -58,7 +58,7 @@ public class singleScheduleCost {
 		return totalCost;
 	}
 	
-	
+	/*
 	public static void main(String args[]) {
 		
 		//create instance
@@ -113,6 +113,6 @@ public class singleScheduleCost {
 		}
 	}
 
-
+*/
 
 }
