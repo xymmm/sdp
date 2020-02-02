@@ -14,7 +14,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import sS.sdp.sS;
+import sS.sS;
 import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;
 

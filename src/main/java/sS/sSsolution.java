@@ -1,4 +1,4 @@
-package sS.sdp;
+package sS;
 
 
 public class sSsolution {

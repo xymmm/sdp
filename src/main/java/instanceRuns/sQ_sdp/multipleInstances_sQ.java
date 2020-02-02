@@ -7,11 +7,11 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 import sQ.sdp.sQ;
-import sQ.sdp.sQgivenQ;
-import sQ.sdp.sQgivenQsolution;
+import sQ.sdp.sQreorderPoint;
+import sQ.sdp.sQreorderPointSolution;
 import sQ.sdp.sQsolution;
-import sS.sdp.sS;
-import sS.sdp.sSsolution;
+import sS.sS;
+import sS.sSsolution;
 import sdp.data.Instance;
 
 public class multipleInstances_sQ{
@@ -141,8 +141,8 @@ public class multipleInstances_sQ{
 						sdp.util.writeText.writeInt(Q, "src/main/java/instanceRuns/sQ_sdp/sQ_sdp_Q.txt");											//Q
 						
 						//solve sQ - s_t
-						sQgivenQsolution sQgivenQorder = sQgivenQ.costVaryingWithInventory(Q, instance, true);
-						int[] s = sQgivenQsolution.getsGivenQ(instance, sQgivenQorder);
+						sQreorderPointSolution sQgivenQorder = sQreorderPoint.costVaryingWithInventory(Q, instance, true);
+						int[] s = sQreorderPointSolution.getsGivenQ(instance, sQgivenQorder);
 						sdp.util.writeText.writeLong(
 								sQgivenQorder.timeConsumed, 
 								"src/main/java/instanceRuns/sQ_sdp/sQ_sdp_time_st.txt");															//time for s_t

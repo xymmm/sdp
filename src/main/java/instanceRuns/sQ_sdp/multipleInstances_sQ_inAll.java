@@ -10,13 +10,13 @@ import minlp.sQminlpInstance;
 import minlp.sQminlp_oneRun;
 import minlp.sQminlp_recursive;
 import sQ.sdp.sQ;
-import sQ.sdp.sQgivenQ;
-import sQ.sdp.sQgivenQsolution;
+import sQ.sdp.sQreorderPoint;
+import sQ.sdp.sQreorderPointSolution;
 import sQ.sdp.sQsolution;
 import sQ.simulation.sQsimInstanceDouble;
 import sQ.simulation.sQsimPoisson;
-import sS.sdp.sS;
-import sS.sdp.sSsolution;
+import sS.sS;
+import sS.sSsolution;
 import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;
 
@@ -154,8 +154,8 @@ public class multipleInstances_sQ_inAll {
 						System.out.println("instance "+(d+1)+" Q-sdp done.");
 
 						//solve sQ - s_t
-						sQgivenQsolution sQgivenQorder = sQgivenQ.costVaryingWithInventory(Q, instance, true);
-						int[] s_sdp = sQgivenQsolution.getsGivenQ(instance, sQgivenQorder);
+						sQreorderPointSolution sQgivenQorder = sQreorderPoint.costVaryingWithInventory(Q, instance, true);
+						int[] s_sdp = sQreorderPointSolution.getsGivenQ(instance, sQgivenQorder);
 						sdp.util.writeText.writeLong(
 								sQgivenQorder.timeConsumed, 
 								fileTimest);															//time for s_t

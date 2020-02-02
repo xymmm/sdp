@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import sQ.sdp.sQ;
 import sQ.sdp.sQsolution;
-import sS.sdp.sSsolution;
+import sS.sSsolution;
 import sdp.data.Instance;
 
 public class sQtest_singleQ {

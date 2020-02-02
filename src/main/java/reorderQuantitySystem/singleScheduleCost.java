@@ -1,12 +1,13 @@
 package reorderQuantitySystem;
 
+import java.util.Arrays;
+
 import sQ.sdp.sQsolution;
-import sS.sdp.sS;
+import sS.sS;
 import sdp.data.Instance;
 
 public class singleScheduleCost {
 	
-	//TODO 
 	//consider sQ and sQt system altogether, classfied by a boolean variable 'timeDependent', which true for sQt
 	
 	//build one-dimension array Q[timeHorizon]
@@ -17,7 +18,7 @@ public class singleScheduleCost {
 	
 	//another code will be applied for the computation of sQ and sQt optimal quantity.
 	
-	public static double[][] singleScheduleCost (Instance instance,int[] Q, double[][] demandProbabilities) {
+	public static double[][] singleScheduleCost (Instance instance, int[] Q, double[][] demandProbabilities) {
 		
 		/**create array for inventory levels**/
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
@@ -32,6 +33,7 @@ public class singleScheduleCost {
 			for(int i=0; i<inventory.length;i++) {
 				//minCost[i] = totalCost[i][0];
 				totalCost[i][t] = sS.computePurchasingCost(Q[t], instance.fixedOrderingCost, instance.unitCost);
+				
 				double scenarioProb = 0;
 				for(int d=0; d<demandProbabilities[t].length;d++) {
 					if((inventory[i] + Q[t] - d <= instance.maxInventory) && (inventory[i] + Q[t] - d >= instance.minInventory)) {
@@ -44,7 +46,7 @@ public class singleScheduleCost {
 										instance.penaltyCost, 
 										instance.fixedOrderingCost, 
 										instance.unitCost)
-								+((t==instance.getStages()-1) ? 0 : totalCost[(int) (i+Q[t]-d)][t+1])
+								+((t==instance.getStages()-1) ? 0 : totalCost[i+Q[t]-d][t+1])
 								);
 						scenarioProb += demandProbabilities[t][d];
 					}//if
@@ -55,5 +57,55 @@ public class singleScheduleCost {
 		
 		return totalCost;
 	}
+	
+	/*
+	public static void main(String args[]) {
+		
+		//create instance
+		double fixedOrderingCost = 10;
+		double unitCost = 0;
+		double holdingCost = 1;
+		double penaltyCost = 5;
+		double tail = 0.00000001;
+
+		int minInventory = -100;
+		int maxInventory = 100;
+		int maxQuantity = 9;
+
+		double stdParameter = 0.25;
+
+		//int[] demandMean = {20, 40, 60, 40};
+		int[] demandMean = {2,4,6,4};
+		
+		Instance instance = new Instance(
+				fixedOrderingCost,
+				unitCost,
+				holdingCost,
+				penaltyCost,
+				demandMean,
+				tail,
+				minInventory,
+				maxInventory,
+				maxQuantity,
+				stdParameter
+				);
+		
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
+
+		
+		//sQt
+		int Qt[] = {8,0,9,0};
+		double[][] costsQt = singleScheduleCost(instance, Qt, demandProbabilities);
+		System.out.println("Optimal cost under (s,Qt) policy is: "+costsQt[instance.initialInventory - instance.minInventory][0]);
+
+		//sQ
+		System.out.println();
+		int Q[] = {9,0,9,0};
+		double[][] costsQ = singleScheduleCost(instance, Q, demandProbabilities);
+		System.out.println("Optimal cost under (s,Q) policy is: "+costsQ[instance.initialInventory - instance.minInventory][0]);
+		
+	}
+*/
+
 
 }

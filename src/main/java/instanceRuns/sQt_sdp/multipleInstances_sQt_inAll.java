@@ -5,10 +5,10 @@ import minlp.sQTminlp_oneRun;
 import minlp.sQTminlp_recursive;
 import sQ.simulation.sQsimInstanceDouble;
 import sQ.simulation.sQsimPoisson;
-import sQt.generatedQ.sQtgeneratedQ_s;
-import sQt.generatedQ.sQtgeneratedQ_s_solution;
-import sQt.generatedQ.sQtgeneratedQlocalM;
-import sQt.generatedQ.sQtgeneratedQlocalMsolution;
+import sQt.generatedQ.sQtReorderPoint;
+import sQt.generatedQ.sQtReorderPointSolution;
+import sQt.generatedQ.sQt;
+import sQt.generatedQ.sQtSolution;
 import sdp.data.Instance;
 import umontreal.ssj.util.Chrono;
 
@@ -107,7 +107,7 @@ public class multipleInstances_sQt_inAll {
 								fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], demandMean[d],
 								0.00000001, minInventory[d], maxInventory[d], maxQuantity, 0.1);
 						//solve sQt - sdp
-						sQtgeneratedQlocalMsolution sQtsolution = sQtgeneratedQlocalM.sQtMultipleG(instance);
+						sQtSolution sQtsolution = sQt.sQtMultipleG(instance);
 						int[] Q = new int[demandMean[d].length];
 						for(int t=0; t<instance.getStages();t++) { Q[t] = (int)sQtsolution.optQ[t]; }
 						//record
@@ -117,7 +117,7 @@ public class multipleInstances_sQt_inAll {
 						System.out.println("instance "+(d+1)+" sQt-sdp done");
 						
 						//solve sQ - s_t
-						sQtgeneratedQ_s_solution sQtgivenQ = sQtgeneratedQ_s.costVaryingWithInventory(Q,instance,true);
+						sQtReorderPointSolution sQtgivenQ = sQtReorderPoint.costVaryingWithInventory(Q,instance,true);
 						int[] s = sQtgivenQ.getsGivenQ(instance, sQtgivenQ);
 						sdp.util.writeText.writeLong(sQtgivenQ.timeConsumed_sQtst, "src/main/java/instanceRuns/sQt_sdp/sQt_sdp_time_st.txt");			//time for s_t
 						sdp.util.writeText.writeIntArray(s, "src/main/java/instanceRuns/sQt_sdp/sQt_sdp_reorderPoints.txt");							//s_t

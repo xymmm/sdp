@@ -1,4 +1,4 @@
-package sS.sdp;
+package sS;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
@@ -8,8 +8,6 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import sS.simulation.sSsim;
-import sS.simulation.sSsimInstance;
 import sdp.data.Instance;
 import sdp.util.Demand;
 import umontreal.ssj.util.Chrono;

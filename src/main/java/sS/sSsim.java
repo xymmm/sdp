@@ -1,4 +1,4 @@
-package sS.simulation;
+package sS;
 
 
 import umontreal.ssj.probdist.PoissonDist;

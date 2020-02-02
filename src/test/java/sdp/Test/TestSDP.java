@@ -6,8 +6,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import sS.sdp.sS;
-import sS.sdp.sSsolution;
+import sS.sS;
+import sS.sSsolution;
 import sdp.data.Instance;
 
 public class TestSDP {

@@ -1,6 +1,6 @@
 package sQt.generatedQ;
 
-public class sQtgeneratedQlocalMsolution {
+public class sQtSolution {
 	
 	//public double[] inventory;
 	public double minCost;
@@ -9,7 +9,7 @@ public class sQtgeneratedQlocalMsolution {
 	public int optG;
 	public long timeConsumed_sQt;
 
-	public sQtgeneratedQlocalMsolution(
+	public sQtSolution(
 			double minCost, 
 			double[] optQ,
 			int optG,

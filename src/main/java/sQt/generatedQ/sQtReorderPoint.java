@@ -10,11 +10,11 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import sQ.sdp.sQgivenQsolution;
-import sS.sdp.sS;
+import sQ.sdp.sQreorderPointSolution;
+import sS.sS;
 import sdp.data.Instance;
 
-public class sQtgeneratedQ_s {
+public class sQtReorderPoint {
 	
 	/**plot OPTIMAL cost with a given Q**/
 	public static void plotCostGivenQGivenStage(double[][] costGivenQ, int Q, int stageIndex, Instance instance) {
@@ -64,7 +64,7 @@ public class sQtgeneratedQ_s {
 	}
 
 	/****compute cost function f(Q,t,i) with given t and Q****/
-	public static sQtgeneratedQ_s_solution costVaryingWithInventory(int[] Q, Instance instance, boolean initialOrder){
+	public static sQtReorderPointSolution costVaryingWithInventory(int[] Q, Instance instance, boolean initialOrder){
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
@@ -138,7 +138,7 @@ public class sQtgeneratedQ_s {
 		long endTime = System.currentTimeMillis();
 		long timeConsumed_sQtst = endTime - startTime;
 
-		return new sQtgeneratedQ_s_solution(costGivenQ, actionGivenQ, costOrder, costNoOrder, timeConsumed_sQtst);
+		return new sQtReorderPointSolution(costGivenQ, actionGivenQ, costOrder, costNoOrder, timeConsumed_sQtst);
 	}
 	
 	public static void main(String[] args) {
@@ -175,7 +175,7 @@ public class sQtgeneratedQ_s {
 				stdParameter
 				);
 		
-		sQtgeneratedQ_s_solution sQgivenQ = costVaryingWithInventory(Q,instance,true);
+		sQtReorderPointSolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);

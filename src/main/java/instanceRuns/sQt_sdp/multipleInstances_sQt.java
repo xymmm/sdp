@@ -7,17 +7,15 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 import sQ.sdp.sQ;
-import sQ.sdp.sQgivenQ;
-import sQ.sdp.sQgivenQsolution;
+import sQ.sdp.sQreorderPoint;
+import sQ.sdp.sQreorderPointSolution;
 import sQ.sdp.sQsolution;
-import sQt.generatedQ.sQtgenerated;
-import sQt.generatedQ.sQtgeneratedQ_s;
-import sQt.generatedQ.sQtgeneratedQ_s_solution;
-import sQt.generatedQ.sQtgeneratedQlocalM;
-import sQt.generatedQ.sQtgeneratedQlocalMsolution;
-import sQt.generatedQ.sQtgeneratedSolution;
-import sS.sdp.sS;
-import sS.sdp.sSsolution;
+import sQt.generatedQ.sQtReorderPoint;
+import sQt.generatedQ.sQtReorderPointSolution;
+import sQt.generatedQ.sQt;
+import sQt.generatedQ.sQtSolution;
+import sS.sS;
+import sS.sSsolution;
 import sdp.data.Instance;
 import sdp.data.InstanceDouble;
 
@@ -114,7 +112,7 @@ public class multipleInstances_sQt {
 								fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], demandMean[d],
 								0.00000001, minInventory, maxInventory, maxQuantity, 0.1);
 						//solve sQt - sdp
-						sQtgeneratedQlocalMsolution sQtsolution = sQtgeneratedQlocalM.sQtMultipleG(instance);
+						sQtSolution sQtsolution = sQt.sQtMultipleG(instance);
 						int[] Q = new int[demandMean[d].length];
 						for(int t=0; t<instance.getStages();t++) { Q[t] = (int)sQtsolution.optQ[t]; }
 						//record
@@ -123,7 +121,7 @@ public class multipleInstances_sQt {
 						sdp.util.writeText.writeIntArray(Q, "src/main/java/instanceRuns/sQt_sdp/sQt_sdp_Qarr.txt");										//Q
 						
 						//solve sQ - s_t
-						sQtgeneratedQ_s_solution sQtgivenQ = sQtgeneratedQ_s.costVaryingWithInventory(Q,instance,true);
+						sQtReorderPointSolution sQtgivenQ = sQtReorderPoint.costVaryingWithInventory(Q,instance,true);
 						int[] s = sQtgivenQ.getsGivenQ(instance, sQtgivenQ);
 						sdp.util.writeText.writeLong(sQtgivenQ.timeConsumed_sQtst, "src/main/java/instanceRuns/sQt_sdp/sQt_sdp_time_st.txt");			//time for s_t
 						sdp.util.writeText.writeIntArray(s, "src/main/java/instanceRuns/sQt_sdp/sQt_sdp_reorderPoints.txt");							//s_t

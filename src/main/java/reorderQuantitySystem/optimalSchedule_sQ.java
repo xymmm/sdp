@@ -3,7 +3,7 @@ package reorderQuantitySystem;
 import java.util.Arrays;
 
 import sQ.sdp.sQsolution;
-import sS.sdp.sS;
+import sS.sS;
 import sdp.data.Instance;
 
 public class optimalSchedule_sQ {

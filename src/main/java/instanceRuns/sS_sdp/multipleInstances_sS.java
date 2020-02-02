@@ -1,7 +1,7 @@
 package instanceRuns.sS_sdp;
 
-import sS.sdp.sS;
-import sS.sdp.sSsolution;
+import sS.sS;
+import sS.sSsolution;
 import sdp.data.Instance;
 
 public class multipleInstances_sS {

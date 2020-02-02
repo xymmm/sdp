@@ -15,8 +15,8 @@ public class mainComputation {
 		double penaltyCost = 5;
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
+		int minInventory = -100;
+		int maxInventory = 100;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;

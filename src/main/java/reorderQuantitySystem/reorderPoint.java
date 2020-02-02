@@ -2,7 +2,7 @@ package reorderQuantitySystem;
 
 import java.util.Arrays;
 
-import sS.sdp.sS;
+import sS.sS;
 import sdp.data.Instance;
 
 public class reorderPoint {

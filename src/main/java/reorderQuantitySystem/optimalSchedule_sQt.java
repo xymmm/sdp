@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import sS.sdp.sS;
+import sS.sS;
 import sdp.data.Instance;
 
 public class optimalSchedule_sQt {

@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import sS.sdp.sS;
+import sS.sS;
 import sdp.data.Instance;
 import sdp.data.InstanceDouble;
 
-public class sQtgeneratedQlocalM {
+public class sQt {
 	
 	public static void writeToText(int generator, double totalCost){
 		/*
@@ -155,7 +155,7 @@ public class sQtgeneratedQlocalM {
 		return totalCost[(int)(instance.initialInventory -instance.minInventory)][0];
 	}
 	
-	public static sQtgeneratedQlocalMsolution sQtMultipleG(Instance instance) {
+	public static sQtSolution sQtMultipleG(Instance instance) {
 		
 		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
@@ -218,7 +218,7 @@ public class sQtgeneratedQlocalM {
 		sQtgeneratedSingle(instance, optG, demandProbabilities, true);
 
 	
-		return new sQtgeneratedQlocalMsolution(minCost, optQ, optG, timeConsumed_sQt);		
+		return new sQtSolution(minCost, optQ, optG, timeConsumed_sQt);		
 	}
 
 	public static void main(String[] args) {
@@ -251,7 +251,7 @@ public class sQtgeneratedQlocalM {
 				stdParameter
 				);
 
-		sQtgeneratedQlocalMsolution solution = sQtMultipleG(instance);
+		sQtSolution solution = sQtMultipleG(instance);
 		
 		System.out.println("optimal Cost for I0 = 0 is "+solution.minCost);
 		

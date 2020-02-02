@@ -10,10 +10,10 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import sS.sdp.sS;
+import sS.sS;
 import sdp.data.Instance;
 
-public class sQgivenQ {
+public class sQreorderPoint {
 
 	/**plot TWO costs with a given Q - Reorder & Non-reorder**/
 	public static void plotTwoCostGivenQ(double[] costOrder, double[] costNoOrder, int Q, int stageIndex, Instance instance, double costLimit) {
@@ -37,7 +37,7 @@ public class sQgivenQ {
 
 
 	/****compute cost function f(Q,t,i) with given t and Q****/
-	public static sQgivenQsolution costVaryingWithInventory(int Q, Instance instance, boolean initialOrder){
+	public static sQreorderPointSolution costVaryingWithInventory(int Q, Instance instance, boolean initialOrder){
 		long startTime = System.currentTimeMillis();
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
@@ -108,7 +108,7 @@ public class sQgivenQ {
 		long endTime = System.currentTimeMillis();
 		long timeConsumed = endTime - startTime;
 
-		return new sQgivenQsolution(inventory, costGivenQ, actionGivenQ, costOrder, costNoOrder, timeConsumed);
+		return new sQreorderPointSolution(inventory, costGivenQ, actionGivenQ, costOrder, costNoOrder, timeConsumed);
 	}
 
 
@@ -144,7 +144,7 @@ public class sQgivenQ {
 			Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMeanInput[d], 
 					tail, minInventory, maxInventory, maxQuantity, stdParameter );	
 			//determine s by compare c(s) and c(s+Q)
-			sQgivenQsolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
+			sQreorderPointSolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
 
 			/**print and plot ETC**/
 			//System.out.println("cost with initial stock = "+instance.initialInventory+" is "+sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
@@ -170,11 +170,11 @@ public class sQgivenQ {
 			}
 
 			/**determine s by compare c(order) and c(no order)**/
-			sQgivenQsolution sQgivenQorder = costVaryingWithInventory(Q, instance, true);
+			sQreorderPointSolution sQgivenQorder = costVaryingWithInventory(Q, instance, true);
 
 			//plotTwoCostGivenQ(sQgivenQorder.costOrder[0], sQgivenQorder.costNoOrder[0], Q, 0, instance,costLimit[d]);
 
-			int[] s = sQgivenQsolution.getsGivenQ(instance, sQgivenQorder);
+			int[] s = sQreorderPointSolution.getsGivenQ(instance, sQgivenQorder);
 			s_compare[d] = s[0];
 			System.out.println("reorder points by comparing actions = " + s[0]);
 
