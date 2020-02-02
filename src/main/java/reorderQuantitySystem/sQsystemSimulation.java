@@ -22,10 +22,10 @@ public class sQsystemSimulation {
 	}
 	
 	/** compute purchasing cost according to action decision **/
-	static double computePurchasingCost(int actionDecision, int currentStageIndex, simInstance instance, sQsystemSolution solution) {
+	static double computePurchasingCost(int actionDecision, int currentStageIndex, simInstance instance, int[] orderQuantity) {
 		return actionDecision*(
 				instance.fixedOrderingCost 
-				+ instance.unitCost*solution.optimalSchedule[currentStageIndex]
+				+ instance.unitCost*orderQuantity[currentStageIndex]
 				);
 	}
 	
@@ -59,7 +59,7 @@ public class sQsystemSimulation {
 //************************************************************************************************************************************
 	
 	
-	public static double sQsimPoisson(simInstance instance, boolean print, int[] reorderPoint, sQsystemSolution solution) {
+	public static double sQsimPoisson(simInstance instance, boolean print) {
 		int inventoryLevel = instance.initialInventory;
 		double cost = 0;
 		int actionDecision;		
@@ -69,15 +69,15 @@ public class sQsystemSimulation {
 			if(print == true) System.out.println("Current inventory level is "+inventoryLevel);
 			
 			//check inventory
-			actionDecision = checkInventory(reorderPoint[currentStageIndex], inventoryLevel);
-			if(print == true) System.out.println((actionDecision == 1) ? "Replenishment order placed. ":"No order placed. ");
+			actionDecision = checkInventory(instance.reorderPoint[currentStageIndex], inventoryLevel);
+			if(print == true) System.out.println((actionDecision == 1) ? "Replenishment order placed with quantity " + instance.orderQuantity[currentStageIndex]:"No order placed. ");
 			//if(currentStageIndex == 0) actionDecision = 0;
 			
 			//compute purchasing cost
-			cost += computePurchasingCost(actionDecision, currentStageIndex, instance, solution);
+			cost += computePurchasingCost(actionDecision, currentStageIndex, instance, instance.orderQuantity);
 			
 			//update inventory level
-			inventoryLevel = updateInventoryLevel(inventoryLevel, actionDecision*solution.optimalSchedule[currentStageIndex]);
+			inventoryLevel = updateInventoryLevel(inventoryLevel, actionDecision*instance.orderQuantity[currentStageIndex]);
 			if(print == true) System.out.println("Updated inventory level is "+inventoryLevel);
 			
 			//generate, check and meet demand
@@ -102,9 +102,9 @@ public class sQsystemSimulation {
 	}
 	
 	/** multiple run times **/
-	public static void sQsimPoissonMultiRuns(simInstance sQsystem1, int count, int[] reorderPoint, sQsystemSolution solution) {
+	public static void sQsimPoissonMultiRuns(simInstance sQsystem1, int count) {
 		for(int i=0; i<count; i++) {
-			sQsystem1.statCost.add(sQsimPoisson(sQsystem1,false, reorderPoint, solution));
+			sQsystem1.statCost.add(sQsimPoisson(sQsystem1, false));
 		}
 	}
 	
@@ -120,15 +120,15 @@ public class sQsystemSimulation {
 
 		double tail = 0.00000001;
 
-		double minInventory = -50;
-		double maxInventory = 50;
+		int minInventory = -100;
+		int maxInventory = 100;
 		double coe = 0.25;
 		int[] demandMean = {2,4,6,4};
-		double[] reorderPoint = {7,-50,7,-50};
+		int[] reorderPoint = {5,-100,7,-100};
 
-		double[] actionQuantity = {8, 0, 9, 0};
+		int[] orderQuantity = {9, 0, 9, 0};
 
-		sQsimInstanceDouble sQsystem1 = new sQsimInstanceDouble(
+		simInstance sQsystem = new simInstance(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
@@ -137,21 +137,21 @@ public class sQsystemSimulation {
 				tail,
 				minInventory,
 				maxInventory,
-				actionQuantity,
+				coe,
 				reorderPoint,
-				coe
+				orderQuantity				
 				);	
 		
 		Chrono timer = new Chrono();
 		
-		int count = 500000;
-		sQsimPoisson.sQsimPoissonMultiRuns(sQsystem1, count);
+		int count = 50000;
+		sQsimPoissonMultiRuns(sQsystem, count);
 		
-		sQsystem1.statCost.setConfidenceIntervalStudent();
-		System.out.println(sQsystem1.statCost.report(0.9, 3));
+		sQsystem.statCost.setConfidenceIntervalStudent();
+		System.out.println(sQsystem.statCost.report(0.9, 3));
 		System.out.println("Total CPU time: "+timer.format());
 
-		System.out.println(sQsystem1.statCost.average());
+		System.out.println(sQsystem.statCost.average());
 	}
 
 }

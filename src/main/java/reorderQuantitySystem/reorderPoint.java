@@ -7,12 +7,11 @@ import sdp.data.Instance;
 
 public class reorderPoint {
 
-	//TODO
 	/*
 	 * Given an optimal schedule,
 	 * 
 	 * if Q[t] != 0, compute reorder point
-	 * else, reorder point does not exist, denoted by the max inventory level
+	 * else, reorder point does not exist, denoted by the min inventory level
 	 * 
 	 * To compute reorder points, 
 	 * 1. substitute Q[t] to an inventory and compute the cost with and without this replenishment quantity -> cost[i][t]
@@ -145,7 +144,7 @@ public class reorderPoint {
 		*/
 		
 		//print cost given a schedule
-		System.out.println(optimalCostByInventory[0][instance.initialInventory - instance.minInventory]);
+		System.out.println("cost when computiong reorder points is: "+optimalCostByInventory[0][instance.initialInventory - instance.minInventory]);
 		return reorderPoint;
 	}
 	

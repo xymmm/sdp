@@ -16,11 +16,13 @@ public class simInstance {
 	/** SDP boundary conditions **/
 	public double tail;
 
-	public int maxDemand;
 	public int minInventory;
 	public int maxInventory;
 	
 	public double coe;
+	
+	public int[] reorderPoint;
+	public int[] orderQuantity;
 	
 	public Tally statCost = new Tally("stats on cost");
 
@@ -31,10 +33,11 @@ public class simInstance {
 			double penaltyCost,
 			int[] demandMean,
 			double tail,
-			int maxDemand,
 			int minInventory,
 			int maxInventory,
-			double coe) {
+			double coe,
+			int[] reorderPoint,
+			int[] orderQuantity) {
 		this.fixedOrderingCost = fixedOrderingCost;
 		this.unitCost = unitCost;
 		this.holdingCost = holdingCost;
@@ -44,6 +47,8 @@ public class simInstance {
 		this.minInventory = minInventory;
 		this.maxInventory = maxInventory;
 		this.coe = coe;
+		this.reorderPoint = reorderPoint;
+		this.orderQuantity = orderQuantity;
 	}
 
 	public int getStages() {
