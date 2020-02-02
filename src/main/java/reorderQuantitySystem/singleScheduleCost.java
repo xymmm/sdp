@@ -31,7 +31,7 @@ public class singleScheduleCost {
 		double totalCost[][] = new double[inventory.length][timeHorizon];		
 		for(int t=instance.getStages()-1; t>=0; t--) {			
 			for(int i=0; i<inventory.length;i++) {
-				//minCost[i] = totalCost[i][0];
+				
 				totalCost[i][t] = sS.computePurchasingCost(Q[t], instance.fixedOrderingCost, instance.unitCost);
 				
 				double scenarioProb = 0;
@@ -58,7 +58,7 @@ public class singleScheduleCost {
 		return totalCost;
 	}
 	
-	/*
+	
 	public static void main(String args[]) {
 		
 		//create instance
@@ -97,15 +97,25 @@ public class singleScheduleCost {
 		int Qt[] = {8,0,9,0};
 		double[][] costsQt = singleScheduleCost(instance, Qt, demandProbabilities);
 		System.out.println("Optimal cost under (s,Qt) policy is: "+costsQt[instance.initialInventory - instance.minInventory][0]);
+		
+		/*print all cost by inventory level and time period*/
+		System.out.println();
+		for(int i=0; i<instance.maxInventory - instance.minInventory +1; i++) {
+			System.out.print((i+instance.minInventory)+" \t");
+			for(int t=0; t<instance.getStages(); t++) {
+				System.out.print(costsQt[i][t]+ "\t");
+			}
+			System.out.println();
+		}
 
 		//sQ
-		System.out.println();
-		int Q[] = {9,0,9,0};
-		double[][] costsQ = singleScheduleCost(instance, Q, demandProbabilities);
-		System.out.println("Optimal cost under (s,Q) policy is: "+costsQ[instance.initialInventory - instance.minInventory][0]);
+		//System.out.println();
+		//int Q[] = {9,0,9,0};
+		//double[][] costsQ = singleScheduleCost(instance, Q, demandProbabilities);
+		//System.out.println("Optimal cost under (s,Q) policy is: "+costsQ[instance.initialInventory - instance.minInventory][0]);
 		
 	}
-*/
+
 
 
 }

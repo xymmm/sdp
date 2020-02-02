@@ -29,11 +29,11 @@ public class reorderPoint {
 		
 		double[][] demandProbabilitiesInput = solution.demandProbabilities;
 
-		double[][] optimalCostByInventory = new double [instance.getStages()][inventory.length];
-		boolean[][] optimalActionByInventory= new boolean[instance.getStages()][inventory.length];
+		double[][] optimalCostByInventory = new double [inventory.length][instance.getStages()];
+		boolean[][] optimalActionByInventory= new boolean[inventory.length][instance.getStages()];
 
-		double[][] costOrder = new double[instance.getStages()][inventory.length];
-		double[][] costNoOrder = new double[instance.getStages()][inventory.length];
+		double[][] costOrder = new double[inventory.length][instance.getStages()];
+		double[][] costNoOrder = new double[inventory.length][instance.getStages()];
 
 
 		int[] optimalSchedule = solution.optimalSchedule;
@@ -44,6 +44,7 @@ public class reorderPoint {
 				if(optimalSchedule[t] != 0) {
 					/** a = Q (given) **/
 					double totalCostOrder = sS.computePurchasingCost(optimalSchedule[t], instance.fixedOrderingCost, instance.unitCost);				 
+					
 					double scenarioProb = 0;
 					for(int d=0;d<demandProbabilitiesInput[t].length;d++) { // Demand
 						if((inventory[i] + optimalSchedule[t] - d <= instance.maxInventory) && (inventory[i] + optimalSchedule[t] - d >= instance.minInventory)) {
@@ -56,13 +57,13 @@ public class reorderPoint {
 											instance.penaltyCost, 
 											instance.fixedOrderingCost, 
 											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : optimalCostByInventory[t+1][i+optimalSchedule[t]-d]) 
+									+ ((t==instance.getStages()-1) ? 0 : optimalCostByInventory[i+optimalSchedule[t]-d][t+1]) 
 									);
 							scenarioProb += demandProbabilitiesInput[t][d];
 						}
 					}
 					totalCostOrder /= scenarioProb;
-					costOrder[t][i] = totalCostOrder;
+					costOrder[i][t] = totalCostOrder;
 
 					/** a = 0**/
 					double totalCostNoOrder = 0;
@@ -78,16 +79,16 @@ public class reorderPoint {
 											instance.penaltyCost, 
 											instance.fixedOrderingCost, 
 											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : optimalCostByInventory[t+1][i-d]) 
+									+ ((t==instance.getStages()-1) ? 0 : optimalCostByInventory[i-d][t+1]) 
 									);
 							scenarioProb += demandProbabilitiesInput[t][d];
 						}
 					}
 					totalCostNoOrder /= scenarioProb;
-					costNoOrder[t][i] = totalCostNoOrder;
+					costNoOrder[i][t] = totalCostNoOrder;
 
-					optimalCostByInventory[t][i] = Math.min(totalCostNoOrder, totalCostOrder);
-					optimalActionByInventory[t][i] = totalCostNoOrder < totalCostOrder ? false : true;
+					optimalCostByInventory[i][t] = Math.min(totalCostNoOrder, totalCostOrder);
+					optimalActionByInventory[i][t] = totalCostNoOrder < totalCostOrder ? false : true;
 				}//if reorder point exists
 				else {
 					double totalCostNoOrder = 0;
@@ -103,16 +104,16 @@ public class reorderPoint {
 											instance.penaltyCost, 
 											instance.fixedOrderingCost, 
 											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : optimalCostByInventory[t+1][i-d]) 
+									+ ((t==instance.getStages()-1) ? 0 : optimalCostByInventory[i-d][t+1]) 
 									);
 							scenarioProb += demandProbabilitiesInput[t][d];
 						}
 					}
 					totalCostNoOrder /= scenarioProb;
-					costNoOrder[t][i] = totalCostNoOrder;
+					costNoOrder[i][t] = totalCostNoOrder;
 
-					optimalCostByInventory[t][i] = totalCostNoOrder;
-					optimalActionByInventory[t][i] = false;
+					optimalCostByInventory[i][t] = totalCostNoOrder;
+					optimalActionByInventory[i][t] = false;
 				}//reorder point does not exist
 			}
 		}
@@ -123,7 +124,7 @@ public class reorderPoint {
 				reorderPoint[t] = instance.minInventory;
 			}else {
 				for(int i=0; i<inventory.length; i++) {  // Inventory   
-					if(optimalActionByInventory[t][i] == false) {
+					if(optimalActionByInventory[i][t] == false) {
 						reorderPoint[t] = i + instance.minInventory;
 						break;
 					}
@@ -132,19 +133,30 @@ public class reorderPoint {
 			}
 		}
 		
-		/*print all actions by inventory level and time period
+		/*print all actions by inventory level and time period*/
 		System.out.println();
 		for(int i=0; i<inventory.length; i++) {
 			System.out.print((i+instance.minInventory)+" \t");
 			for(int t=0; t<instance.getStages(); t++) {
-				System.out.print(optimalActionByInventory[t][i]+ "\t");
+				System.out.print(optimalActionByInventory[i][t]+ "\t");
+			}
+			System.out.println();
+		}
+		
+		
+		/*print all cost by inventory level and time period
+		System.out.println();
+		for(int i=0; i<inventory.length; i++) {
+			System.out.print((i+instance.minInventory)+" \t");
+			for(int t=0; t<instance.getStages(); t++) {
+				System.out.print(optimalCostByInventory[i][t]+ "\t");
 			}
 			System.out.println();
 		}
 		*/
 		
 		//print cost given a schedule
-		System.out.println("cost when computiong reorder points is: "+optimalCostByInventory[0][instance.initialInventory - instance.minInventory]);
+		System.out.println("cost when computiong reorder points is: "+optimalCostByInventory[instance.initialInventory - instance.minInventory][0]);
 		return reorderPoint;
 	}
 	
@@ -157,8 +169,8 @@ public class reorderPoint {
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
+		int minInventory = -100;
+		int maxInventory = 100;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;

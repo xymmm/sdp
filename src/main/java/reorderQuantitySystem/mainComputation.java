@@ -16,14 +16,14 @@ public class mainComputation {
 		double penaltyCost = 5;
 		double tail = 0.00000001;
 
-		int minInventory = -100;
-		int maxInventory = 100;
+		int minInventory = -50;
+		int maxInventory = 50;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {20, 40, 60, 40};
-		int[] demandMean = {2,4,6,4};
+		int[] demandMean = {10,2,15,6};
 		
 		Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost,
 				demandMean, tail, minInventory, maxInventory, maxQuantity, stdParameter );
@@ -34,7 +34,7 @@ public class mainComputation {
 		System.out.println("Optimal reordering schedule under (s,Qt) policy is: "+Arrays.toString(sQtsolution.optimalSchedule));
 		int[] reorderPointsQt = reorderQuantitySystem.reorderPoint.computeReorderPoint(instance, sQtsolution);
 		System.out.println("Reorder point = "+Arrays.toString(reorderPointsQt));
-		
+		/*
 		simInstance sQtsystem = new simInstance(fixedOrderingCost, unitCost, holdingCost, penaltyCost,
 				demandMean, tail, minInventory, maxInventory, stdParameter,
 				reorderPointsQt, sQtsolution.optimalSchedule);			
@@ -43,6 +43,7 @@ public class mainComputation {
 		sQsystemSimulation.sQsimPoissonMultiRuns(sQtsystem, count);
 		sQtsystem.statCost.setConfidenceIntervalStudent();
 		System.out.println(sQtsystem.statCost.average());
+		*/
 
 		/**sQ**/
 		System.out.println();
@@ -51,14 +52,14 @@ public class mainComputation {
 		System.out.println("Optimal reordering schedule under (s,Q) policy is: "+Arrays.toString(sQsolution.optimalSchedule));
 		int[] reorderPointsQ = reorderQuantitySystem.reorderPoint.computeReorderPoint(instance, sQsolution);
 		System.out.println("Reorder point = "+Arrays.toString(reorderPointsQ));
-		
+		/*
 		simInstance sQsystem = new simInstance(fixedOrderingCost, unitCost, holdingCost, penaltyCost,
 				demandMean, tail, minInventory, maxInventory, stdParameter,
 				reorderPointsQ, sQsolution.optimalSchedule);				
 		sQsystemSimulation.sQsimPoissonMultiRuns(sQsystem, count);
 		sQtsystem.statCost.setConfidenceIntervalStudent();
 		System.out.println(sQsystem.statCost.average());
-
+*/
 		
 	}
 

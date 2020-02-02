@@ -47,9 +47,6 @@ public class sQ {
 	}
 	
 	public static void presentsQresults(Instance instance, sQsolution sQsolution) {
-		//plotComparedCosts(instance, sQsolution, 0);
-		//printReorderPoints(instance, sQsolution);
-		//System.out.println();
 		printOptimalQuantity(instance, sQsolution);
 		System.out.println();
 		printOpitmalCost(instance, sQsolution);
