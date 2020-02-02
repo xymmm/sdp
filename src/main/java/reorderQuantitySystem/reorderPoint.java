@@ -40,11 +40,8 @@ public class reorderPoint {
 
 		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 			for(int i=0;i<inventory.length;i++) { // Inventory 
-				/**reorder point exists**/
-				if(optimalSchedule[t] != 0) {
 					/** a = Q (given) **/
 					double totalCostOrder = sS.computePurchasingCost(optimalSchedule[t], instance.fixedOrderingCost, instance.unitCost);				 
-					
 					double scenarioProb = 0;
 					for(int d=0;d<demandProbabilitiesInput[t].length;d++) { // Demand
 						if((inventory[i] + optimalSchedule[t] - d <= instance.maxInventory) && (inventory[i] + optimalSchedule[t] - d >= instance.minInventory)) {
@@ -89,32 +86,7 @@ public class reorderPoint {
 
 					optimalCostByInventory[i][t] = Math.min(totalCostNoOrder, totalCostOrder);
 					optimalActionByInventory[i][t] = totalCostNoOrder < totalCostOrder ? false : true;
-				}//if reorder point exists
-				else {
-					double totalCostNoOrder = 0;
-					double scenarioProb = 0;
-					for(int d=0;d<demandProbabilitiesInput[t].length;d++) { // Demand
-						if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {
-							totalCostNoOrder += demandProbabilitiesInput[t][d]*(
-									sS.computeImmediateCost(
-											inventory[i], 
-											0, 
-											d, 
-											instance.holdingCost, 
-											instance.penaltyCost, 
-											instance.fixedOrderingCost, 
-											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : optimalCostByInventory[i-d][t+1]) 
-									);
-							scenarioProb += demandProbabilitiesInput[t][d];
-						}
-					}
-					totalCostNoOrder /= scenarioProb;
-					costNoOrder[i][t] = totalCostNoOrder;
-
-					optimalCostByInventory[i][t] = totalCostNoOrder;
-					optimalActionByInventory[i][t] = false;
-				}//reorder point does not exist
+				
 			}
 		}
 		
@@ -133,18 +105,18 @@ public class reorderPoint {
 			}
 		}
 		
-		/*print all actions by inventory level and time period*/
+		/*print all actions by inventory level and time period
 		System.out.println();
 		for(int i=0; i<inventory.length; i++) {
 			System.out.print((i+instance.minInventory)+" \t");
 			for(int t=0; t<instance.getStages(); t++) {
-				System.out.print(optimalActionByInventory[i][t]+ "\t");
+				System.out.print(optimalActionByInventory[t][i]+ "\t");
 			}
 			System.out.println();
 		}
+		*/
 		
-		
-		/*print all cost by inventory level and time period
+		/*print all actions by inventory level and time period*/
 		System.out.println();
 		for(int i=0; i<inventory.length; i++) {
 			System.out.print((i+instance.minInventory)+" \t");
@@ -153,7 +125,7 @@ public class reorderPoint {
 			}
 			System.out.println();
 		}
-		*/
+		
 		
 		//print cost given a schedule
 		System.out.println("cost when computiong reorder points is: "+optimalCostByInventory[instance.initialInventory - instance.minInventory][0]);
@@ -169,8 +141,8 @@ public class reorderPoint {
 
 		double tail = 0.00000001;
 
-		int minInventory = -100;
-		int maxInventory = 100;
+		int minInventory = -50;
+		int maxInventory = 50;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
@@ -191,12 +163,12 @@ public class reorderPoint {
 				stdParameter
 				);
 
-		sQsystemSolution sQtsolution = reorderQuantitySystem.optimalSchedule_sQt.optimalSchedule_sQt(instance);
+		sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance);
 		
-		System.out.println(sQtsolution.optimalCost);
-		System.out.println(Arrays.toString(sQtsolution.optimalSchedule));
+		System.out.println(sQsolution.optimalCost);
+		System.out.println(Arrays.toString(sQsolution.optimalSchedule));
 		
-		int[] reorderPoint = computeReorderPoint(instance, sQtsolution);
+		int[] reorderPoint = computeReorderPoint(instance, sQsolution);
 		System.out.println(Arrays.toString(reorderPoint));
 
 	}

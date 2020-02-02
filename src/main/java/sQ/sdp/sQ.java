@@ -47,6 +47,9 @@ public class sQ {
 	}
 	
 	public static void presentsQresults(Instance instance, sQsolution sQsolution) {
+		//plotComparedCosts(instance, sQsolution, 0);
+		//printReorderPoints(instance, sQsolution);
+		//System.out.println();
 		printOptimalQuantity(instance, sQsolution);
 		System.out.println();
 		printOpitmalCost(instance, sQsolution);
@@ -145,8 +148,8 @@ public class sQ {
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
+		int minInventory = -100;
+		int maxInventory = 100;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;

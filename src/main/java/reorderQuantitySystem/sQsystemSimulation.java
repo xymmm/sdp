@@ -124,7 +124,7 @@ public class sQsystemSimulation {
 		int maxInventory = 100;
 		double coe = 0.25;
 		int[] demandMean = {2,4,6,4};
-		int[] reorderPoint = {5,-100,7,-100};
+		int[] reorderPoint = {5, -100, 7, -100};
 
 		int[] orderQuantity = {9, 0, 9, 0};
 
