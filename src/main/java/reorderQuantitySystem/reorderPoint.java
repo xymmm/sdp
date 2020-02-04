@@ -110,11 +110,11 @@ public class reorderPoint {
 		for(int i=0; i<inventory.length; i++) {
 			System.out.print((i+instance.minInventory)+" \t");
 			for(int t=0; t<instance.getStages(); t++) {
-				System.out.print(optimalActionByInventory[t][i]+ "\t");
+				System.out.print(optimalActionByInventory[i][t]+ "\t");
 			}
 			System.out.println();
-		}
-		*/
+		}*/
+		
 		
 		/*print all actions by inventory level and time period
 		System.out.println();
@@ -141,8 +141,8 @@ public class reorderPoint {
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
+		int minInventory = -100;
+		int maxInventory = 100;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;

@@ -124,9 +124,9 @@ public class sQsystemSimulation {
 		int maxInventory = 100;
 		double coe = 0.25;
 		int[] demandMean = {2,4,6,4};
-		int[] reorderPoint = {5, -100, 7, -100};
+		int[] reorderPoint = {1,3,5,1};
 
-		int[] orderQuantity = {9, 0, 9, 0};
+		int[] orderQuantity = {9, 9, 9, 9};
 
 		simInstance sQsystem = new simInstance(
 				fixedOrderingCost,
@@ -144,7 +144,7 @@ public class sQsystemSimulation {
 		
 		Chrono timer = new Chrono();
 		
-		int count = 50000;
+		int count = 500000;
 		sQsimPoissonMultiRuns(sQsystem, count);
 		
 		sQsystem.statCost.setConfidenceIntervalStudent();
