@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import sS.sS;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class reorderPoint {
 
@@ -18,7 +19,7 @@ public class reorderPoint {
 	 * 2. for those t with Q[t]!=0, find the switch point , and choose the lower one as the reorder point
 	 * */
 
-	public static int[] computeReorderPoint(Instance instance, sQsystemSolution solution) {
+	public static int[] computeReorderPoint(InstanceDouble instance, sQsystemSolution solution) {
 		int[] reorderPoint = new int [instance.getStages()];
 
 		/**create array for inventory levels**/
@@ -128,7 +129,7 @@ public class reorderPoint {
 		
 		
 		//print cost given a schedule
-		System.out.println("cost when computiong reorder points is: "+optimalCostByInventory[instance.initialInventory - instance.minInventory][0]);
+		System.out.println("cost when computing reorder points is: "+optimalCostByInventory[(int) (instance.initialInventory - instance.minInventory)][0]);
 		return reorderPoint;
 	}
 	
@@ -148,9 +149,9 @@ public class reorderPoint {
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {200, 240, 260, 240};
-		int[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,4,6,4};
 		
-		Instance instance = new Instance(
+		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,

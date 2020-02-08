@@ -9,6 +9,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 import sdp.util.Demand;
 import umontreal.ssj.util.Chrono;
 
@@ -24,7 +25,7 @@ public class sS {
 	 * The probability value is discarded if it is smaller than a given truncation quantile.
 	 * 
 	 * **/
-	public static double[][] computeDemandProbability(int[] demandMean, int maxDemand, double tail) {
+	public static double[][] computeDemandProbability(double[] demandMean, int maxDemand, double tail) {
 		double[][] demandProbability = new double [demandMean.length][maxDemand+1];
 		for(int t=0; t<demandMean.length;t++) {
 			demandProbability[t] = Demand.tabulateProbability(demandMean[t], tail);
@@ -32,7 +33,7 @@ public class sS {
 		return demandProbability;
 	}
 	
-	public static double[][] computeNormalDemandProbability(int[] demandMean, double stdParameter, int maxDemand, double tail){
+	public static double[][] computeNormalDemandProbability(double[] demandMean, double stdParameter, int maxDemand, double tail){
 		double[][] demandProbability = new double [demandMean.length][maxDemand+1];
 		for(int t=0; t<demandMean.length;t++) {
 			demandProbability[t] = Demand.normalProbability(demandMean[t], stdParameter, tail);
@@ -83,7 +84,7 @@ public class sS {
 	}
 	
 	/** Plot the expected optimal cost **/
-	public static void plotOptimalCost(Instance instance, sSsolution solution) {
+	public static void plotOptimalCost(InstanceDouble instance, sSsolution solution) {
 		XYSeries series = new XYSeries("sS Plot");
 		for(int i=0;i<solution.inventory.length;i++) {
 			series.add(i+instance.minInventory,solution.optimalCost[i][0]);
@@ -97,7 +98,7 @@ public class sS {
 	}
 	
 	/** Print reorder points **/
-	public static void prints(sSsolution solution, Instance instance) {
+	public static void prints(sSsolution solution, InstanceDouble instance) {
 		System.out.println("reorder points (s) under (s,S) policy: ");
 		for(int t=0; t<instance.getStages(); t++) {
 			System.out.print(sSsolution.getsSDP(solution.optimalAction)[t]+" ");
@@ -106,7 +107,7 @@ public class sS {
 	}
 
 	/** Print order-up-to levels **/
-	public static void printS(sSsolution solution, Instance instance) {
+	public static void printS(sSsolution solution, InstanceDouble instance) {
 		System.out.println("Order-up-to levels (S) under (s,S) policy: ");
 		for(int t=0; t<instance.getStages(); t++) {
 			System.out.print(sSsolution.getSSDP(solution.optimalAction)[t]+" ");
@@ -115,7 +116,7 @@ public class sS {
 	}
 	
 	/** Present results **/
-	public static void presentsSresults(sSsolution solution, Instance instance) {
+	public static void presentsSresults(sSsolution solution, InstanceDouble instance) {
 		sS.plotOptimalCost(instance, solution);
 		sS.prints(solution, instance);
 		System.out.println();
@@ -127,7 +128,7 @@ public class sS {
 	}
 	
 	/** compute the expected total cost and get optimal actions **/
-	public static sSsolution solveInstance(Instance instance, boolean initialOrder) {
+	public static sSsolution solveInstance(InstanceDouble instance, boolean initialOrder) {
 		/** model stages? **/
 		int Stages = instance.getStages();
 
@@ -234,9 +235,9 @@ public class sS {
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {2,4,6,4};
-		int[] demandMean = {60, 60, 60, 60};
+		double[] demandMean = {60, 60, 60, 60};
 
-		Instance instance = new Instance(
+		InstanceDouble instance = new InstanceDouble(
 										fixedOrderingCost,
 										unitCost,
 										holdingCost,

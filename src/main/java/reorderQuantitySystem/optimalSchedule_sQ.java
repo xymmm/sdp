@@ -5,10 +5,11 @@ import java.util.Arrays;
 import sQ.sdp.sQsolution;
 import sS.sS;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class optimalSchedule_sQ {
 	
-	public static sQsystemSolution optimalSchedule_sQ(Instance instance) {		
+	public static sQsystemSolution optimalSchedule_sQ(InstanceDouble instance) {		
 		
 		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
@@ -22,7 +23,7 @@ public class optimalSchedule_sQ {
 			double[] cost = new double[N];
 			
 			for(int n=0; n<N; n++) {
-				cost[n] = singleScheduleCost.singleScheduleCost(instance, schedule[n], demandProbabilities)[instance.initialInventory -instance.minInventory][0];
+				cost[n] = singleScheduleCost.singleScheduleCost(instance, schedule[n], demandProbabilities)[(int) (instance.initialInventory -instance.minInventory)][0];
 			}
 			bestCost[q-1] = sdp.util.globleMinimum.getGlobalMinimum(cost);
 			bestSchedule[q-1] = schedule[sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(cost)];

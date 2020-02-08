@@ -6,10 +6,11 @@ import java.util.List;
 
 import sS.sS;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class optimalSchedule_sQt {
 	
-	public static sQsystemSolution optimalSchedule_sQt(Instance instance) {
+	public static sQsystemSolution optimalSchedule_sQt(InstanceDouble instance) {
 		
 		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
@@ -28,13 +29,13 @@ public class optimalSchedule_sQt {
 		//SPECIAL CASE: g = 0,1,2
 		costPrevious = singleScheduleCost.singleScheduleCost(instance, 
 															 scheduleGenerator_sQt.sQtschedule(instance.getStages(), 0), 
-															 demandProbabilities)[instance.initialInventory -instance.minInventory][0];
+															 demandProbabilities)[(int) (instance.initialInventory -instance.minInventory)][0];
 		costCurrent  = singleScheduleCost.singleScheduleCost(instance, 
 				 											 scheduleGenerator_sQt.sQtschedule(instance.getStages(), 1), 
-				 											 demandProbabilities)[instance.initialInventory -instance.minInventory][0];
+				 											 demandProbabilities)[(int) (instance.initialInventory -instance.minInventory)][0];
 		costLater    = singleScheduleCost.singleScheduleCost(instance, 
 				 											 scheduleGenerator_sQt.sQtschedule(instance.getStages(), 2), 
-				 											 demandProbabilities)[instance.initialInventory -instance.minInventory][0];
+				 											 demandProbabilities)[(int) (instance.initialInventory -instance.minInventory)][0];
 		if((costPrevious > costCurrent)&&(costCurrent < costLater)) {
 			LocalMinCostsList.add(costCurrent);
 			minGsList.add(1);
@@ -45,7 +46,7 @@ public class optimalSchedule_sQt {
 			costCurrent = costLater;
 			costLater = singleScheduleCost.singleScheduleCost(instance, 
 					 										  scheduleGenerator_sQt.sQtschedule(instance.getStages(), g), 
-					 										  demandProbabilities)[instance.initialInventory -instance.minInventory][0];
+					 										  demandProbabilities)[(int) (instance.initialInventory -instance.minInventory)][0];
 			if((costPrevious > costCurrent)&&(costCurrent < costLater)) {
 				LocalMinCostsList.add(costCurrent);
 				minGsList.add(g-1);
@@ -74,7 +75,7 @@ public class optimalSchedule_sQt {
 		return new sQsystemSolution(optimalSchedule, optimalCost, demandProbabilities);		
 	}
 	
-	/*
+	
 	public static void main(String args[]) {
 		double fixedOrderingCost = 10;
 		double unitCost = 0;
@@ -90,9 +91,9 @@ public class optimalSchedule_sQt {
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {20, 40, 60, 40};
-		int[] demandMean = {2,4,6,4};
+		double[] demandMean = {1,2,1.5,3};
 		
-		Instance instance = new Instance(
+		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
@@ -111,6 +112,6 @@ public class optimalSchedule_sQt {
 		System.out.println(Arrays.toString(sQtsolution.optimalSchedule));
 
 	}
-*/
+
 
 }

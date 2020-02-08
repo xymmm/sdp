@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class scheduleGenerator_sQ {
 		
@@ -25,7 +26,7 @@ public class scheduleGenerator_sQ {
     }
     
     /**generate all schedule for a single given Q**/
-    public static int[][] generateQ(Instance instance, int Q){
+    public static int[][] generateQ(InstanceDouble instance, int Q){
     	int N = (int) Math.pow(2, instance.getStages());   	
     	int[][] schedule = new int[N][instance.getStages()];  	
     	for(int i=0; i<N; i++) {

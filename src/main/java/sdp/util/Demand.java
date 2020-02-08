@@ -22,7 +22,7 @@ public class Demand {
    
    
    
-   public static double[] normalProbability(int meanDemand, double stdPara, double tail) {
+   public static double[] normalProbability(double meanDemand, double stdPara, double tail) {
 	   
 	   double stdDemand = meanDemand * stdPara;
 	   

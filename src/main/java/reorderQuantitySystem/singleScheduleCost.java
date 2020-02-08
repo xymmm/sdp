@@ -5,6 +5,7 @@ import java.util.Arrays;
 import sQ.sdp.sQsolution;
 import sS.sS;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class singleScheduleCost {
 	
@@ -18,10 +19,10 @@ public class singleScheduleCost {
 
 	//another code will be applied for the computation of sQ and sQt optimal quantity.
 
-	public static double[][] singleScheduleCost (Instance instance, int[] Q, double[][] demandProbabilities) {
+	public static double[][] singleScheduleCost (InstanceDouble instance, int[] Q, double[][] demandProbabilities) {
 
 		/**create array for inventory levels**/
-		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
+		double[] inventory = new double [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
 		}
@@ -105,9 +106,9 @@ public class singleScheduleCost {
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {20, 40, 60, 40};
-		int[] demandMean = {2,4,6,4};
+		double[] demandMean = {1,2,1.5,3};
 		
-		Instance instance = new Instance(
+		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
@@ -132,7 +133,7 @@ public class singleScheduleCost {
 		System.out.println();
 		int Q[] = {9,0,9,0};
 		double[][] costsQ = singleScheduleCost(instance, Q, demandProbabilities);
-		System.out.println("Optimal cost under (s,Q) policy is: "+costsQ[instance.initialInventory - instance.minInventory][0]);
+		System.out.println("Optimal cost under (s,Q) policy is: "+costsQ[(int) (instance.initialInventory - instance.minInventory)][0]);
 		
 		/*
 		for(int i=0; i<instance.maxInventory - instance.minInventory + 1; i++) {

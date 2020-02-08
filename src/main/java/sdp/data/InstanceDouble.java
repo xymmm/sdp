@@ -8,7 +8,7 @@ public class InstanceDouble {
 	   public double unitCost;
 	   public double holdingCost;
 	   public double penaltyCost;
-	   public int[] demandMean;
+	   public double[] demandMean;
 	   public double initialInventory = 0;
 	   
 	   public double stdParameter;
@@ -18,20 +18,20 @@ public class InstanceDouble {
 	   public double tail;
 	   
 	   public int maxDemand;
-	   public double minInventory;
-	   public double maxInventory;
-	   public double maxQuantity;
+	   public int minInventory;
+	   public int maxInventory;
+	   public int maxQuantity;
 	   
 	   public InstanceDouble(
 	         double fixedOrderingCost,
 	         double unitCost,
 	         double holdingCost,
 	         double penaltyCost,
-	         int[] demandMean,
+	         double[] demandMean,
 	         double tail,
-	         double minInventory,
-	         double maxInventory,
-	         double maxQuantity,
+	         int minInventory,
+	         int maxInventory,
+	         int maxQuantity,
 	         double stdParameter) {
 	      this.fixedOrderingCost = fixedOrderingCost;
 	      this.unitCost = unitCost;
