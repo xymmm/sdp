@@ -91,7 +91,7 @@ public class sQt {
 	}
 
 
-	public static double sQtgeneratedSingle(Instance instance, int g, double[][] demandProbabilities, boolean print) {		
+	public static double sQtgeneratedSingle(InstanceDouble instance, int g, double[][] demandProbabilities, boolean print) {		
 		
 		double[] inventory = new double[(int) (instance.maxInventory - instance.minInventory + 1)];
 		for(int i=0;i<inventory.length;i++) {
@@ -155,7 +155,7 @@ public class sQt {
 		return totalCost[(int)(instance.initialInventory -instance.minInventory)][0];
 	}
 	
-	public static sQtSolution sQtMultipleG(Instance instance) {
+	public static sQtSolution sQtMultipleG(InstanceDouble instance) {
 		
 		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
 		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
@@ -236,9 +236,9 @@ public class sQt {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,4,6,4};
 
-		Instance instance = new Instance(
+		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,

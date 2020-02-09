@@ -136,14 +136,10 @@ public class sQsimPoisson {
 		double maxInventory = 50;
 		double coe = 0.25;
 		//1,28,108,164,106,20
-		int[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,4,6,4};
 		double[] reorderPoint = {7,-50,7,-50};
-		/*
-		double Q = 242;
-		double[] actionQuantity = new double[reorderPoint.length];
-		for(int t=0; t<actionQuantity.length;t++) {
-			actionQuantity[t] = Q;
-		}*/double[] actionQuantity = {8, 0, 9, 0};
+
+		double[] actionQuantity = {8, 0, 9, 0};
 
 		sQsimInstanceDouble sQsystem1 = new sQsimInstanceDouble(
 				fixedOrderingCost,

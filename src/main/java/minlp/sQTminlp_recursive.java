@@ -23,7 +23,7 @@ import ilog.opl.IloOplSettings;
 
 public class sQTminlp_recursive {
 	
-	int[] 		demandMean;
+	double[] 		demandMean;
 	double 		holdingCost;
 	double 		fixedCost;
 	double 		unitCost;
@@ -33,7 +33,7 @@ public class sQTminlp_recursive {
 	
 	String instanceIdentifier;
 	
-	public sQTminlp_recursive(int[] demandMean, 
+	public sQTminlp_recursive(double[] demandMean, 
 				   double holdingCost,
 				   double fixedCost,
 				   double unitCost,
@@ -111,7 +111,7 @@ public class sQTminlp_recursive {
             handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
             handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
             handler.startElement("meandemand"); handler.startArray();
-            for (int j = 0 ; j<demandMean.length ; j++) {handler.addIntItem(demandMean[j]);}
+            for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
             handler.endArray(); handler.endElement();
             handler.startElement("initialStock"); handler.addIntItem(initialStock); handler.endElement();
             
@@ -169,8 +169,8 @@ public class sQTminlp_recursive {
 
 
 	public static void main(String[] args) {
-		int[] demandMean = {2,4,6,4};
-		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
+		double[] demandMean = {2,4,6,4};
+		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		double fixedCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;

@@ -2,6 +2,7 @@ package sQt.generatedQ;
 
 import sQ.sdp.sQreorderPointSolution;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class sQtReorderPointSolution {
 	
@@ -23,10 +24,10 @@ public class sQtReorderPointSolution {
 		this.timeConsumed_sQtst = timeConsumed_sQtst;
 	}
 	
-	public int[] getsGivenQ(Instance instance, sQtReorderPointSolution sQtgeneratedQ_s_solution) {
+	public int[] getsGivenQ(InstanceDouble instance, sQtReorderPointSolution sQtgeneratedQ_s_solution) {
 		int[] s = new int[instance.getStages()];
 		for(int t=0;t<instance.getStages();t++) { // Time
-			for(int i=(instance.initialInventory - instance.minInventory);i<(instance.maxInventory - instance.minInventory+1);i++) {  // Inventory   
+			for(int i=(int) (instance.initialInventory - instance.minInventory);i<(instance.maxInventory - instance.minInventory+1);i++) {  // Inventory   
 				if(sQtgeneratedQ_s_solution.actionGivenQ[t][i] == false) {
 					s[t] = i + instance.minInventory;
 					break;

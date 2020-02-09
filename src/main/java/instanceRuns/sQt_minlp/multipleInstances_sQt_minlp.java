@@ -57,7 +57,7 @@ public class multipleInstances_sQt_minlp {
 		int initialInventoryLevel = 0;
 		int partitions = 10;*/
 		
-		int[][] demandMean = {{2,4,6,4}};
+		double[][] demandMean = {{2,4,6,4}};
 		double[] fixedCost = {10};
 		double[] unitCost = {0};
 		double holdingCost = 1;
@@ -138,7 +138,7 @@ public class multipleInstances_sQt_minlp {
 						int[] s_minlp = new int[demandMean[d].length];
 						double[] cost_i = new double[maxInventory - minInventory +1];
 						long reMINLPstartTime = System.currentTimeMillis();
-						int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean[d]);
+						double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean[d]);
 						for(int t=0; t<demandMean[d].length; t++) {
 							for(int i=0; i<inventory.length; i++) {
 								try {

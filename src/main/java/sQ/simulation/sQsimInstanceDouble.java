@@ -11,7 +11,7 @@ public class sQsimInstanceDouble {
 	public double holdingCost;
 	public double penaltyCost;
 	
-	public int[] demandMean;
+	public double[] demandMean;
 	public double initialInventory = 0;
 
 	/** SDP boundary conditions **/
@@ -34,7 +34,7 @@ public class sQsimInstanceDouble {
 			double unitCost,
 			double holdingCost,
 			double penaltyCost,
-			int[] demandMean,
+			double[] demandMean,
 			double tail,
 			double minInventory,
 			double maxInventory,

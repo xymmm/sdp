@@ -24,8 +24,6 @@ public class mainComputation {
 
 		double stdParameter = 0.25;
 
-		//int[] demandMean = {60, 60, 60, 60};
-		//int[] demandMean = {2,4,6,4};
 		double[] demandMean = {1, 2, 1.5, 3};
 		
 		InstanceDouble instance = new InstanceDouble(fixedOrderingCost, unitCost, holdingCost, penaltyCost,

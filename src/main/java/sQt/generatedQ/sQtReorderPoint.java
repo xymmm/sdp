@@ -13,6 +13,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import sQ.sdp.sQreorderPointSolution;
 import sS.sS;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class sQtReorderPoint {
 	
@@ -30,7 +31,7 @@ public class sQtReorderPoint {
 		frame.setSize(1800,1500);
 	}
 	/**plot TWO costs with a given Q - Reorder & Non-reorder**/
-	public static void plotTwoCostGivenQ(double[][] costOrder, double[][] costNoOrder, int Q, int stageIndex, Instance instance) {
+	public static void plotTwoCostGivenQ(double[][] costOrder, double[][] costNoOrder, int Q, int stageIndex, InstanceDouble instance) {
 		  XYSeries series1 = new XYSeries("Cost with Reorder");
 	      for(int i=0;i<costOrder[0].length;i++) {
 	    	  series1.add((i+instance.minInventory),costOrder[stageIndex][i]);
@@ -64,7 +65,7 @@ public class sQtReorderPoint {
 	}
 
 	/****compute cost function f(Q,t,i) with given t and Q****/
-	public static sQtReorderPointSolution costVaryingWithInventory(int[] Q, Instance instance, boolean initialOrder){
+	public static sQtReorderPointSolution costVaryingWithInventory(int[] Q, InstanceDouble instance, boolean initialOrder){
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
@@ -156,13 +157,13 @@ public class sQtReorderPoint {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,4,6,4};
 
 		
 		int[] Q = {8, 0, 9, 0};
 		
 
-		Instance instance = new Instance(
+		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,

@@ -10,6 +10,7 @@ import sQt.generatedQ.sQtReorderPointSolution;
 import sQt.generatedQ.sQt;
 import sQt.generatedQ.sQtSolution;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 import umontreal.ssj.util.Chrono;
 
 public class multipleInstances_sQt_inAll {
@@ -21,7 +22,7 @@ public class multipleInstances_sQt_inAll {
 	 * 
 	 * */
 	
-	public static void multi_sQt(int[][] demandMean, double[] fixedCost, double[] penaltyCost, double[] unitCost, double holdingCost, 
+	public static void multi_sQt(double[][] demandMean, double[] fixedCost, double[] penaltyCost, double[] unitCost, double holdingCost, 
 			int[] minInventory, int[] maxInventory, int maxQuantity, int partitions, int initialInventoryLevel) {
 
 		
@@ -103,10 +104,10 @@ public class multipleInstances_sQt_inAll {
 						/*sdp*/
 						/*================================================================================================*/
 						//create instance
-						Instance instance = new Instance(
+						InstanceDouble instance = new InstanceDouble(
 								fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], demandMean[d],
 								0.00000001, minInventory[d], maxInventory[d], maxQuantity, 0.1);
-						//solve sQt - sdp
+
 						sQtSolution sQtsolution = sQt.sQtMultipleG(instance);
 						int[] Q = new int[demandMean[d].length];
 						for(int t=0; t<instance.getStages();t++) { Q[t] = (int)sQtsolution.optQ[t]; }
@@ -154,7 +155,7 @@ public class multipleInstances_sQt_inAll {
 						int[] s_minlp = new int[demandMean[d].length];
 						double[] cost_i = new double[maxInventory[d] - minInventory[d] +1];
 						long reMINLPstartTime = System.currentTimeMillis();
-						int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean[d]);
+						double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean[d]);
 						for(int t=0; t<demandMean[d].length; t++) {
 							for(int i=0; i<inventory.length; i++) {
 								try {

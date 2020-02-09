@@ -18,6 +18,7 @@ import sQ.simulation.sQsimPoisson;
 import sS.sS;
 import sS.sSsolution;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 import umontreal.ssj.util.Chrono;
 
 public class multipleInstances_sQ_inAll {
@@ -32,7 +33,7 @@ public class multipleInstances_sQ_inAll {
 	 * 
 	 * */
 
-	public static void multi_sQ (int[][] demandMean, double[] fixedCost, double[] penaltyCost, double[] unitCost, double holdingCost, 
+	public static void multi_sQ (double[][] demandMean, double[] fixedCost, double[] penaltyCost, double[] unitCost, double holdingCost, 
 			int[] minInventory, int[] maxInventory, int[] maxQuantity,
 			int partitions, double initialInventoryLevel,
 			boolean rangeQ,
@@ -123,7 +124,7 @@ public class multipleInstances_sQ_inAll {
 						/*================================================================================================*/
 						/*sS*/
 						/*================================================================================================*/
-						Instance sSinstance = new Instance(
+						InstanceDouble sSinstance = new InstanceDouble(
 								fixedCost[f], unitCost[u], holdingCost,penaltyCost[p],demandMean[d],
 								0.00000001, minInventory[d], maxInventory[d], maxQuantity[d], 0.1 );
 						sSsolution solution = sS.solveInstance(sSinstance, true);
@@ -137,7 +138,7 @@ public class multipleInstances_sQ_inAll {
 						/*================================================================================================*/
 
 						//create instance
-						Instance instance = new Instance(
+						InstanceDouble instance = new InstanceDouble(
 								fixedCost[f], unitCost[u], holdingCost,penaltyCost[p],demandMean[d],
 								0.00000001, minInventory[d], maxInventory[d], maxQuantity[d], 0.1 );
 						//solve sQ - sdp
@@ -147,7 +148,7 @@ public class multipleInstances_sQ_inAll {
 								sQsolution.timeConsumedsQ, 
 								fileTimeSDPcost);														//time for Q & cost
 						sdp.util.writeText.writeDouble(
-								sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_a(instance)+1][0], 
+								sQsolution.totalCost[(int) (instance.initialInventory - instance.minInventory)][sQsolution.getOpt_a(instance)+1][0], 
 								fileSDPcost);															//cost
 						int Q = sQsolution.getOpt_a(instance)+1;
 						sdp.util.writeText.writeInt(Q, fileSDPQ);										//Q
@@ -196,7 +197,7 @@ public class multipleInstances_sQ_inAll {
 						long reMINLPstartTime = System.currentTimeMillis();
 
 						int Q_minlpInt = (int) Math.ceil(Q_minlp);
-						int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean[d]);
+						double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean[d]);
 						int[] s_minlp = new int[demandMean[d].length]; 
 						for(int t=0; t<demandMean[d].length; t++) {
 							sQminlpInstance sQminlpInstance = new sQminlpInstance(

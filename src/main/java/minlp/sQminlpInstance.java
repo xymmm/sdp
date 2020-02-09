@@ -2,7 +2,7 @@ package minlp;
 
 public class sQminlpInstance {
 	
-	public int[] demandMean;
+	public double[] demandMean;
 	public double fixedCost;
 	public double unitCost;
 	public double holdingCost;
@@ -16,7 +16,7 @@ public class sQminlpInstance {
 	public int Q_minlp;
 
 	public sQminlpInstance(
-			int[] demandMean,
+			double[] demandMean,
 			double fixedCost,
 			double unitCost,
 			double holdingCost,

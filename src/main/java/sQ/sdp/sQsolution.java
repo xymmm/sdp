@@ -1,6 +1,7 @@
 package sQ.sdp;
 
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class sQsolution {
 
@@ -20,14 +21,14 @@ public class sQsolution {
 	}
 
 	
-	public int getOpt_a(Instance instance) {
+	public int getOpt_a(InstanceDouble instance) {
 		// Determine the optimal a. What is the optimal a?
 		int a = 0;
 		int minIndex = a;
-		double minCost = totalCost[minIndex][instance.initialInventory - instance.minInventory][0]; //Time zero
+		double minCost = totalCost[minIndex][(int) (instance.initialInventory - instance.minInventory)][0]; //Time zero
 		do {
-			if(minCost > totalCost[a+1][instance.initialInventory - instance.minInventory][0]) {
-				minCost = totalCost[a+1][instance.initialInventory - instance.minInventory][0];
+			if(minCost > totalCost[a+1][(int) (instance.initialInventory - instance.minInventory)][0]) {
+				minCost = totalCost[a+1][(int) (instance.initialInventory - instance.minInventory)][0];
 				minIndex = a+1;
 			}
 			a = a + 1;

@@ -13,6 +13,7 @@ import sQ.sdp.sQsolution;
 import sS.sS;
 import sS.sSsolution;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class multipleInstances_sQ{
 	
@@ -63,7 +64,7 @@ public class multipleInstances_sQ{
 		int maxQuantity = 9;*/
 		
 		/*demand - 10 periods*/
-		int demandMean[][] = {
+		double demandMean[][] = {
 				{23		,42		,70		,103	,136	,161	,170	,161	,136	,103},
 				{103	,136	,161	,170	,161	,136	,103	,70		,42		,23},
 				{76		,27		,10		,36		,88		,68		,22		,11		,42		,96},
@@ -125,7 +126,7 @@ public class multipleInstances_sQ{
 
 					for(int d=0; d<demandMean.length; d++) {
 						//create instance
-						Instance instance = new Instance(
+						InstanceDouble instance = new InstanceDouble(
 								fixedCost[f], unitCost[u], holdingCost,penaltyCost[p],demandMean[d],
 								0.00000001, minInventory, maxInventory, maxQuantity, 0.1 );
 						//solve sQ - sdp
@@ -135,7 +136,7 @@ public class multipleInstances_sQ{
 								sQsolution.timeConsumedsQ, 
 								"src/main/java/instanceRuns/sQ_sdp/sQ_sdp_time_QandCost.txt");														//time for Q & cost
 						sdp.util.writeText.writeDouble(
-								sQsolution.totalCost[instance.initialInventory - instance.minInventory][sQsolution.getOpt_a(instance)+1][0], 
+								sQsolution.totalCost[(int) (instance.initialInventory - instance.minInventory)][sQsolution.getOpt_a(instance)+1][0], 
 								"src/main/java/instanceRuns/sQ_sdp/sQ_sdp_cost.txt");																//cost
 						int Q = sQsolution.getOpt_a(instance)+1;
 						sdp.util.writeText.writeInt(Q, "src/main/java/instanceRuns/sQ_sdp/sQ_sdp_Q.txt");											//Q

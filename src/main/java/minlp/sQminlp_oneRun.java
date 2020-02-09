@@ -20,7 +20,7 @@ import ilog.opl.IloOplSettings;
 
 public class sQminlp_oneRun{
 
-	int[] 	demandMean;
+	double[] 	demandMean;
 	double 	holdingCost;
 	double 	fixedCost;
 	double 	unitCost;
@@ -30,7 +30,7 @@ public class sQminlp_oneRun{
 	
 	String instanceIdentifier;
 	
-	public sQminlp_oneRun(int[] demandMean, 
+	public sQminlp_oneRun(double[] demandMean, 
 				   double holdingCost,
 				   double fixedCost,
 				   double unitCost,
@@ -48,7 +48,7 @@ public class sQminlp_oneRun{
 	}
 	
 	/** compute lamda matrix for linearisation of Poisson distribution **/
-	public static double[][][] getLamdaMatrix (int[] demandMean, int partitions, int nbSamples){
+	public static double[][][] getLamdaMatrix (double[] demandMean, int partitions, int nbSamples){
 		double[][][] coefficients = PoissonPiecewise.possionPiecewisePartitions.lamdaMatrix(demandMean, partitions, nbSamples);
 		return coefficients;
 	}
@@ -119,7 +119,7 @@ public class sQminlp_oneRun{
 		
 		long startTime = System.currentTimeMillis();
 		
-		int[] demandMean = {12	,7	, 10	,13	,7	,12};
+		double[] demandMean = {2,4,6,4};
 		double fixedCost = 10;//5,10,20
 		double unitCost = 1;//0,1
 		double holdingCost = 1;
@@ -166,8 +166,8 @@ public class sQminlp_oneRun{
             handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
             handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
             handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
-            
             handler.startElement("meandemand"); handler.startArray();
+            
             for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
             handler.endArray(); handler.endElement();
             

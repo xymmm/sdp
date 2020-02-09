@@ -5,7 +5,7 @@ public class multi_sQt_main {
 	public static void main(String args[]) {
 		
 		/*demand - 6 periods*/
-		int demandMean [][] = {
+		double demandMean [][] = {
 				{10	,12	,10	,6	,5	,2	},
 				{2	,5	,6	,10	,12	,10	},
 				{15	,4	,10	,18	,4	,10	},

@@ -16,20 +16,21 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import sS.sS;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 import umontreal.ssj.util.Chrono;
 
 public class sQ {
 	
 	/** print optimal quantity **/
-	public static void printOptimalQuantity(Instance instance, sQsolution sQsolution) {
+	public static void printOptimalQuantity(InstanceDouble instance, sQsolution sQsolution) {
 		System.out.println("Optimal Q for all periods is: ");
 		System.out.println(sQsolution.getOpt_a(instance)+1);
 	}
 	
 	/** print cost of optimal quantity **/
-	public static void printOpitmalCost(Instance instance, sQsolution sQsolution){
+	public static void printOpitmalCost(InstanceDouble instance, sQsolution sQsolution){
 		System.out.println("Optimal cost with initial inventory level " +(instance.initialInventory)+" is: ");
-		System.out.println(sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][instance.initialInventory - instance.minInventory][0]);
+		System.out.println(sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][(int) (instance.initialInventory - instance.minInventory)][0]);
 	}
 
 	/** Plot costs - cost with no action and with a given Q for a given stage**/
@@ -46,7 +47,7 @@ public class sQ {
 		frame.setSize(1500,1200);
 	}
 	
-	public static void presentsQresults(Instance instance, sQsolution sQsolution) {
+	public static void presentsQresults(InstanceDouble instance, sQsolution sQsolution) {
 		//plotComparedCosts(instance, sQsolution, 0);
 		//printReorderPoints(instance, sQsolution);
 		//System.out.println();
@@ -56,7 +57,7 @@ public class sQ {
 	}
 
 	/** main computation **/
-	public static sQsolution solvesQInstance(Instance instance) {
+	public static sQsolution solvesQInstance(InstanceDouble instance) {
 
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
@@ -155,9 +156,9 @@ public class sQ {
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {20, 40, 60, 40};
-		int[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,4,6,4};
 		
-		Instance instance = new Instance(
+		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
 				unitCost,
 				holdingCost,
@@ -190,7 +191,7 @@ public class sQ {
 		for(int t=0; t<instance.getStages();t++) {
 			System.out.println("a: " + (sQsolution.getOpt_a(instance)+1) + "\t"
 								+ "t: "+ (t+1)+ "\t"  
-								+sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][instance.initialInventory - instance.minInventory][t]);
+								+sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][(int) (instance.initialInventory - instance.minInventory)][t]);
 		}
 		
 		for(int i=0; i<sQsolution.inventory.length;i++) {

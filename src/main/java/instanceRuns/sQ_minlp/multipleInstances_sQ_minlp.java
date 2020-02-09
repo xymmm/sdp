@@ -65,7 +65,7 @@ public class multipleInstances_sQ_minlp {
 		int[][] s_sdp = {};*/
 
 		/*demand - 10 periods*/
-		int demandMean[][] = {
+		double demandMean[][] = {
 				{23		,42		,70		,103	,136	,161	,170	,161	,136	,103},
 				{103	,136	,161	,170	,161	,136	,103	,70		,42		,23},
 				{76		,27		,10		,36		,88		,68		,22		,11		,42		,96},
@@ -172,7 +172,7 @@ public class multipleInstances_sQ_minlp {
 						/*2. solve sQ-minlp recursive for st **********************************************************************************************/
 						long reMINLPstartTime = System.currentTimeMillis();
 						int Q_minlpInt = (int) Math.ceil(Q_minlp);
-						int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean[d]);
+						double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean[d]);
 						int[] s_minlp = new int[demandMean[d].length];
 						
 						for(int t=0; t<demandMean[d].length; t++) {

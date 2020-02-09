@@ -5,7 +5,7 @@ public class multi_sQ_10periods_34_main {
 	public static void main(String args[]) throws Exception {
 		
 		/*demand - 10 periods*/
-		int demandMean[][] = {
+		double demandMean[][] = {
 				{76		,27		,10		,36		,88		,68		,22		,11		,42		,96},
 				{103	,85		,73		,98		,124	,130	,109	,80		,69		,78}
 		};		

@@ -3,6 +3,7 @@ package instanceRuns.sS_sdp;
 import sS.sS;
 import sS.sSsolution;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class multipleInstances_sS {
 
@@ -20,7 +21,7 @@ public class multipleInstances_sS {
 	 * time	-> "src/main/java/instanceRuns/sS_sdp/sS_sdp_time.txt"
 	 */
 
-	public static void multi_sS(int[][] demandMean, double[] fixedCost, double[] penaltyCost, double[] unitCost, double holdingCost, 
+	public static void multi_sS(double[][] demandMean, double[] fixedCost, double[] penaltyCost, double[] unitCost, double holdingCost, 
 			int[] minInventory, int maxInventory[], int maxQuantity[],
 			String filesScost, String filesStime) {		
 
@@ -53,7 +54,7 @@ public class multipleInstances_sS {
 
 
 
-						Instance instance = new Instance(
+						InstanceDouble instance = new InstanceDouble(
 								fixedCost[f], unitCost[u], holdingCost,penaltyCost[p],demandMean[d],
 								0.00000001, minInventory[d], maxInventory[d], maxQuantity[d], 0.1 );
 						sSsolution solution = sS.solveInstance(instance, true);

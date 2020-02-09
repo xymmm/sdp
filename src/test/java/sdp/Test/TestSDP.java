@@ -9,6 +9,7 @@ import org.junit.Test;
 import sS.sS;
 import sS.sSsolution;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class TestSDP {
 
@@ -20,13 +21,13 @@ public class TestSDP {
    public void tearDown() throws Exception {
    }
    
-   public static Instance getInstanceA() {
+   public static InstanceDouble getInstanceA() {
       /*** Problem instance ***/
       double fixedOrderingCost = 178;
       double unitCost = 0;
       double holdingCost = 1;
       double penaltyCost = 4;
-      int[] demandMean = {20, 10, 93, 29, 49, 97, 37, 60, 38, 47};
+      double[] demandMean = {20, 10, 93, 29, 49, 97, 37, 60, 38, 47};
       
       
       /** SDP boundary conditions **/
@@ -38,7 +39,7 @@ public class TestSDP {
       double stdParameter = 0.25;
 
 
-      return new Instance(
+      return new InstanceDouble(
             fixedOrderingCost,
             unitCost,
             holdingCost,
@@ -52,13 +53,13 @@ public class TestSDP {
             );
    }
    
-   public static Instance getInstanceB() {
+   public static InstanceDouble getInstanceB() {
       /*** Problem instance ***/
       double fixedOrderingCost = 336;
       double unitCost = 0;
       double holdingCost = 1;
       double penaltyCost = 5;
-      int[] demandMean = {50, 12, 97, 27, 74, 59, 7, 46, 78, 63};
+      double[] demandMean = {50, 12, 97, 27, 74, 59, 7, 46, 78, 63};
       
       
       /** SDP boundary conditions **/
@@ -69,7 +70,7 @@ public class TestSDP {
 
       double stdParameter = 0.25;
       
-      return new Instance(
+      return new InstanceDouble(
             fixedOrderingCost,
             unitCost,
             holdingCost,
@@ -83,13 +84,13 @@ public class TestSDP {
             );
    }
    
-   public static Instance getInstanceC() {
+   public static InstanceDouble getInstanceC() {
       /*** Problem instance ***/
       double fixedOrderingCost = 122;
       double unitCost = 0;
       double holdingCost = 1;
       double penaltyCost = 2;
-      int[] demandMean = {6, 18, 44, 54, 26, 50, 54, 73, 18, 53};
+      double[] demandMean = {6, 18, 44, 54, 26, 50, 54, 73, 18, 53};
       
       
       /** SDP boundary conditions **/
@@ -101,7 +102,7 @@ public class TestSDP {
       
       double stdParameter = 0.25;
 
-      return new Instance(
+      return new InstanceDouble(
             fixedOrderingCost,
             unitCost,
             holdingCost,
@@ -117,7 +118,7 @@ public class TestSDP {
    
    @Test
    public void testInstanceA() {
-      Instance instance = getInstanceA();
+      InstanceDouble instance = getInstanceA();
       
       sSsolution solution = sS.solveInstance(instance,false);
       
@@ -130,7 +131,7 @@ public class TestSDP {
    
    @Test
    public void testInstanceB() {
-      Instance instance = getInstanceB();
+      InstanceDouble instance = getInstanceB();
       
       sSsolution solution = sS.solveInstance(instance,false);
       
@@ -143,7 +144,7 @@ public class TestSDP {
    
    @Test
    public void testInstanceC() {
-      Instance instance = getInstanceC();
+      InstanceDouble instance = getInstanceC();
       
       sSsolution solution = sS.solveInstance(instance,false);
       

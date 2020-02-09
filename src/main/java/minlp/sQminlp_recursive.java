@@ -30,7 +30,7 @@ import ilog.opl.IloOplSettings;
 
 public class sQminlp_recursive {
 	
-	int[] 	demandMean;
+	double[] 	demandMean;
 	double 	holdingCost;
 	double 	fixedCost;
 	double 	unitCost;
@@ -41,7 +41,7 @@ public class sQminlp_recursive {
 	
 	String instanceIdentifier;
 	
-	public sQminlp_recursive(int[] demandMean, 
+	public sQminlp_recursive(double[] demandMean, 
 				   double holdingCost,
 				   double fixedCost,
 				   double unitCost,
@@ -306,8 +306,8 @@ public class sQminlp_recursive {
 		
 		//writeToText(0,true, writeFileName);
 			
-		int[] demandMean = {20, 40, 60, 40};
-		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
+		double[] demandMean = {20, 40, 60, 40};
+		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		
 		double fixedCost = 100;
 		double unitCost = 0;

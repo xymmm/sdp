@@ -46,7 +46,7 @@ public class multipleInstances_sQt {
 	public static void main(String[] args) {
 			
 		/*demand - 6 periods*/
-		int demandMean [][] = {
+		double demandMean [][] = {
 				{10	,12	,10	,6	,5	,2	},
 				{2	,5	,6	,10	,12	,10	},
 				{15	,4	,10	,18	,4	,10	},
@@ -108,7 +108,7 @@ public class multipleInstances_sQt {
 
 					for(int d=0; d<demandMean.length; d++) {
 						//create instance
-						Instance instance = new Instance(
+						InstanceDouble instance = new InstanceDouble(
 								fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], demandMean[d],
 								0.00000001, minInventory, maxInventory, maxQuantity, 0.1);
 						//solve sQt - sdp

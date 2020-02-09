@@ -12,6 +12,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import sS.sS;
 import sdp.data.Instance;
+import sdp.data.InstanceDouble;
 
 public class sQreorderPoint {
 
@@ -37,7 +38,7 @@ public class sQreorderPoint {
 
 
 	/****compute cost function f(Q,t,i) with given t and Q****/
-	public static sQreorderPointSolution costVaryingWithInventory(int Q, Instance instance, boolean initialOrder){
+	public static sQreorderPointSolution costVaryingWithInventory(int Q, InstanceDouble instance, boolean initialOrder){
 		long startTime = System.currentTimeMillis();
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
@@ -128,8 +129,8 @@ public class sQreorderPoint {
 
 		double stdParameter = 0.25;
 
-		int[] demandMean = {2,4,6,4};
-		int[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
+		double[] demandMean = {2,4,6,4};
+		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 
 		int Q = 84;
 
@@ -141,7 +142,7 @@ public class sQreorderPoint {
 		for(int d=0; d<1;d++) {
 
 			/** create and resolve instance**/
-			Instance instance = new Instance(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMeanInput[d], 
+			InstanceDouble instance = new InstanceDouble(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMeanInput[d], 
 					tail, minInventory, maxInventory, maxQuantity, stdParameter );	
 			//determine s by compare c(s) and c(s+Q)
 			sQreorderPointSolution sQgivenQ = costVaryingWithInventory(Q,instance,false);

@@ -116,15 +116,9 @@ public class sQsimNormal {
 		double coe = 0.25;
 		
 		//instance classic
-		int[] demandMean = {20,40,60,40};
-		//double[] reorderPoint = {16,30,57,30};	//MINLP p4
-		//double[] reorderPoint = {16, 30, 58, 29}; //MINLP p10
-		//double Q = 83.743;						//MINLP
-		//double[] reorderPoint = {13,35,57,24};	//SDP
-		//double Q = 84;							//SDP
+		double[] demandMean = {20,40,60,40};
 		double Q = 9;								//SDP sQ
 		double[] reorderPoint = {139, 124, 88, 31};	//SDP sQ, SDP sQt
-		//double[] actionQuantity = {9,9,9,0};		//SDP sQt
 
 		
 		double[] actionQuantity = new double[reorderPoint.length];

@@ -10,7 +10,7 @@ import org.apache.commons.math3.distribution.PoissonDistribution;
 public class possionPiecewisePartitions {
 	
 	/**formulate 3D matrix for d_jt with p partitions**/
-	public static double[][][] lamdaMatrix(int[] demandMean, int partitions, int nbSamples){
+	public static double[][][] lamdaMatrix(double[] demandMean, int partitions, int nbSamples){
 		double[][][] lamdaMatrix = new double [demandMean.length][demandMean.length][partitions];
 		for(int t=0; t<demandMean.length; t++) {
 			//System.out.println("t = "+t);
@@ -23,7 +23,7 @@ public class possionPiecewisePartitions {
 		return lamdaMatrix;
 	}
 	
-	public static int convolution(int[] demandMean, int indexLower, int indexUpper) {
+	public static int convolution(double[] demandMean, int indexLower, int indexUpper) {
 		int sum = 0;
 		for(int i=indexLower; i<=indexUpper; i++) {
 			sum += demandMean[i];
@@ -97,8 +97,8 @@ public class possionPiecewisePartitions {
 		}
 	}
 	
-	public static int[] getDemandMeanArray(int[] demandMeanInput, int indexStart) {
-		int[] demandMean = new int[demandMeanInput.length - indexStart];
+	public static double[] getDemandMeanArray(double[] demandMeanInput, int indexStart) {
+		double[] demandMean = new double[demandMeanInput.length - indexStart];
 		for(int j=0; j<demandMean.length; j++) {
 			demandMean[j] = demandMeanInput[indexStart + j];
 		}
@@ -107,12 +107,12 @@ public class possionPiecewisePartitions {
 
 
 	public static void main(String[] args) {
-		int [] demandMeanInput = {1,23,42,70, 103, 136, 161, 170, 161, 136, 103};
+		double [] demandMeanInput = {1,23,42,70, 103, 136, 161, 170, 161, 136, 103};
 		int nbSamples = 100000;
 		int partitions = 10;
 		//for(int d=0; d<demandMeanInput.length; d++) {
 			for(int i=0; i<1; i++) {
-				int[] demandMean = getDemandMeanArray(demandMeanInput, i);
+				double[] demandMean = getDemandMeanArray(demandMeanInput, i);
 				double[][][] coefficients = lamdaMatrix(demandMean, partitions, nbSamples);
 				System.out.println(Arrays.deepToString(coefficients));	
 				writeToText(coefficients);		

@@ -20,22 +20,22 @@ import ilog.opl.IloOplSettings;
 
 public class sQTminlp_oneRun {
 
-	int[] 		demandMean;
+	double[] 		demandMean;
 	double 		holdingCost;
 	double 		fixedCost;
 	double 		unitCost;
 	double 		penaltyCost;
-	int 		initialStock;
+	double 		initialInventoryLevel;
 	int 		partitions;
 
 	String instanceIdentifier;
 
-	public sQTminlp_oneRun(int[] demandMean, 
+	public sQTminlp_oneRun(double[] demandMean, 
 			double holdingCost,
 			double fixedCost,
 			double unitCost,
 			double penaltyCost,
-			int initialStock,
+			double initialInventoryLevel,
 			int 	  partitions,
 			String instanceIdentifier) {
 		this.demandMean 	= demandMean;
@@ -43,7 +43,7 @@ public class sQTminlp_oneRun {
 		this.fixedCost 		= fixedCost;
 		this.unitCost 		= unitCost;
 		this.penaltyCost 	= penaltyCost;
-		this.initialStock 	= initialStock;
+		this.initialInventoryLevel 	= initialInventoryLevel;
 		this.partitions 	= partitions;
 	}
 
@@ -116,9 +116,11 @@ public class sQTminlp_oneRun {
 			handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
 			handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
 			handler.startElement("meandemand"); handler.startArray();
-			for (int j = 0 ; j<demandMean.length ; j++) {handler.addIntItem(demandMean[j]);}
-			handler.endArray(); handler.endElement();
-			handler.startElement("initialStock"); handler.addIntItem(initialStock); handler.endElement();
+			
+            for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
+            handler.endArray(); handler.endElement();
+			
+			handler.startElement("initialInventoryLevel"); handler.addNumItem(initialInventoryLevel); handler.endElement();
 
 			//piecewise
 			handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
@@ -149,13 +151,13 @@ public class sQTminlp_oneRun {
 	}
 
 	public static void main(String[] args) {
-		int[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,4,6,4};
 		double fixedCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 5;
 
-		int initialStock = 0;
+		double initialInventoryLevel = 0;
 
 		int partitions = 10;
 
@@ -170,7 +172,7 @@ public class sQTminlp_oneRun {
 					fixedCost,
 					unitCost,
 					penaltyCost,
-					initialStock,
+					initialInventoryLevel,
 					partitions,
 					"sQtPoisson"
 					);
