@@ -1,4 +1,4 @@
-package minlp;
+package minlp_Poisson;
 
 import ilog.concert.IloException;
 import ilog.opl.IloCplex;

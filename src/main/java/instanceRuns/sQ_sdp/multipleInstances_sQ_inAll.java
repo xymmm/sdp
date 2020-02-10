@@ -6,9 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import ilog.concert.IloException;
-import minlp.sQminlpInstance;
-import minlp.sQminlp_oneRun;
-import minlp.sQminlp_recursive;
+import minlp_Poisson.sQminlpInstance;
+import minlp_Poisson.sQminlp_oneRun;
+import minlp_Poisson.sQminlp_recursive;
 import sQ.sdp.sQ;
 import sQ.sdp.sQreorderPoint;
 import sQ.sdp.sQreorderPointSolution;
@@ -205,7 +205,7 @@ public class multipleInstances_sQ_inAll {
 									partitions, s_sdp, Q_minlpInt);
 							int i1 = s_sdp[t];
 							double costDifference_s_sdp = 
-									minlp.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[t], 
+									minlp_Poisson.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[t], 
 											fileConsole, rangeQ);
 							//s_minlp[t] = sQminlp_recursive.computeMINLP_s(costDifference_s_sdp, sQminlpInstance, i1, t, tempFile, fileConsole, rangeQ);
 							s_minlp[t] = sQminlp_recursive.computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, tempFile, t, fileConsole, rangeQ);

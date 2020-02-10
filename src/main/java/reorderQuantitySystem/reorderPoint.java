@@ -129,7 +129,7 @@ public class reorderPoint {
 		
 		
 		//print cost given a schedule
-		System.out.println("cost when computing reorder points is: "+optimalCostByInventory[(int) (instance.initialInventory - instance.minInventory)][0]);
+		//System.out.println("cost when computing reorder points is: "+optimalCostByInventory[(int) (instance.initialInventory - instance.minInventory)][0]);
 		return reorderPoint;
 	}
 	

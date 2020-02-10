@@ -1,4 +1,4 @@
-package minlp;
+package minlp_Poisson;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -119,13 +119,13 @@ public class sQminlp_oneRun{
 		
 		long startTime = System.currentTimeMillis();
 		
-		double[] demandMean = {2,4,6,4};
-		double fixedCost = 10;//5,10,20
+		double[] demandMean = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40};
+		double fixedCost = 5;//5,10,20
 		double unitCost = 1;//0,1
 		double holdingCost = 1;
 		double penaltyCost = 3;//2,3
 		double initialInventoryLevel = 0;
-		int partitions = 10;
+		int partitions = 4;
 		
 		double Q = Double.NaN;
 		
@@ -140,13 +140,13 @@ public class sQminlp_oneRun{
 					partitions,
 					null
 					);
-			Q = sQmodel.solveMINLP_oneRun("sQsinglePoisson_Qranged");
+			Q = sQmodel.solveMINLP_oneRun("sQsinglePoisson");
 		}catch(IloException e){
 	         e.printStackTrace();
 	    }
 		long endTime = System.currentTimeMillis();
 		System.out.println("Q = "+Math.ceil(Q));
-		System.out.println("time consumed = "+(endTime - startTime)/1000+"s");
+		System.out.println("time consumed = "+(endTime - startTime)+"s");
 	}
 	
 	

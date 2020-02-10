@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.FileReader;
 
 import ilog.concert.IloException;
-import minlp.sQminlpInstance;
-import minlp.sQminlp_oneRun;
-import minlp.sQminlp_recursive;
+import minlp_Poisson.sQminlpInstance;
+import minlp_Poisson.sQminlp_oneRun;
+import minlp_Poisson.sQminlp_recursive;
 import sQ.simulation.sQsimInstanceDouble;
 import sQ.simulation.sQsimInstanceInt;
 import sQ.simulation.sQsimPoisson;
@@ -180,7 +180,7 @@ public class multipleInstances_sQ_minlp {
 									demandMeanInput[t], fixedCost[f], unitCost[u], holdingCost, penaltyCost[p], (int)minInventory, (int)maxInventory,
 									partitions, s_sdp[d], Q_minlpInt);
 							int i1 = s_sdp[d][t];
-							double costDifference_s_sdp = minlp.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[d][t], 
+							double costDifference_s_sdp = minlp_Poisson.sQminlp_recursive.costDifference(sQminlpInstance, s_sdp[d][t], 
 									"src/main/java/instanceRuns/main/sQ_console.txt", rangedQ);
 							//s_minlp[t] = sQminlp_recursive.computeMINLP_s(costDifference_s_sdp, sQminlpInstance, i1, t, file);
 							s_minlp[t] = sQminlp_recursive.computeMINLP_s_bySlope(costDifference_s_sdp, sQminlpInstance, i1, file, t, 

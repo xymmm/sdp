@@ -1,8 +1,8 @@
 package instanceRuns.sQt_minlp;
 
 import ilog.concert.IloException;
-import minlp.sQTminlp_oneRun;
-import minlp.sQTminlp_recursive;
+import minlp_Poisson.sQTminlp_oneRun;
+import minlp_Poisson.sQTminlp_recursive;
 import sQ.simulation.sQsimInstanceDouble;
 import sQ.simulation.sQsimInstanceInt;
 import sQ.simulation.sQsimPoisson;

@@ -1,4 +1,4 @@
-package minlp;
+package minlp_Poisson;
 
 public class sQminlpInstance {
 	

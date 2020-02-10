@@ -107,9 +107,9 @@ public class possionPiecewisePartitions {
 
 
 	public static void main(String[] args) {
-		double [] demandMeanInput = {1,23,42,70, 103, 136, 161, 170, 161, 136, 103};
+		double [] demandMeanInput = {5, 5, 5, 5};
 		int nbSamples = 100000;
-		int partitions = 10;
+		int partitions = 4;
 		//for(int d=0; d<demandMeanInput.length; d++) {
 			for(int i=0; i<1; i++) {
 				double[] demandMean = getDemandMeanArray(demandMeanInput, i);
