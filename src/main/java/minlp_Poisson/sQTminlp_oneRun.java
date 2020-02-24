@@ -120,7 +120,8 @@ public class sQTminlp_oneRun {
             for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
             handler.endArray(); handler.endElement();
 			
-			handler.startElement("initialInventoryLevel"); handler.addNumItem(initialInventoryLevel); handler.endElement();
+			//handler.startElement("initialInventoryLevel"); handler.addNumItem(initialInventoryLevel); handler.endElement();
+			handler.startElement("initialStock"); handler.addNumItem(initialInventoryLevel); handler.endElement();
 
 			//piecewise
 			handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();

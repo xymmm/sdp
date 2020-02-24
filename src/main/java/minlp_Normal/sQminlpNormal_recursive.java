@@ -1,4 +1,4 @@
-package minlp_Poisson;
+package minlp_Normal;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,33 +28,39 @@ import ilog.opl.IloOplModelDefinition;
 import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
 
-public class sQminlp_recursive {
+public class sQminlpNormal_recursive {
 	
 	double[] 	demandMean;
 	double 	holdingCost;
 	double 	fixedCost;
 	double 	unitCost;
 	double 	penaltyCost;
-	int 	initialStock;
+	double 	initialStock;
+	double stdParameter;
 	int 	partitions;
+	double[] means;
+	double[] piecewiseProb;
+	double error;
+	double Q_minlp;
 	
 	String instanceIdentifier;
 	
-	public sQminlp_recursive(double[] demandMean, 
-				   double holdingCost,
-				   double fixedCost,
-				   double unitCost,
-				   double penaltyCost,
-				   int initialStock,
-				   int partitions,
-				   String instanceIdentifier) {
-		this.demandMean 	= demandMean;
-		this.holdingCost 	= holdingCost;
-		this.fixedCost 		= fixedCost;
-		this.unitCost 		= unitCost;
-		this.penaltyCost 	= penaltyCost;
-		this.initialStock 	= initialStock;
-		this.partitions 	= partitions;
+	public sQminlpNormal_recursive(double[] demandMean, double holdingCost, double fixedCost,  double unitCost, double penaltyCost, 
+			double initialStock, double stdParameter, 
+			int partitions, double[] means, double[] piecewiseProb, double error,
+			String instanceIdentifier, double Q_minlp) {
+					this.demandMean 	= demandMean;
+					this.holdingCost 	= holdingCost;
+					this.fixedCost 		= fixedCost;
+					this.unitCost 		= unitCost;
+					this.penaltyCost 	= penaltyCost;		
+					this.initialStock 	= initialStock;
+					this.stdParameter = stdParameter;
+
+					this.partitions 	= partitions;		
+					this.means = means;
+					this.piecewiseProb = piecewiseProb;
+					this.error = error;
 	}
 	
 	public InputStream getMINLPmodelStream(File file) {
@@ -68,7 +74,7 @@ public class sQminlp_recursive {
 	}
 	
 	//where Q is an input
-	public double solveMINLP_recursive (String model_name) throws IloException{
+	public double solveMINLP_recursive_Normal (String model_name) throws IloException{
 		IloOplFactory oplF = new IloOplFactory();
         IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
         IloCplex cplex = oplF.createCplex();
@@ -79,7 +85,7 @@ public class sQminlp_recursive {
         cplex.setParam(IloCplex.IntParam.Threads, 8);
         cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);
         
-        IloOplDataSource dataSource = new sQminlp_recursive.sQrecursiveData(oplF);
+        IloOplDataSource dataSource = new sQminlpNormal_recursive.sQrecursiveData(oplF);
         opl.addDataSource(dataSource);
         opl.generate();
 
@@ -113,44 +119,39 @@ public class sQminlp_recursive {
         }
 
         public void customRead(){
-        
-         IloOplDataHandler handler = getDataHandler();
-         //problem parameters
-            handler.startElement("nbmonths"); handler.addIntItem(demandMean.length); handler.endElement();
-            handler.startElement("fc"); handler.addNumItem(fixedCost); handler.endElement();
-            handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
-            handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
-            handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
-            handler.startElement("meandemand"); handler.startArray();
-            for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
-            handler.endArray(); handler.endElement();
-            handler.startElement("initialStock"); handler.addIntItem(initialStock); handler.endElement();
             
-            //piecewise
-            handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
-            
-            double partitionProb = 1.0/partitions;
-            handler.startElement("prob"); handler.startArray();
-            for (int j = 0 ; j<partitions; j++){handler.addNumItem(partitionProb);}
-            handler.endArray(); handler.endElement();
-            
-            double[][][] coefficients = sQminlp_oneRun.getLamdaMatrix (demandMean, partitions, 100000);
-            handler.startElement("lamda_matrix");
-            handler.startArray();
-            for(int t=0; t<demandMean.length; t++) {
-            	handler.startArray();
-            	for(int j=0; j<demandMean.length; j++) {
-            		handler.startArray();
-            		for(int p = 0; p<partitions; p++) {
-            			handler.addNumItem(coefficients[t][j][p]);
-            		}
-            		handler.endArray(); 
-            	}
-            	handler.endArray(); 
-            }
-            handler.endArray(); 
-            handler.endElement();
-        }
+            IloOplDataHandler handler = getDataHandler();
+            //problem parameters
+            		//demandMean, holdingCost, fixedCost,  unitCost, penaltyCost, 
+   		 		//initialStock, stdParameter, 
+   		 		//partitions,  means, piecewiseProb, error,
+
+               handler.startElement("nbmonths"); handler.addIntItem(demandMean.length); handler.endElement();
+               handler.startElement("fc"); handler.addNumItem(fixedCost); handler.endElement();
+               handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
+               handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
+               handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
+               
+               handler.startElement("meandemand"); handler.startArray();            
+               for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
+               handler.endArray(); handler.endElement();
+               
+               handler.restartElement("stdParameter"); handler.addNumItem(stdParameter); handler.endElement();           
+               handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();
+               
+               //piecewise
+               handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
+    
+               handler.startElement("means"); handler.startArray();
+               for (int j = 0 ; j<partitions; j++){handler.addNumItem(means[j]);}
+               handler.endArray(); handler.endElement();
+               
+               handler.startElement("prob"); handler.startArray();
+               for (int j = 0 ; j<partitions; j++){handler.addNumItem(piecewiseProb[j]);}
+               handler.endArray(); handler.endElement();
+
+               handler.startElement("error"); handler.addNumItem(error); handler.endElement();         
+           }
 		
 	}
 	
@@ -179,9 +180,10 @@ public class sQminlp_recursive {
 	}
 	
 	
-	public static double costDifference (sQminlpInstance instance, int i1, String consoleFileName, boolean rangedQ) {
+	public static double costDifference (sQminlpInstanceNormal instance, 
+										int i1, String consoleFileName, boolean rangedQ) {
 		double d = 0;
-		int i1_Q = i1 + instance.Q_minlp;
+		int i1_Q =  i1 + instance.getQ();
 		String modFileName;
 		if(rangedQ == true) {
 			modFileName = "sQsinglePoisson_recursive_Qranged";
@@ -189,14 +191,19 @@ public class sQminlp_recursive {
 			modFileName = "sQsinglePoisson_recursive";
 		}
 		try {
-			sQminlp_recursive sQmodel1 = new sQminlp_recursive(
-					instance.demandMean, instance.holdingCost, instance.fixedCost, instance.unitCost, instance.penaltyCost,
-					i1, instance.partitions, modFileName);
-			double c1 = sQmodel1.solveMINLP_recursive("sQsinglePoisson_recursive");
-			sQminlp_recursive sQmodel2 = new sQminlp_recursive(
-					instance.demandMean, instance.holdingCost, instance.fixedCost, instance.unitCost, instance.penaltyCost,
-					i1_Q, instance.partitions, modFileName);
-			double c1_Q = sQmodel2.solveMINLP_recursive(modFileName);
+			sQminlpNormal_recursive sQmodel1 = new sQminlpNormal_recursive(
+					instance.demandMean, instance.holdingCost, instance.fixedCost, instance.unitCost, instance.penaltyCost, 
+					i1, instance.stdParameter, 
+					instance.partitions, instance.means, instance.piecewiseProb, instance.error,
+					modFileName, instance.getQ());
+			double c1 = sQmodel1.solveMINLP_recursive_Normal("sQsinglePoisson_recursive");
+			sQminlpNormal_recursive sQmodel2 = new sQminlpNormal_recursive(
+					instance.demandMean, instance.holdingCost, instance.fixedCost, instance.unitCost, instance.penaltyCost, 
+					i1_Q, instance.stdParameter, 
+					instance.partitions, instance.means, instance.piecewiseProb, instance.error,
+					modFileName, instance.getQ()
+					);
+			double c1_Q = sQmodel2.solveMINLP_recursive_Normal(modFileName);
 			d = c1 - c1_Q;
 			System.out.println("c("+i1+") - c("+(i1_Q)+") = "+d);
 			sdp.util.writeText.writeString("c("+i1+") - c("+(i1_Q)+") = "+d, consoleFileName);
@@ -207,7 +214,7 @@ public class sQminlp_recursive {
 	}
 
 	/** by identifing direction increase or decrease ****************************************************************************/
-	public static int computeMINLP_sGreaterK(sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex, 
+	public static int computeMINLP_sGreaterK(sQminlpInstanceNormal sQminlpInstance, int i1, int currentPeriodIndex, 
 											 File FileName, String ConsoleFileName, boolean rangedQ) throws Exception {
 		int s = sQminlpInstance.s_sdp[currentPeriodIndex];
 		int i2 = i1 + 1;
@@ -223,7 +230,7 @@ public class sQminlp_recursive {
 		}
 		return s;
 	}	
-	public static int computeMINLP_sLessK(sQminlpInstance sQminlpInstance, int i1 , int currentPeriodIndex, 
+	public static int computeMINLP_sLessK(sQminlpInstanceNormal sQminlpInstance, int i1 , int currentPeriodIndex, 
 										  File FileName, String ConsoleFileName, boolean rangedQ) throws Exception {
 		int s = sQminlpInstance.s_sdp[currentPeriodIndex];
 		int i2 = i1 - 1;
@@ -239,7 +246,7 @@ public class sQminlp_recursive {
 		}
 		return s;
 	}	
-	public static int computeMINLP_s(double costDifference_s_sdp, sQminlpInstance sQminlpInstance, int i1, int currentPeriodIndex, 
+	public static int computeMINLP_s(double costDifference_s_sdp, sQminlpInstanceNormal sQminlpInstance, int i1, int currentPeriodIndex, 
 									 File FileName, String consoleFileName, boolean rangedQ) throws Exception {//before this, declare i1 = s_sdp[d]
 		if((i1<=sQminlpInstance.minInventory) ||(i1>=sQminlpInstance.maxInventory)) return i1;
 		if(costDifference_s_sdp > sQminlpInstance.fixedCost + sQminlpInstance.unitCost * sQminlpInstance.Q_minlp) {
@@ -251,7 +258,7 @@ public class sQminlp_recursive {
 	/** by identifing direction increase or decrease ****************************************************************************/
 
 	/**by approximating slope==================================================================================================**/
-	public static int computeMINLP_s_bySlope(double costDifference_s_sdp, sQminlpInstance instance, int i1, 
+	public static int computeMINLP_s_bySlope(double costDifference_s_sdp, sQminlpInstanceNormal instance, int i1, 
 			File FileName, int currentPeriodIndex, String consoleFileName, boolean rangedQ) throws Exception {
 		//check if s_sdp[t]+-1 is s_minlp[t]
 		int i2 = (costDifference_s_sdp > instance.fixedCost + instance.unitCost * instance.Q_minlp)? (i1+1):(i1-1);
@@ -309,11 +316,22 @@ public class sQminlp_recursive {
 		double penaltyCost = 10;
 		int minInventory = -100;
 		int maxInventory = 100;
-	
-		int partitions = 10;
+
 		int[] s_sdp = {13,33,54,24};
 
 		int Q_minlp = 84;
+		
+		double stdParameter = 0.25;
+		
+		int partitions = 4;
+		double[] piecewiseProb = {0.187555, 0.312445, 0.312445, 0.187555};
+		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
+		double error = 0.0339052;
+
+		//int partitions = 10;
+		//double[] piecewiseProb = {0.04206108420763477, 0.0836356495308449, 0.11074334596058821, 0.1276821455299152, 0.13587777477101692, 0.13587777477101692, 0.1276821455299152, 0.11074334596058821, 0.0836356495308449, 0.04206108420763477};
+		//double[] means = {-2.133986195498256, -1.3976822972668839, -0.918199946431143, -0.5265753462727588, -0.17199013069262026, 0.17199013069262026, 0.5265753462727588, 0.918199946431143, 1.3976822972668839, 2.133986195498256};
+		//double error = 0.005885974956458359;
 		
 		boolean rangedQ = false;
 		
@@ -321,8 +339,11 @@ public class sQminlp_recursive {
 		
 		File file = new File("src/main/java/instanceRuns/sQ_minlp/temp.txt");
 		for(int d=0; d<demandMeanInput.length; d++) {
-			sQminlpInstance sQminlpInstance = new sQminlpInstance(demandMeanInput[d], fixedCost, unitCost, holdingCost, penaltyCost, minInventory, maxInventory,
-					partitions, s_sdp, Q_minlp);
+			sQminlpInstanceNormal sQminlpInstance = new sQminlpInstanceNormal(
+					demandMeanInput[d],
+					fixedCost, unitCost, holdingCost, penaltyCost, minInventory, maxInventory, stdParameter,
+					partitions, means, piecewiseProb, error, s_sdp,
+					Q_minlp);
 			double costDifference_s_sdp = costDifference(sQminlpInstance, s_sdp[d], "src/main/java/instanceRuns/main/sQ_console.txt", rangedQ);
 
 			int i1 = s_sdp[d];

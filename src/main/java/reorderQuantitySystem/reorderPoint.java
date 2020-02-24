@@ -96,7 +96,7 @@ public class reorderPoint {
 			if(solution.optimalSchedule[t] == 0) {
 				reorderPoint[t] = instance.minInventory;
 			}else {
-				for(int i=0; i<inventory.length; i++) {  // Inventory   
+				for(int i=50; i<inventory.length; i++) {  // Inventory   
 					if(optimalActionByInventory[i][t] == false) {
 						reorderPoint[t] = i + instance.minInventory;
 						break;

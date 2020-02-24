@@ -22,7 +22,7 @@ public class sQsystemSimulation {
 	}
 	
 	/** compute purchasing cost according to action decision **/
-	static double computePurchasingCost(int actionDecision, int currentStageIndex, simInstance instance, int[] orderQuantity) {
+	static double computePurchasingCost(int actionDecision, int currentStageIndex, simInstance instance, double[] orderQuantity) {
 		return actionDecision*(
 				instance.fixedOrderingCost 
 				+ instance.unitCost*orderQuantity[currentStageIndex]
@@ -30,7 +30,7 @@ public class sQsystemSimulation {
 	}
 	
 	/** update inventory level**/
-	static int updateInventoryLevel(int inventoryLevel, int inventoryAlteration) {
+	static double updateInventoryLevel(double inventoryLevel, double inventoryAlteration) {
 		return inventoryLevel + inventoryAlteration;
 	}
 	
@@ -60,7 +60,7 @@ public class sQsystemSimulation {
 	
 	
 	public static double sQsimPoisson(simInstance instance, boolean print) {
-		int inventoryLevel = instance.initialInventory;
+		double inventoryLevel = instance.initialInventory;
 		double cost = 0;
 		int actionDecision;		
 		int currentStageIndex = 0;
@@ -123,10 +123,10 @@ public class sQsystemSimulation {
 		int minInventory = -100;
 		int maxInventory = 100;
 		double coe = 0.25;
-		int[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,4,6,4};
 		int[] reorderPoint = {1,3,5,1};
 
-		int[] orderQuantity = {9, 9, 9, 9};
+		double[] orderQuantity = {9, 9, 9, 9};
 
 		simInstance sQsystem = new simInstance(
 				fixedOrderingCost,

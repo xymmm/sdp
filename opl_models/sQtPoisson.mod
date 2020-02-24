@@ -11,9 +11,9 @@ float fc=...;
 float h=...;
 float p=...;
 float v = ...;
-int meandemand[months]=...;
+float meandemand[months]=...;
 
-int initialStock = ...;
+float initialStock = ...;
 
 int nbpartitions=...;
 range partitions=1..nbpartitions;

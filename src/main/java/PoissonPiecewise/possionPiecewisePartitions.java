@@ -16,7 +16,7 @@ public class possionPiecewisePartitions {
 			//System.out.println("t = "+t);
 			for(int j=0; j<=t; j++){
 				//System.out.println("j = "+j);
-				int sumLamda = convolution(demandMean, j,t);
+				double sumLamda = convolution(demandMean, j,t);
 				lamdaMatrix[j][t] = conditionalExpectationGivenPartitions(sumLamda, nbSamples, partitions);
 			}
 		}
@@ -52,7 +52,7 @@ public class possionPiecewisePartitions {
 	}
 	
 	/** to compute expectations of subregions**/
-	public static double[] conditionalExpectationGivenPartitions(int lamda, int nbSamples, int partitions) {
+	public static double[] conditionalExpectationGivenPartitions(double lamda, int nbSamples, int partitions) {
 		double[] prob = computeProb(partitions);
 		PoissonDistribution PoissonDist = new PoissonDistribution(lamda);
 		int[] realisations = PoissonDist.sample(nbSamples);
@@ -107,7 +107,7 @@ public class possionPiecewisePartitions {
 
 
 	public static void main(String[] args) {
-		double [] demandMeanInput = {5, 5, 5, 5};
+		double [] demandMeanInput = {5.5, 5, 5, 5};
 		int nbSamples = 100000;
 		int partitions = 4;
 		//for(int d=0; d<demandMeanInput.length; d++) {
