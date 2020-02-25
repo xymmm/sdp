@@ -1,4 +1,4 @@
-package RecedingHorizon;
+package RecedingHorizon.sQt;
 
 public class RHsolution_sQt {
 	

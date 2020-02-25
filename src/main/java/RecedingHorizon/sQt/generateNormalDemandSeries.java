@@ -1,4 +1,4 @@
-package RecedingHorizon;
+package RecedingHorizon.sQt;
 
 import java.util.Random;
 

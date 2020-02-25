@@ -1,4 +1,4 @@
-package RecedingHorizon;
+package RecedingHorizon.sQt;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +19,7 @@ import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
 import minlp_Normal.sQminlpNormal_oneRun;
 
-public class recedingHorizon_sQt {
+public class RH_sQt {
 	
 	double[] 	demand;	
 	double		holdingCost;
@@ -29,7 +29,7 @@ public class recedingHorizon_sQt {
 	double		initialStock;	
 	String 		instancIdentifier;
 	
-	public recedingHorizon_sQt(	double[] demand, double holdingCost, double fixedCost, double penaltyCost, double unitCost, double initialStock, 
+	public RH_sQt(	double[] demand, double holdingCost, double fixedCost, double penaltyCost, double unitCost, double initialStock, 
 								String instancIdentifier) {
 		this.demand 		= demand;
 		this.fixedCost 		= fixedCost;
@@ -65,9 +65,9 @@ public class recedingHorizon_sQt {
         opl.addDataSource(dataSource);
         opl.generate();
         cplex.setOut(null);
-        double start = cplex.getCplexImpl().getCplexTime();
+        //double start = cplex.getCplexImpl().getCplexTime();
         boolean status =  cplex.solve();
-        double end = cplex.getCplexImpl().getCplexTime();
+        //double end = cplex.getCplexImpl().getCplexTime();
         
         if(status) {
         	double[] Q = new double[demand.length];
@@ -118,17 +118,18 @@ public class recedingHorizon_sQt {
 
 	}
 	
+	
 	/**For one step of receding horizon. 
 	 * 'demand' is generated in the main, containing all information of demand that is being dealt with.
 	 * initialStock is substituted as the closing inventory of last iteration**/
 	public static singleRHsolution_sQt oneStepRH_sQt(double[] demand, double stdParameter, 
 									 double holdingCost, double fixedCost, double unitCost, double penaltyCost, 
 									 double initialStock, int currentTimeIndex) {
-		double[] futureDemand = RecedingHorizon.generateNormalDemandSeries.demandRecedingHorizon(demand, currentTimeIndex);
+		double[] futureDemand = RecedingHorizon.sQt.generateNormalDemandSeries.demandRecedingHorizon(demand, currentTimeIndex);
 		System.out.println("t = "+(currentTimeIndex+1)+"\t"+"future demand: "+Arrays.toString(futureDemand));
 		singleRHminlpSolution_sQt solution = null;
 		try {
-			recedingHorizon_sQt sQtRHmodel = new recedingHorizon_sQt(
+			RH_sQt sQtRHmodel = new RH_sQt(
 					futureDemand, 
 					holdingCost, fixedCost, penaltyCost, unitCost, initialStock, null
 					);
@@ -149,7 +150,7 @@ public class recedingHorizon_sQt {
 	}
 	
 	/**Main computation of receding horizon - sQt**/
-	public static RHsolution_sQt RH_sQt(double[] demand,
+	public static RHsolution_sQt RHcomplete_sQt(double[] demand,
 									double stdParameter, double holdingCost, double fixedCost, double unitCost, double penaltyCost,
 									double initialStock) {
 		double[] scheduleQ = new double[demand.length];
@@ -171,6 +172,8 @@ public class recedingHorizon_sQt {
 		return new RHsolution_sQt(scheduleQ, scheduleCurrentCost);
 	}
 	
+	
+	
 	public static void main(String[] args) {
 		double[] demandMean = {20,40,60,40};
 		double stdParameter = 0.25;
@@ -180,11 +183,11 @@ public class recedingHorizon_sQt {
 		double penaltyCost = 10;
 		double initialStock = 0;
 		
-		double[] demand = RecedingHorizon.generateNormalDemandSeries.generateNormalDemand(demandMean, stdParameter);
+		double[] demand = RecedingHorizon.sQt.generateNormalDemandSeries.generateNormalDemand(demandMean, stdParameter);
 		System.out.println("Generated Normal Demand: "+Arrays.toString(demand));
 		System.out.println();
 		
-		RHsolution_sQt solution = RH_sQt(demand, stdParameter, 
+		RHsolution_sQt solution = RHcomplete_sQt(demand, stdParameter, 
 				 holdingCost, fixedCost, unitCost, penaltyCost, 
 				 initialStock);
 		
