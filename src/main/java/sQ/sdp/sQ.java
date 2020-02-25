@@ -142,21 +142,21 @@ public class sQ {
 
 		Chrono timer = new Chrono();
 
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 10;
 
 		double tail = 0.00000001;
 
-		int minInventory = -100;
-		int maxInventory = 100;
-		int maxQuantity = 9;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 200;
 
 		double stdParameter = 0.25;
 
-		//int[] demandMean = {20, 40, 60, 40};
-		double[] demandMean = {2,4,6,4};
+		double[] demandMean = {20, 40, 60, 40};
+		//double[] demandMean = {2,4,6,4};
 		
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
@@ -194,6 +194,7 @@ public class sQ {
 								+sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][(int) (instance.initialInventory - instance.minInventory)][t]);
 		}
 		
+		//print cost for i and t under the optimal quantity
 		for(int i=0; i<sQsolution.inventory.length;i++) {
 			System.out.print("i: "+ (i+instance.minInventory) + "\t");
 			for(int t=0; t<instance.demandMean.length; t++) {

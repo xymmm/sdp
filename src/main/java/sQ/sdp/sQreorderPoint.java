@@ -116,20 +116,20 @@ public class sQreorderPoint {
 
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 100;
 		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 10;
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
-		int maxQuantity = 9;
+		int minInventory = -500;
+		int maxInventory = 500;
+		int maxQuantity = 200;
 
 		double stdParameter = 0.25;
 
-		double[] demandMean = {2,4,6,4};
+		double[] demandMean = {20,40,60,40};
 		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 
 		int Q = 84;
@@ -148,9 +148,9 @@ public class sQreorderPoint {
 			sQreorderPointSolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
 
 			/**print and plot ETC**/
-			//System.out.println("cost with initial stock = "+instance.initialInventory+" is "+sQgivenQ.costGivenQ[0][instance.initialInventory-instance.minInventory]);
-			//sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(sQgivenQ.costGivenQ[0], sQgivenQ.inventory, "inventory level", "expected cost", "Expected cost without initial order t=1");//cost
-			for(int i=501; i<701; i++) {
+			System.out.println("cost with initial stock = "+instance.initialInventory+" is "+sQgivenQ.costGivenQ[0][(int) (instance.initialInventory-instance.minInventory)]);
+			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(sQgivenQ.costGivenQ[0], sQgivenQ.inventory, "inventory level", "expected cost", "Expected cost without initial order t=1");//cost
+			for(int i=500; i<701; i++) {
 			System.out.println(sQgivenQ.costGivenQ[0][i]);
 			}
 
@@ -164,7 +164,7 @@ public class sQreorderPoint {
 			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(costDifference, sQgivenQ.inventory, "inventory level", "cost difference", "t="+(d+1));//cost difference
 			for(int j=0; j<costDifference.length-1; j++) {
 				if(costDifference[j] <= fixedOrderingCost + unitCost*Q) {
-					System.out.println("BreakPoints = "+(j + minInventory));
+					//System.out.println("BreakPoints = "+(j + minInventory));
 					s_breakpoint[d] = j+minInventory;
 					break;
 				}
@@ -177,7 +177,7 @@ public class sQreorderPoint {
 
 			int[] s = sQreorderPointSolution.getsGivenQ(instance, sQgivenQorder);
 			s_compare[d] = s[0];
-			System.out.println("reorder points by comparing actions = " + s[0]);
+			//System.out.println("reorder points by comparing actions = " + s[0]);
 
 		}
 		System.out.println();

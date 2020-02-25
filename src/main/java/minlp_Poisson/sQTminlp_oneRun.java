@@ -152,15 +152,15 @@ public class sQTminlp_oneRun {
 	}
 
 	public static void main(String[] args) {
-		double[] demandMean = {2,4,6,4};
-		double fixedCost = 10;
+		double[] demandMean = {1, 3, 4.5, 2};
+		double fixedCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 3;
 
 		double initialInventoryLevel = 0;
 
-		int partitions = 10;
+		int partitions = 20;
 
 		long startTime = System.currentTimeMillis();
 

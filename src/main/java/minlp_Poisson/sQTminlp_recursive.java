@@ -169,12 +169,12 @@ public class sQTminlp_recursive {
 
 
 	public static void main(String[] args) {
-		double[] demandMean = {2,4,6,4};
+		double[] demandMean = {1, 3, 4.5, 2};
 		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
-		double fixedCost = 10;
+		double fixedCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 3;
 		int partitions = 20;
 		int minInventory = -10;
 		int maxInventory = 50;
@@ -205,7 +205,7 @@ public class sQTminlp_recursive {
 							);
 					double obj = sQmodel.solveMINLP_recursive("sQtPoisson_recursive");
 					//System.out.println("c("+initialStock[i]+") = " +obj);
-					System.out.println(obj);
+					System.out.println((i+minInventory)+" " + obj);
 					cost_i[i] = obj;
 					//writeToText(obj,false);
 				}catch(IloException e){

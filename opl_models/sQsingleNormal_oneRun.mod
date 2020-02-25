@@ -14,7 +14,7 @@ float v = ...;
 float meandemand[months]=...;
 float stdParameter=...;
 
-int initialStock = ...;
+float initialStock = ...;
 
 int nbpartitions=...;
 range partitions=1..nbpartitions;

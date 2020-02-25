@@ -25,7 +25,7 @@ public class multi_sQ_10periods_12_main {
 		String fileRecord =  "./instanceResults/sQinstance12.txt";
 		
 		//sQ-sdp, sQ-minlp, sQ-simulation
-		instanceRuns.sQ_sdp.multipleInstances_sQ_inAll.multi_sQ (
+		/*instanceRuns.sQ_sdp.multipleInstances_sQ_inAll.multi_sQ (
 				demandMean, fixedCost, penaltyCost, unitCost, holdingCost, 
 				minInventory, maxInventory, maxQuantity,
 				partitions, initialInventoryLevel,
@@ -33,7 +33,7 @@ public class multi_sQ_10periods_12_main {
 				fileConsole, 
 				fileRecord, fileRecord, fileRecord, fileRecord, fileRecord,
 				fileRecord, fileRecord, fileRecord, fileRecord, 
-				fileRecord);
+				fileRecord);*/
 	}
 		
 	
