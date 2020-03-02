@@ -162,6 +162,7 @@ public class RH_sQ {
 		closingInventory[0] = initialStock;
 		
 		for(int t=0; t<demand.length; t++) {
+			System.out.println("MINLP"+"\t"+"opening Inventory: "+closingInventory[t]);
 			singleRHsolution_sQ solution = oneStepRH_sQ(demand, stdParameter, 
 					 holdingCost, fixedCost, unitCost, penaltyCost, 
 					 closingInventory[t], t,Q);

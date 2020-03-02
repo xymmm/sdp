@@ -154,31 +154,6 @@ public class sQminlp_recursive {
 		
 	}
 	
-	public static void writeToText(double value, boolean enter, String fileName){
-		FileWriter fw = null;
-		try {
-			File f = new File(fileName); // relative path, if no file then create a new output.txt
-			fw = new FileWriter(f, true);//true, continue to write
-		}catch(IOException e) {
-			e.printStackTrace();
-		}
-		PrintWriter pw = new PrintWriter(fw);
-		if(!enter) {
-			pw.print(value+"  "); // \r\n is enter
-		}else {
-			pw.print("\r\n");
-		}
-		pw.flush(); // save soft drive
-		try {
-			fw.flush();
-			pw.close();
-			fw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
 	public static double costDifference (sQminlpInstance instance, int i1, String consoleFileName, boolean rangedQ) {
 		double d = 0;
 		int i1_Q = i1 + instance.Q_minlp;

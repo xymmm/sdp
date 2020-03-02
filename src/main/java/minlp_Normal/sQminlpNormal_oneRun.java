@@ -166,7 +166,7 @@ public class sQminlpNormal_oneRun{
 		double fixedCost = 100;//5,10,20
 		double unitCost = 1;//0,1
 		double holdingCost = 1;
-		double penaltyCost = 5;//2,3
+		double penaltyCost = 10;//2,3
 		double initialStock = 0;
 		double stdParameter = 0.25;
 		/*
