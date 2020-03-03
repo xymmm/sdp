@@ -200,19 +200,19 @@ public class sQminlpNormal_recursive {
 
 		//double cost1 = costDifference (sQmodel, i1);
 		//double cost2 = costDifference (sQmodel, i1+pace);
-		//System.out.println("cost("+i1+") = " + cost1 +"\t" + "cost("+(i1+pace)+") = "+cost2);
+		System.out.println("cost("+i1+") = " + costLeft +"\t" + "cost("+(i1+pace)+") = "+costRight);
 
 		if( (costLeft - orderingCost)*(costRight - orderingCost)<0 ) {
-			double levelBinary = Math.floor(0.5*pace + i1); System.out.println("levelBinary = "+levelBinary);
+			double levelBinary = i1 + Math.floor(0.5*pace); 
 			double costBinary = costDifference(sQmodel, levelBinary);
 			System.out.println("cost(binary="+levelBinary+") = " + costBinary);
 
 			//judge if costBinary > orderingCost or not
 			if(costBinary > orderingCost) {//[binary, input]
 				double costBinaryClose = costDifference (sQmodel, levelBinary + 1);
-				if(costBinaryClose < orderingCost) {
+				if((costBinaryClose < orderingCost)||(levelBinary == i1 + pace)) {
 					System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
-					String s_string = Double.toString(levelBinary);
+					String s_string = Double.toString(levelBinary+1);
 					boolean flag = writeTxtFile(s_string, tempFile);
 					System.out.println();
 				}else {
@@ -221,9 +221,9 @@ public class sQminlpNormal_recursive {
 				}
 			}else {//[input, binary]
 				double costBinaryClose = costDifference (sQmodel, levelBinary - 1);
-				if(costBinaryClose > orderingCost) {
+				if((costBinaryClose > orderingCost)||(levelBinary == i1)) {
 					System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
-					String s_string = Double.toString(levelBinary);
+					String s_string = Double.toString(levelBinary+1);
 					boolean flag = writeTxtFile(s_string, tempFile);
 					System.out.println();
 				}else {
@@ -234,12 +234,13 @@ public class sQminlpNormal_recursive {
 		}else {//pace is not large/small enough
 			if( costLeft < orderingCost) {
 				System.out.println("Cost of initial input invnetory is too small, move left");
-				binarySearch(i1 - pace, pace, sQmodel,costDifference(sQmodel, i1-pace), costLeft);
+				binarySearch(i1 - pace, pace, sQmodel,costDifference(sQmodel, i1-pace), costDifference(sQmodel, i1));
 			}else {
 				System.out.println("Cost of initial input invnetory is too large, move right");
-				binarySearch(i1 + pace, pace, sQmodel, costRight, costDifference(sQmodel, i1+pace));
+				binarySearch(i1 + pace, pace, sQmodel, costDifference(sQmodel, i1), costDifference(sQmodel, i1+pace));
 			}
 		}
+		long endTime = System.currentTimeMillis();
 
 	}
 
@@ -278,7 +279,7 @@ public class sQminlpNormal_recursive {
 		double[] s = new double[demandMean.length];
 
 		for(int t=0; t<demandMean.length; t++) {
-
+			long singleStartTime = System.currentTimeMillis();
 			try {
 				sQminlpNormal_recursive sQmodel = new sQminlpNormal_recursive(
 						demandMeanInput[t], holdingCost, fixedCost,  unitCost, penaltyCost, 
@@ -289,7 +290,7 @@ public class sQminlpNormal_recursive {
 				System.out.println("orderingCost = " + (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost));
 				double costLeft = costDifference(sQmodel, initialStock); System.out.println("costLeft = "+ costLeft);
 				double costRight = costDifference(sQmodel, initialStock + pace); System.out.println("costRight = "+ costRight);
-				binarySearch(0.0, pace, sQmodel, costLeft, costRight);
+				binarySearch(initialStock, pace, sQmodel, costLeft, costRight);
 			}catch(IloException e){
 				e.printStackTrace();
 			}
@@ -300,9 +301,14 @@ public class sQminlpNormal_recursive {
 			String read = "";
 			read = br.readLine();
 			s[t] = Double.parseDouble(read);
+			long singleEndTime = System.currentTimeMillis();
+			System.out.println("time consumed for single period = "+(singleEndTime - singleStartTime)/1000.0+"s");
+			System.out.println();
+			System.out.println();
 		}
 		long endTime = System.currentTimeMillis();		
 		System.out.println("time consumed = "+(endTime - startTime)/1000.0+"s");
+
 		
 		System.out.println(Arrays.toString(s));
 	}
