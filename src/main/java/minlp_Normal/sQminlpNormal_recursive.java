@@ -207,7 +207,7 @@ public class sQminlpNormal_recursive {
 			System.out.println("cost(binary="+levelBinary+")= " + costBinary);
 
 			//judge if costBinary > orderingCost or not
-			if(costBinary > orderingCost) {//[input, binary]
+			if(costBinary > orderingCost) {//[binary, input]
 				double costBinaryClose = costDifference (sQmodel, levelBinary + 1);
 				if(costBinaryClose < orderingCost) {
 					System.out.println("cost (binary + 1) = " +costBinaryClose);
@@ -215,10 +215,10 @@ public class sQminlpNormal_recursive {
 					boolean flag = writeTxtFile(s_string, tempFile);
 					System.out.println();
 				}else {
+					System.out.println("binary search proceeds, right interval.");
 					binarySearch(levelBinary, Math.round(0.5*pace), sQmodel);
-					System.out.println("binary search proceeds.");
 				}
-			}else {//[binary, intput+Q]
+			}else {//[input, binary]
 				double costBinaryClose = costDifference (sQmodel, levelBinary - 1);
 				if(costBinaryClose > orderingCost) {
 					System.out.println("cost (binary + 1) = " +costBinaryClose);
@@ -226,8 +226,8 @@ public class sQminlpNormal_recursive {
 					boolean flag = writeTxtFile(s_string, tempFile);
 					System.out.println();
 				}else {
-					binarySearch(i1+pace, Math.round(0.5*pace), sQmodel);
-					System.out.println("binary search proceeds.");
+					System.out.println("binary search proceeds, left interval.");
+					binarySearch(i1, Math.round(0.5*pace), sQmodel);
 				}				
 			}
 		}else {//pace is not large/small enough
