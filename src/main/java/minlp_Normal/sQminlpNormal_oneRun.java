@@ -162,25 +162,25 @@ public class sQminlpNormal_oneRun{
 		
 		long startTime = System.currentTimeMillis();
 		
-		double[] demandMean = {20,40,60,40};
+		double[] demandMean = {11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71};// {20,40,60,40};
 		double fixedCost = 100;//5,10,20
 		double unitCost = 1;//0,1
 		double holdingCost = 1;
 		double penaltyCost = 10;//2,3
 		double initialStock = 0;
-		double stdParameter = 0.25;
-		/*
+		double stdParameter = 0.1;
+		
 		int partitions = 4;
 		double[] piecewiseProb = {0.187555, 0.312445, 0.312445, 0.187555};
 		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
 		double error = 0.0339052;
-		*/
-
+		
+/*
 		int partitions = 10;
 		double[] piecewiseProb = {0.04206108420763477, 0.0836356495308449, 0.11074334596058821, 0.1276821455299152, 0.13587777477101692, 0.13587777477101692, 0.1276821455299152, 0.11074334596058821, 0.0836356495308449, 0.04206108420763477};
 		double[] means = {-2.133986195498256, -1.3976822972668839, -0.918199946431143, -0.5265753462727588, -0.17199013069262026, 0.17199013069262026, 0.5265753462727588, 0.918199946431143, 1.3976822972668839, 2.133986195498256};
 		double error = 0.005885974956458359;
-		
+		*/
 		double Q = Double.NaN;
 		
 		try {
@@ -196,7 +196,7 @@ public class sQminlpNormal_oneRun{
 	    }
 		long endTime = System.currentTimeMillis();
 		System.out.println("Q = "+Math.ceil(Q));
-		System.out.println("time consumed = "+(endTime - startTime)+"ms");
+		System.out.println("time consumed = "+(endTime - startTime)/1000.0+"s");
 	}
 	
 
