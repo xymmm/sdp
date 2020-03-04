@@ -113,20 +113,20 @@ public class sQsystemSimulation {
 	public static void main(String[] args) {
 
 		/** declare instance parameters **/
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 3;
 
 		double tail = 0.00000001;
 
-		int minInventory = -100;
-		int maxInventory = 100;
+		int minInventory = -50;
+		int maxInventory = 50;
 		double coe = 0.25;
-		double[] demandMean = {2,4,6,4};
-		int[] reorderPoint = {1,3,5,1};
+		double[] demandMean = {2.5, 1, 3.5, 4.5, 1.5, 3};
+		int[] reorderPoint = {1, -1, 2, 4, 0, 1};
 
-		double[] orderQuantity = {9, 9, 9, 9};
+		double[] orderQuantity = {4,4,4,4,4,4};
 
 		simInstance sQsystem = new simInstance(
 				fixedOrderingCost,
@@ -144,7 +144,7 @@ public class sQsystemSimulation {
 		
 		Chrono timer = new Chrono();
 		
-		int count = 500000;
+		int count = 10000;
 		sQsimPoissonMultiRuns(sQsystem, count);
 		
 		sQsystem.statCost.setConfidenceIntervalStudent();

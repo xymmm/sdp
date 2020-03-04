@@ -28,6 +28,9 @@ dvar float stock[0..nbmonths];
 dvar float+ stockhlb[0..nbmonths];
 dvar float+ stockplb[0..nbmonths];
 dvar boolean purchase[months];
+
+dvar float purchaseDouble[months];
+
 dvar boolean P[months][months];
 dvar float+ U[1..nbmonths];
 
@@ -48,6 +51,9 @@ subject to{
 
 forall(t in months) purchase[t] == 1 => U[t]==Q;
 forall(t in months) purchase[t] == 0 => U[t]==0;
+
+forall(t in months) purchase[t] == 1 => purchaseDouble[t] == 1;
+forall(t in months) purchase[t] == 0 => purchaseDouble[t] == 0;
 
 forall(t in months) purchase[t] == 0 => stock[t] + meandemand[t] - stock[t-1] == 0;
 forall(t in months) purchase[t] == 1 => stock[t] + meandemand[t] - stock[t-1] == Q; 

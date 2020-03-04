@@ -1,20 +1,14 @@
 package minlp_Normal;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
 
 import ilog.concert.IloException;
 import ilog.opl.IloCplex;
@@ -27,10 +21,8 @@ import ilog.opl.IloOplModel;
 import ilog.opl.IloOplModelDefinition;
 import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
-import minlp_Poisson.sQminlpInstance;
-import minlp_Poisson.sQminlp_recursive;
 
-public class sQminlpNormal_recursive {
+public class sQTminlpNormal_heuristic {
 
 	double[] 	demandMean;
 	double 		holdingCost;
@@ -43,15 +35,13 @@ public class sQminlpNormal_recursive {
 	double[] 	means;
 	double[] 	piecewiseProb;
 	double 		error;
-	double		Q;				//given an optimal Q from MINLP, solve recursively for reorder point
-
-
+	double[]	optQ;		//future Q schedule
 	String instanceIdentifier;
 
-	public sQminlpNormal_recursive(double[] demandMean, double holdingCost, double fixedCost,  double unitCost, double penaltyCost, 
+	public sQTminlpNormal_heuristic(double[] demandMean, double holdingCost, double fixedCost,  double unitCost, double penaltyCost, 
 			double initialStock, double stdParameter, 
 			int partitions, double[] means, double[] piecewiseProb, double error,
-			String instanceIdentifier, double Q) {
+			String instanceIdentifier, double[] optQ) {
 		this.demandMean 	= demandMean;
 		this.holdingCost 	= holdingCost;
 		this.fixedCost 		= fixedCost;
@@ -63,7 +53,7 @@ public class sQminlpNormal_recursive {
 		this.means = means;
 		this.piecewiseProb = piecewiseProb;
 		this.error = error;
-		this.Q = Q;
+		this.optQ = optQ;
 	}
 
 	public InputStream getMINLPmodelStream(File file) {
@@ -77,7 +67,7 @@ public class sQminlpNormal_recursive {
 	}
 
 	/**main solving block *****************************************************/
-	public double solveMINLP_recursive_Normal (String model_name) throws IloException{		
+	public double solveMINLP_heuristic_Normal (String model_name) throws IloException{		
 		IloOplFactory oplF = new IloOplFactory();
 		IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
 		IloCplex cplex = oplF.createCplex();
@@ -87,18 +77,15 @@ public class sQminlpNormal_recursive {
 		IloOplModel opl=oplF.createOplModel(def,cplex);
 		cplex.setParam(IloCplex.IntParam.Threads, 8);
 		cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);
-		IloOplDataSource dataSource = new sQminlpNormal_recursive.sQrecursiveData(oplF);
+		IloOplDataSource dataSource = new sQTminlpNormal_heuristic.sQheuristicData(oplF);
 		opl.addDataSource(dataSource);
 		opl.generate();
 		cplex.setOut(null);
 		boolean status =  cplex.solve();
-		if(status){   
+		if ( status ){   
 			double objective = cplex.getObjValue();
 			opl.postProcess();
-			//opl.end();
 			oplF.end();
-			//errHandler.end();
-			//cplex.end();
 			System.gc();
 			return objective;
 		}else{
@@ -110,8 +97,8 @@ public class sQminlpNormal_recursive {
 	}
 
 	/**import data to .mod**/
-	class sQrecursiveData extends IloCustomOplDataSource{
-		sQrecursiveData(IloOplFactory oplF){
+	class sQheuristicData extends IloCustomOplDataSource{
+		sQheuristicData(IloOplFactory oplF){
 			super(oplF);
 		}
 		public void customRead(){
@@ -126,6 +113,7 @@ public class sQminlpNormal_recursive {
 			handler.endArray(); handler.endElement();
 			handler.restartElement("stdParameter"); handler.addNumItem(stdParameter); handler.endElement();           
 			handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();
+			//piecewise
 			handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
 			handler.startElement("means"); handler.startArray();
 			for (int j = 0 ; j<partitions; j++){handler.addNumItem(means[j]);}
@@ -133,29 +121,33 @@ public class sQminlpNormal_recursive {
 			handler.startElement("prob"); handler.startArray();
 			for (int j = 0 ; j<partitions; j++){handler.addNumItem(piecewiseProb[j]);}
 			handler.endArray(); handler.endElement();
-			handler.startElement("error"); handler.addNumItem(error); handler.endElement();         
+			handler.startElement("error"); handler.addNumItem(error); handler.endElement();      
+			handler.startElement("optQ"); handler.startArray();            
+			for (int t = optQ.length-1 ; t >= 0; t--) {handler.addNumItem(optQ[t]);}
+			handler.endArray(); handler.endElement();
 		}
+
 	}
-	
+
 	/***********************************************************************************************************************************/
-	/*****************************************BINARY SEARCH*****************************************************************************/
+	/*****************************************BINARY SEARCH for sQt heuristic***********************************************************/
 	/***********************************************************************************************************************************/
-	public static double costDifference (sQminlpNormal_recursive sQmodel, double inventoryLevel) {
-		double inventoryPlusQ = inventoryLevel + sQmodel.Q;
+	public static double costDifferencesQtHeuristic (sQTminlpNormal_heuristic sQmodel, double inventoryLevel, double currentQ) {
+		double inventoryPlusQ = inventoryLevel + currentQ;
 		double difference = 0;
 		try {
-			sQminlpNormal_recursive sQmodelInput = new sQminlpNormal_recursive(
+			sQTminlpNormal_heuristic sQmodelInput = new sQTminlpNormal_heuristic(
 					sQmodel.demandMean, sQmodel.holdingCost, sQmodel.fixedCost,  sQmodel.unitCost, sQmodel.penaltyCost, 
 					inventoryLevel, sQmodel.stdParameter, 
 					sQmodel.partitions,  sQmodel.means, sQmodel.piecewiseProb, sQmodel.error,
-					null, sQmodel.Q);
-			double c1 = sQmodelInput.solveMINLP_recursive_Normal("sQsingleNormal_recursive");
-			sQminlpNormal_recursive sQmodelPlusQ = new sQminlpNormal_recursive(
+					null, sQmodel.optQ);
+			double c1 = sQmodelInput.solveMINLP_heuristic_Normal("sQtNormal_heuristic");
+			sQTminlpNormal_heuristic sQmodelPlusQ = new sQTminlpNormal_heuristic(
 					sQmodel.demandMean, sQmodel.holdingCost, sQmodel.fixedCost,  sQmodel.unitCost, sQmodel.penaltyCost, 
 					inventoryPlusQ, sQmodel.stdParameter, 
 					sQmodel.partitions,  sQmodel.means, sQmodel.piecewiseProb, sQmodel.error,
-					null, sQmodel.Q);
-			double c2 = sQmodelPlusQ.solveMINLP_recursive_Normal("sQsingleNormal_recursive");
+					null, sQmodel.optQ);
+			double c2 = sQmodelPlusQ.solveMINLP_heuristic_Normal("sQtNormal_heuristic");
 			difference = c1 - c2;
 		}catch(IloException e){
 			e.printStackTrace();
@@ -163,17 +155,22 @@ public class sQminlpNormal_recursive {
 		return  difference;
 	}
 
-	public static void binarySearch(double initialInputLevel, double pace, sQminlpNormal_recursive sQmodel,
-									double costLeft, double costRight) throws Exception {
+	public static void binarySearchsQtHeuristic(double initialInputLevel, double pace, sQTminlpNormal_heuristic sQmodel,
+			double costLeft, double costRight, double currentQ) throws Exception {
+
 		File tempFile = new File ("src/main/java/minlp_Normal/tempRminlp.txt"); //to save reorder point as a string in the file
-		double orderingCost = (sQmodel.Q==0.0)? 0 : (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost);
+		double orderingCost = (currentQ==0.0)? 0 : (sQmodel.fixedCost + currentQ*sQmodel.unitCost);
 		double i1 = initialInputLevel; 
+		//System.out.println("cost("+i1+") = " + costLeft +"\t" + "cost("+(i1+pace)+") = "+costRight);
+
 		if( (costLeft - orderingCost)*(costRight - orderingCost)<0 ) {
 			double levelBinary = i1 + Math.floor(0.5*pace); 
-			double costBinary = costDifference(sQmodel, levelBinary);
+			double costBinary = costDifferencesQtHeuristic(sQmodel, levelBinary, currentQ);
+			//System.out.println("cost(binary="+levelBinary+") = " + costBinary);
+
 			//judge if costBinary > orderingCost or not
 			if(costBinary > orderingCost) {//[binary, input]
-				double costBinaryClose = costDifference (sQmodel, levelBinary + 1);
+				double costBinaryClose = costDifferencesQtHeuristic (sQmodel, levelBinary + 1, currentQ);
 				if((costBinaryClose < orderingCost)||(levelBinary == i1 + pace)) {
 					//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
 					String s_string = Double.toString(levelBinary+1);
@@ -181,10 +178,10 @@ public class sQminlpNormal_recursive {
 					System.out.println();
 				}else {
 					System.out.println("binary search proceeds, right interval.");
-					binarySearch(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight);
+					binarySearchsQtHeuristic(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight, currentQ);
 				}
 			}else {//[input, binary]
-				double costBinaryClose = costDifference (sQmodel, levelBinary - 1);
+				double costBinaryClose = costDifferencesQtHeuristic (sQmodel, levelBinary - 1, currentQ);
 				if((costBinaryClose > orderingCost)||(levelBinary == i1)) {
 					//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
 					String s_string = Double.toString(levelBinary+1);
@@ -192,49 +189,65 @@ public class sQminlpNormal_recursive {
 					System.out.println();
 				}else {
 					System.out.println("binary search proceeds, left interval.");
-					binarySearch(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary);
+					binarySearchsQtHeuristic(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary, currentQ);
 				}				
 			}
 		}else {//pace is not large/small enough
 			if( costLeft < orderingCost) {
 				System.out.println("Cost of initial input invnetory is too small, move left");
-				binarySearch(i1 - pace, pace, sQmodel,costDifference(sQmodel, i1-pace), costDifference(sQmodel, i1));
+				binarySearchsQtHeuristic(i1 - pace, pace, sQmodel,
+						costDifferencesQtHeuristic(sQmodel, i1-pace, currentQ), 
+						costDifferencesQtHeuristic(sQmodel, i1, currentQ), currentQ);
 			}else {
 				System.out.println("Cost of initial input invnetory is too large, move right");
-				binarySearch(i1 + pace, pace, sQmodel, costDifference(sQmodel, i1), costDifference(sQmodel, i1+pace));
+				binarySearchsQtHeuristic(i1 + pace, pace, sQmodel, 
+						costDifferencesQtHeuristic(sQmodel, i1, currentQ), 
+						costDifferencesQtHeuristic(sQmodel, i1+pace, currentQ), currentQ);
 			}
 		}
 	}
-	
-	public static double[] reorderPoint_sQheuristic(
+
+	public static double[] reorderPoint_sQtHeuristic(
 			double[] demandMean, double fixedCost, double unitCost, double holdingCost, double penaltyCost, 
-			double initialStock, double stdParameter,
-			int partitions, double[] piecewiseProb, double[] means, double error, double pace, double[] schedule) throws Exception {
-		
-		//compute reorder point
+			double initialStock, double stdParameter, int partitions, double[] piecewiseProb, double[] means, double error, 
+			double pace, double[] schedule) throws Exception {
 		double[] reorderPoint = new double[demandMean.length];
 		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
+
+		//solve reorderpoints
 		for(int t=0; t<demandMean.length; t++) {
 			if(schedule[t] == 0.0) {
 				reorderPoint[t] = Double.NEGATIVE_INFINITY;
-				System.out.println("no replenishmeng placed.");
+				System.out.println("no replenishment placed.");
 				System.out.println();
 			}else {
-				try {
-					sQminlpNormal_recursive sQmodel = new sQminlpNormal_recursive(
+				if(t==demandMean.length-1) {
+					try {
+						sQminlpNormal_recursive sQmodelBR = new sQminlpNormal_recursive(
+								demandMeanInput[t], holdingCost, fixedCost,  unitCost, penaltyCost, 
+								initialStock, stdParameter, 
+								partitions,  means, piecewiseProb, error,
+								null, schedule[t]);
+						//System.out.println("orderingCost = " + (sQmodelBR.fixedCost + Q[t]*sQmodelBR.unitCost));
+						double costLeft = minlp_Normal.sQminlpNormal_recursive.costDifference(sQmodelBR, initialStock); 
+						double costRight = minlp_Normal.sQminlpNormal_recursive.costDifference(sQmodelBR, initialStock + pace); 
+						minlp_Normal.sQminlpNormal_recursive.binarySearch(initialStock, pace, sQmodelBR, costLeft, costRight);
+					}catch(IloException e){
+						e.printStackTrace();
+					}	
+				}else{
+					double[] futureQ = sdp.util.decomposeDoubleArray.decomposeArray(schedule, demandMean.length-t-1);
+					//System.out.println("future Q: "+Arrays.toString(futureQ));
+					sQTminlpNormal_heuristic sQmodelBRT = new sQTminlpNormal_heuristic(
 							demandMeanInput[t], holdingCost, fixedCost,  unitCost, penaltyCost, 
 							initialStock, stdParameter, 
-							partitions,  means, piecewiseProb, error,
-							null, schedule[t]
-							);
-					System.out.println("orderingCost = " + (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost));
-					double costLeft = costDifference(sQmodel, initialStock); System.out.println("costLeft = "+ costLeft);
-					double costRight = costDifference(sQmodel, initialStock + pace); System.out.println("costRight = "+ costRight);
-					binarySearch(initialStock, pace, sQmodel, costLeft, costRight);
-				}catch(IloException e){
-					e.printStackTrace();
+							partitions, means, piecewiseProb, error,
+							null, futureQ);
+					double costLeft = costDifferencesQtHeuristic(sQmodelBRT, initialStock, schedule[t]); 
+					double costRight = costDifferencesQtHeuristic(sQmodelBRT, initialStock + pace, schedule[t]); 
+					binarySearchsQtHeuristic(initialStock, pace, sQmodelBRT, costLeft, costRight, schedule[t]);				
 				}
-
+				//record reorder point in an array
 				File tempFile = new File ("src/main/java/minlp_Normal/tempRminlp.txt"); 		
 				FileReader fr = new FileReader(tempFile);
 				BufferedReader br = new BufferedReader(fr);
@@ -246,15 +259,9 @@ public class sQminlpNormal_recursive {
 		return reorderPoint;
 	}
 
-
-
-
-
-
-
-
-
-
+	
+	
+	
 	/*************************************************************************************/
 	public static boolean writeTxtFile(String content,File fileName)throws Exception{
 		RandomAccessFile mm=null;
@@ -270,9 +277,5 @@ public class sQminlpNormal_recursive {
 		}
 		return flag;
 	}
+
 }
-
-
-
-
-

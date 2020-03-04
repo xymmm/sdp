@@ -1,9 +1,10 @@
 /*********************************************
- * OPL 12.8.0.0 Model
+ * OPL 12.9.0.0 Model
  * Author: Xiyuan
- * Creation Date: Sep 23, 2019 at 1:08:34 PM
+ * Creation Date: 2020年3月3日 at 下午8:49:08
  *********************************************/
 
+ 
 //parameters
 int nbmonths=...;
 range months=1..nbmonths;
@@ -21,6 +22,9 @@ range partitions=1..nbpartitions;
 float means[partitions]=...;
 float prob[partitions]=...;
 float error=...;
+
+range monthsMinor = 2..nbmonths;
+float optQ[monthsMinor] = ...;
 
 //variables
 dvar float stock[0..nbmonths];
@@ -45,7 +49,9 @@ subject to{
  stockhlb[0]==maxl(stock[0],0);
  stockplb[0]==maxl(-stock[0],0);
  
-//purchase[1] == 0;	//initial order = 0 when compute reorder point s.
+purchase[1] == 0;	//initial order = 0 when compute reorder point s.
+
+forall(t in monthsMinor)Q[t] == optQ[t];
 
 forall(t in months) purchase[t] == 1 => U[t]==Q[t];
 forall(t in months) purchase[t] == 0 => U[t]==0;
