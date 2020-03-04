@@ -126,7 +126,7 @@ public class RH_sQt {
 									 double holdingCost, double fixedCost, double unitCost, double penaltyCost, 
 									 double initialStock, int currentTimeIndex) {
 		double[] futureDemand = RecedingHorizon.sQt.generateNormalDemandSeries.demandRecedingHorizon(demand, currentTimeIndex);
-		System.out.println("t = "+(currentTimeIndex+1)+"\t"+"future demand: "+Arrays.toString(futureDemand));
+		//System.out.println("t = "+(currentTimeIndex+1)+"\t"+"future demand: "+Arrays.toString(futureDemand));
 		singleRHminlpSolution_sQt solution = null;
 		try {
 			RH_sQt sQtRHmodel = new RH_sQt(
@@ -137,10 +137,10 @@ public class RH_sQt {
 		}catch(IloException e){
 	         e.printStackTrace();
 	    }
-		System.out.println("MINLP"+"\t"+"Q: "+Arrays.toString(solution.Q));
-		System.out.println("MINLP"+"\t"+"holding: "+Arrays.toString(solution.stockhlb));
-		System.out.println("MINLP"+"\t"+"penalty: "+Arrays.toString(solution.stockplb));
-		System.out.println();
+		//System.out.println("MINLP"+"\t"+"Q: "+Arrays.toString(solution.Q));
+		//System.out.println("MINLP"+"\t"+"holding: "+Arrays.toString(solution.stockhlb));
+		//System.out.println("MINLP"+"\t"+"penalty: "+Arrays.toString(solution.stockplb));
+		//System.out.println();
 		
 		double optimalQ = solution.Q[0];
 		double currentCost = ((optimalQ>0)?1:0)*(fixedCost + optimalQ*unitCost) 
@@ -160,7 +160,7 @@ public class RH_sQt {
 		closingInventory[0] = initialStock;
 		
 		for(int t=0; t<demand.length; t++) {
-			System.out.println("MINLP"+"\t"+"opening Inventory: "+closingInventory[t]);
+			//System.out.println("MINLP"+"\t"+"opening Inventory: "+closingInventory[t]);
 			singleRHsolution_sQt solution = oneStepRH_sQt(demand, stdParameter, 
 					 holdingCost, fixedCost, unitCost, penaltyCost, 
 					 closingInventory[t], t);
@@ -186,18 +186,27 @@ public class RH_sQt {
 		double penaltyCost = 10;
 		double initialStock = 0;
 		
-		double[] demand = RecedingHorizon.sQt.generateNormalDemandSeries.generateNormalDemand(demandMean, stdParameter);
-		System.out.println("Generated Normal Demand: "+Arrays.toString(demand));
-		System.out.println();
+
 		
-		RHsolution_sQt solution = RHcomplete_sQt(demand, stdParameter, 
-				 holdingCost, fixedCost, unitCost, penaltyCost, 
-				 initialStock);
+		int count = 10;
+		double[] RHcosts = new double[count];
+		for(int i=0; i<count; i++) {
+			double[] demand = RecedingHorizon.sQt.generateNormalDemandSeries.generateNormalDemand(demandMean, stdParameter);
+			//System.out.println("Generated Normal Demand: "+Arrays.toString(demand));
+			//System.out.println();
+			
+			RHsolution_sQt solution = RHcomplete_sQt(demand, stdParameter, 
+					 holdingCost, fixedCost, unitCost, penaltyCost, 
+					 initialStock);
+			//System.out.println("===================================");
+			//System.out.println("RH-Q"+"\t"+Arrays.toString(solution.scheduleQ));
+			//System.out.println("RH-C"+"\t"+Arrays.toString(solution.scheduleCurrentCost));
+			RHcosts[i] = solution.totalCost;
+		}
+		System.out.println(Arrays.toString(RHcosts));
+		System.out.println("average = "+ sdp.util.sum.average(RHcosts));
 		
-		System.out.println("===================================");
-		System.out.println("RH-Q"+"\t"+Arrays.toString(solution.scheduleQ));
-		System.out.println("RH-C"+"\t"+Arrays.toString(solution.scheduleCurrentCost));
-		System.out.println("RH-C"+"\t"+solution.totalCost);
+
 
 
 	}

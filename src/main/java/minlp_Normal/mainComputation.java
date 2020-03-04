@@ -21,20 +21,6 @@ public class mainComputation {
 		
 		double pace = 100;
 		
-		//============================== sQ minlp ==========================
-		//schedule
-		double[] sQschedule = sQminlpNormal_oneRun.sQminlpSchedule(
-				demandMean, fixedCost, unitCost, holdingCost, penaltyCost,
-			 initialStock, stdParameter, partitions, piecewiseProb, means, error);		
-		//reorder point
-		double[] s_sQ = sQminlpNormal_recursive.reorderPoint_sQheuristic(
-				demandMean, fixedCost, unitCost, holdingCost, penaltyCost, 
-				initialStock, stdParameter,
-				partitions, piecewiseProb, means, error, pace, sQschedule);
-		System.out.println("optimal schedule for sQt policy is "+Arrays.toString(sQschedule));
-		System.out.println("Associated reorder poing is "+Arrays.toString(s_sQ));
-		System.out.println();
-
 		//============================== sQt minlp ==========================
 		//sQt minlp 
 		
@@ -49,6 +35,22 @@ public class mainComputation {
 		System.out.println("optimal schedule for sQt policy is "+Arrays.toString(sQtschedule));
 		System.out.println("Associated reorder poing is "+Arrays.toString(s_sQt));
 		System.out.println();
+		
+		//============================== sQ minlp ==========================
+		//schedule
+		double[] sQschedule = sQminlpNormal_oneRun.sQminlpSchedule(
+				demandMean, fixedCost, unitCost, holdingCost, penaltyCost,
+			 initialStock, stdParameter, partitions, piecewiseProb, means, error);		
+		//reorder point
+		double[] s_sQ = sQminlpNormal_recursive.reorderPoint_sQheuristic(
+				demandMean, fixedCost, unitCost, holdingCost, penaltyCost, 
+				initialStock, stdParameter,
+				partitions, piecewiseProb, means, error, pace, sQschedule);
+		System.out.println("optimal schedule for sQt policy is "+Arrays.toString(sQschedule));
+		System.out.println("Associated reorder poing is "+Arrays.toString(s_sQ));
+		System.out.println();
+
+
 
 	}
 

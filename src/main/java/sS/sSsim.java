@@ -36,13 +36,6 @@ public class sSsim {
 	
 	/** 5. generate Poisson random number as demand **/
 	static int generateDemand(int inventoryLevel, int actionDecision, sSsimInstance sSsimInstance, int currentStageIndex) {
-		/*
-		int demand = getPoissonVariable(sSsimInstance.demandMean[currentStageIndex]);
-		while(checkDemand(inventoryLevel, sSsimInstance, demand) == false) {
-			demand = getPoissonVariable(sSsimInstance.demandMean[currentStageIndex]);
-		}
-		return -demand;
-		*/
 		  RandomVariateGenInt genDemand;
 		  RandomStream streamDemand = new MRG32k3a();
 		  genDemand = new PoissonGen(streamDemand, new PoissonDist(sSsimInstance.demandMean[currentStageIndex])); 
@@ -60,24 +53,7 @@ public class sSsim {
 			return false;
 		}
 	}
-	/*
-	private static int getPoissonVariable(double lamda) {
-		int x = 0;
-		double y = Math.random(), cdf = getPoissonProbability(x, lamda);
-		while (cdf < y) {
-			x++;
-			cdf += getPoissonProbability(x, lamda);
-		}
-		return x;
-	}
-	private static double getPoissonProbability(int k, double lamda) {
-		double c = Math.exp(-lamda), sum = 1;
-		for (int i = 1; i <= k; i++) {
-			sum *= lamda / i;
-		}
-		return sum * c;
-	}
-	*/
+
 	
 	
 	/** 6. compute holding or penalty cost **/

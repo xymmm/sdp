@@ -158,8 +158,8 @@ public class sS {
 		 * The probability of each possible demand in each period is computed and stored in a 2D array, demandProbabilities[][].
 		 * The first index represents the possible demand value ranged from 0 to maxDemand, and the second index represents the time period.
 		 * **/
-		double demandProbabilities [][] = computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
-		//double demandProbabilities [][] = computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
+		//double demandProbabilities [][] = computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
 
 		/** Compute ETC 
 		 *
@@ -235,7 +235,7 @@ public class sS {
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {2,4,6,4};
-		double[] demandMean = {60, 60, 60, 60};
+		double[] demandMean = {20, 40, 60, 40};
 
 		InstanceDouble instance = new InstanceDouble(
 										fixedOrderingCost,

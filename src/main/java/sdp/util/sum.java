@@ -9,5 +9,9 @@ public class sum {
 		}
 		return sum;
 	}
+	
+	public static double average(double[] arr) {
+		return summation(arr)/arr.length;
+	}
 
 }

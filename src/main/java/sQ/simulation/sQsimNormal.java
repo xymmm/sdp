@@ -117,14 +117,10 @@ public class sQsimNormal {
 		
 		//instance classic
 		double[] demandMean = {20,40,60,40};
-		double Q = 9;								//SDP sQ
-		double[] reorderPoint = {139, 124, 88, 31};	//SDP sQ, SDP sQt
+		double[] reorderPoint = {44, Double.NEGATIVE_INFINITY, 69,Double.NEGATIVE_INFINITY};//{12, Double.NEGATIVE_INFINITY, 51, Double.NEGATIVE_INFINITY};	//SDP sQ, SDP sQt
 
 		
-		double[] actionQuantity = new double[reorderPoint.length];
-		for(int t=0; t<actionQuantity.length;t++) {
-			actionQuantity[t] = Q;
-		}
+		double[] actionQuantity = {76, 0, 91, 0};
 		
 		sQsimInstanceDouble sQsystem = new sQsimInstanceDouble(
 				fixedOrderingCost,
