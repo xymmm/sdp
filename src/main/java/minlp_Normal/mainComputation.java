@@ -2,13 +2,15 @@ package minlp_Normal;
 
 import java.util.Arrays;
 
+import umontreal.ssj.util.Chrono;
+
 public class mainComputation {
 	
 	public static void main(String args[]) throws Exception {
 		
 		double[] demandMean = {20, 40, 60, 40};
 		double fixedCost = 100;//5,10,20
-		double unitCost = 1;//0,1
+		double unitCost = 0;//0,1
 		double holdingCost = 1;
 		double penaltyCost = 10;//2,3
 		double initialStock = 0;
@@ -34,6 +36,25 @@ public class mainComputation {
 		
 		System.out.println("optimal schedule for sQt policy is "+Arrays.toString(sQtschedule));
 		System.out.println("Associated reorder poing is "+Arrays.toString(s_sQt));
+
+		
+		simNormalInstance normalInstance_sQt = new simNormalInstance(
+				demandMean, 
+				fixedCost,
+				unitCost,
+				holdingCost, 
+				penaltyCost, 
+				initialStock, 
+				stdParameter, 
+				sQtschedule, 
+				s_sQt				
+				);
+		
+		int count = 100000;
+		minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(normalInstance_sQt, count);
+		normalInstance_sQt.statCost.setConfidenceIntervalStudent();
+		double sQt_simCost = normalInstance_sQt.statCost.average();
+		System.out.println(sQt_simCost);
 		System.out.println();
 		
 		//============================== sQ minlp ==========================
@@ -46,9 +67,25 @@ public class mainComputation {
 				demandMean, fixedCost, unitCost, holdingCost, penaltyCost, 
 				initialStock, stdParameter,
 				partitions, piecewiseProb, means, error, pace, sQschedule);
-		System.out.println("optimal schedule for sQt policy is "+Arrays.toString(sQschedule));
+		System.out.println("optimal schedule for sQ policy is "+Arrays.toString(sQschedule));
 		System.out.println("Associated reorder poing is "+Arrays.toString(s_sQ));
-		System.out.println();
+		
+		simNormalInstance normalInstance_sQ = new simNormalInstance(
+				demandMean, 
+				fixedCost,
+				unitCost,
+				holdingCost, 
+				penaltyCost, 
+				initialStock, 
+				stdParameter, 
+				sQschedule, 
+				s_sQ				
+				);
+
+		minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(normalInstance_sQ, count);
+		normalInstance_sQ.statCost.setConfidenceIntervalStudent();
+		double sQ_simCost = normalInstance_sQ.statCost.average();
+		System.out.println(sQ_simCost);
 
 
 

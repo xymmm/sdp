@@ -11,8 +11,8 @@ public class optimalSchedule_sQ {
 	
 	public static sQsystemSolution optimalSchedule_sQ(InstanceDouble instance) {		
 		
-		//double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
-		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
+		double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
+		//double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
 		
 		double[] bestCost = new double[instance.maxQuantity];
 		int[][] bestSchedule = new int[instance.maxQuantity][instance.getStages()];
