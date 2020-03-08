@@ -100,14 +100,11 @@ public class sQminlp_recursive {
 		}
 	}
 
-
 	class sQrecursiveData extends IloCustomOplDataSource{
 		sQrecursiveData(IloOplFactory oplF){
 			super(oplF);
 		}
-
 		public void customRead(){
-
 			IloOplDataHandler handler = getDataHandler();
 			//problem parameters
 			handler.startElement("nbmonths"); handler.addIntItem(demandMean.length); handler.endElement();
@@ -222,7 +219,6 @@ public class sQminlp_recursive {
 	public static double[] reorderPoint_sQheuristic(
 			double[] demandMean, double fixedCost, double unitCost, double holdingCost, double penaltyCost, 
 			double initialStock, int partitions, double pace, double[] schedule, boolean rangedQ) throws Exception {
-		
 		//compute reorder point
 		double[] reorderPoint = new double[demandMean.length];
 		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
@@ -253,39 +249,9 @@ public class sQminlp_recursive {
 		}
 		return reorderPoint;
 	}
+	
 
-
-
-
-
-
-
-
-	public static void main(String[] args) throws Exception {;
-
-		double[] demandMean = {20, 40, 60, 40};
-		double fixedCost = 100;
-		double unitCost = 0;
-		double holdingCost = 1;
-		double penaltyCost = 10;
-		double initialStock = 0;
-		int partitions = 10;
-		
-		double pace = 100;
-		boolean rangedQ = false;
-		
-		double[] sQschedule = sQminlp_oneRun.sQPoissonMinlpSchedule(demandMean, fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, rangedQ);
-		System.out.println("Poisson Demand: optimal schedule for sQ policy is "+Arrays.toString(sQschedule));
-		double[] s_sQ = sQminlp_recursive.reorderPoint_sQheuristic(demandMean, fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, pace, sQschedule, rangedQ);
-		System.out.println("Associated reorder point is "+Arrays.toString(s_sQ));
-
-		
-		
-
-
-	}
-
-
+//**************************************************************************************************
 	public static boolean writeTxtFile(String content,File fileName)throws Exception{
 		RandomAccessFile mm=null;
 		boolean flag=false;

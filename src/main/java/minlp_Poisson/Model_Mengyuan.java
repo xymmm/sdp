@@ -28,7 +28,7 @@ import java.util.Arrays;
  *
  */
 
-public class Model {
+public class Model_Mengyuan {
    
    int Nbmonths;
    double[] expDemand; 
@@ -42,7 +42,7 @@ public class Model {
    
    String instanceIdentifier;
    
-   public Model(
+   public Model_Mengyuan(
          int Nbmonths, 
          double[] expDemand, 
          double ordercost, 
@@ -137,7 +137,7 @@ public class Model {
       double lb = Double.NaN;
       double ub = Double.NaN;
       try{
-         Model model = new Model(
+         Model_Mengyuan model = new Model_Mengyuan(
                Nbmonths, 
                expDemand, 
                ordercost, 
@@ -155,7 +155,7 @@ public class Model {
       }
       
       try{
-         Model model = new Model(
+         Model_Mengyuan model = new Model_Mengyuan(
                Nbmonths, 
                expDemand, 
                ordercost, 
@@ -202,7 +202,7 @@ public double solve(String model_name) throws IloException{
         cplex.setParam(IloCplex.IntParam.MIPEmphasis, 3);
         */
 
-        IloOplDataSource dataSource = new Model.MyData(oplF);
+        IloOplDataSource dataSource = new Model_Mengyuan.MyData(oplF);
         opl.addDataSource(dataSource);
         opl.generate();
 

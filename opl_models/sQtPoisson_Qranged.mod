@@ -56,6 +56,8 @@ forall (t in months, j in 1..t)
   
 forall (t in months)
    		sum(k in 1..t) purchase[k] == 0 => P[1][t] == 1;  
+
+forall(t in months) Q[t] <= 9;
    
 /** Original formulation for Poisson holding cost / complementary loss **/
 forall(t in months, p in partitions)

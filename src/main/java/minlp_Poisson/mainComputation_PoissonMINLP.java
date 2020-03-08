@@ -17,6 +17,15 @@ public class mainComputation_PoissonMINLP {
 		double pace = 100;
 		boolean rangedQ = false;
 		
+		//**********************sQt for Poisson Demand*************************
+		long timeStartsQt = System.currentTimeMillis();
+		double[] sQtschedule = sQTminlp_oneRun.sQTminlpSchedule(demandMean, fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, rangedQ);
+		System.out.println("Poisson Demand: optimal schedule for sQt policy is "+Arrays.toString(sQtschedule));
+		double[] s_sQt = sQTminlp_heuristic.reorderPoint_sQtHeuristic(demandMean, fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, pace, sQtschedule, rangedQ);
+		System.out.println("Associated reorder point is "+Arrays.toString(s_sQt));
+		long timeEndsQt = System.currentTimeMillis();
+		System.out.println("Time consumed for sQt is "+(timeEndsQt - timeStartsQt)/1000.0+"s");
+		
 		
 		//**********************sQ for Poisson Demand*************************
 		long timeStartsQ = System.currentTimeMillis();

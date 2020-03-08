@@ -17,6 +17,7 @@ import ilog.opl.IloOplModel;
 import ilog.opl.IloOplModelDefinition;
 import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
+import minlp_Normal.sQTminlpNormal_oneRun;
 
 public class sQTminlp_oneRun {
 
@@ -79,10 +80,10 @@ public class sQTminlp_oneRun {
 		{   
 			double objective = cplex.getObjValue();
 			double[] Q = new double[demandMean.length];
-            for(int t = 0; t < Q.length; t++){
-                Q[t] = cplex.getValue(opl.getElement("Q").asNumVarMap().get(t+1));
-                //System.out.println("Q["+(t+1)+"] = "+Q[t]);
-             }
+			for(int t = 0; t < Q.length; t++){
+				Q[t] = cplex.getValue(opl.getElement("Q").asNumVarMap().get(t+1));
+				//System.out.println("Q["+(t+1)+"] = "+Q[t]);
+			}
 			opl.postProcess();
 			oplF.end();
 			System.gc();
@@ -93,9 +94,9 @@ public class sQTminlp_oneRun {
 			System.out.println("No solution!");
 			oplF.end();
 			System.gc();
-            for(int t = 0; t < Q.length; t++){
-                Q[t] = Double.NaN;
-                }
+			for(int t = 0; t < Q.length; t++){
+				Q[t] = Double.NaN;
+			}
 			return Q;
 		} 
 
@@ -116,10 +117,10 @@ public class sQTminlp_oneRun {
 			handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
 			handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
 			handler.startElement("meandemand"); handler.startArray();
-			
-            for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
-            handler.endArray(); handler.endElement();
-			
+
+			for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
+			handler.endArray(); handler.endElement();
+
 			//handler.startElement("initialInventoryLevel"); handler.addNumItem(initialInventoryLevel); handler.endElement();
 			handler.startElement("initialStock"); handler.addNumItem(initialInventoryLevel); handler.endElement();
 
@@ -151,45 +152,31 @@ public class sQTminlp_oneRun {
 
 	}
 
-	public static void main(String[] args) {
-		double[] demandMean = {1, 3, 4.5, 2};
-		double fixedCost = 5;
-		double unitCost = 0;
-		double holdingCost = 1;
-		double penaltyCost = 3;
-
-		double initialInventoryLevel = 0;
-
-		int partitions = 20;
-
-		long startTime = System.currentTimeMillis();
-
-		double[] Q = new double[demandMean.length];
+	public static double[] sQTminlpSchedule(
+			double[] demandMean, double fixedCost, double unitCost, double holdingCost, double penaltyCost,
+			double initialStock, 
+			int partitions, boolean Qranged) {
 		
+		String FileName = null;	
+		if(Qranged == true) {
+			FileName = "sQtPoisson_Qranged";
+		}else {
+			FileName = "sQtPoisson";
+		}
+		
+		double[] schedule = new double[demandMean.length];
 		try {
 			sQTminlp_oneRun sQmodel = new sQTminlp_oneRun(
-					demandMean,
-					holdingCost,
-					fixedCost,
-					unitCost,
-					penaltyCost,
-					initialInventoryLevel,
+					demandMean, holdingCost, fixedCost,  unitCost, penaltyCost, 
+					initialStock, 
 					partitions,
-					"sQtPoisson"
+					null
 					);
-			Q = sQmodel.solveMINLP_recursive("sQtPoisson");
-			//System.out.println("c("+initialStock+") = " +obj);
-			
+			schedule = sQmodel.solveMINLP_recursive(FileName);
 		}catch(IloException e){
 			e.printStackTrace();
 		}
-
-		long endTime = System.currentTimeMillis();
-
-		System.out.println("time consumed = "+(endTime - startTime)/1000+" s");		
-
-		System.out.println(Arrays.toString(Q));
+		return schedule;
 	}
-
 
 }
