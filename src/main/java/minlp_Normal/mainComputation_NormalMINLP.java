@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import umontreal.ssj.util.Chrono;
 
-public class mainComputation {
+public class mainComputation_NormalMINLP {
 	
 	public static void main(String args[]) throws Exception {
 		
@@ -68,7 +68,7 @@ public class mainComputation {
 				initialStock, stdParameter,
 				partitions, piecewiseProb, means, error, pace, sQschedule);
 		System.out.println("optimal schedule for sQ policy is "+Arrays.toString(sQschedule));
-		System.out.println("Associated reorder poing is "+Arrays.toString(s_sQ));
+		System.out.println("Associated reorder point is "+Arrays.toString(s_sQ));
 		
 		simNormalInstance normalInstance_sQ = new simNormalInstance(
 				demandMean, 
