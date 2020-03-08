@@ -73,7 +73,8 @@ public class RH_sQt {
 	public static singleRHsolution oneStepRH_sQt(double[] demandMean, double randomDemand, double stdParameter, 
 									 double holdingCost, double fixedCost, double unitCost, double penaltyCost, 
 									 int partitions, double[] means, double[] piecewiseProb, double error,
-									 double initialStock, int currentTimeIndex, double pace) throws Exception {
+									 double initialStock, int currentTimeIndex, double pace, 
+									 boolean print) throws Exception {
 		
 		//obtain the demandMean from the current period to T
 		double[] futureDemand = generateNormalDemandSeries.futureDemandSegment(demandMean, currentTimeIndex);
@@ -83,20 +84,22 @@ public class RH_sQt {
 				futureDemand, fixedCost, unitCost, holdingCost, penaltyCost, 
 				initialStock, stdParameter, 
 				partitions, piecewiseProb, means, error);	//where initialStock will be an input, taking value of previous closing inventory
+		if(print) System.out.println("schedule = "+Arrays.toString(schedule));
 		double[] reorderPoints = minlp_Normal.sQTminlpNormal_heuristic.reorderPoint_sQtHeuristic(
 				futureDemand, fixedCost, unitCost, holdingCost, penaltyCost, 
 				initialStock, stdParameter, 
 				partitions, piecewiseProb, means, error, 
 				pace, schedule);							//same for initialStock
+		if(print) System.out.println("reorderPoints = "+Arrays.toString(reorderPoints));
 		
 		//get solution to this current period and simulate current period
 		singleRHSimSolution currentPeriodEnd = onePeriodSimulation.singlSimulationRH(
 				schedule[0], reorderPoints[0], 
 				randomDemand, 								//generated demand with demandMean
-				fixedCost, holdingCost, penaltyCost, unitCost, initialStock);//same for the initialStock	
-		double currentCost = currentPeriodEnd.cost;
-		double closingInventory = currentPeriodEnd.closingInventory;
-		return new singleRHsolution(currentCost, closingInventory);
+				fixedCost, holdingCost, penaltyCost, unitCost, initialStock, //same for the initialStock
+				print);	
+
+		return new singleRHsolution(currentPeriodEnd.cost, currentPeriodEnd.closingInventory);
 	}
 	
 	
@@ -105,24 +108,26 @@ public class RH_sQt {
 	public static double RHcomplete_sQt(double[] demandMean, double stdParameter, 
 			 									double holdingCost, double fixedCost, double unitCost, double penaltyCost, 
 			 									int partitions, double[] means, double[] piecewiseProb, double error,
-			 									double initialStock, double pace) throws Exception {
+			 									double initialStock, double pace,
+			 									boolean print) throws Exception {
 		double[] CurrentCost = new double[demandMean.length];
 		double[] randomDemand = new double[demandMean.length];
 		for(int t=0; t<demandMean.length; t++) {
 			randomDemand[t] = generateNormalDemand(demandMean[t], stdParameter);
 		}
-		System.out.println(Arrays.toString(randomDemand));
+		//System.out.println(Arrays.toString(randomDemand));
 		
 		double[] closingInventory = new double[demandMean.length];
 		closingInventory[0] = initialStock;
 		
 		for(int t=0; t<demandMean.length; t++) {
+			if(print) System.out.println((t+1));
 			singleRHsolution solution = oneStepRH_sQt(demandMean, randomDemand[t], stdParameter, 
 					 holdingCost, fixedCost, unitCost, penaltyCost, 
 					 partitions, means, piecewiseProb, error,
-					 closingInventory[t], t, pace);	
+					 closingInventory[t], t, pace, print);	
 			CurrentCost[t] = solution.cost;
-			if(t<demandMean.length-1)closingInventory[t] = solution.closingInventory;
+			if(t<demandMean.length-1)closingInventory[t+1] = solution.closingInventory;
 		}
 
 		
@@ -144,11 +149,18 @@ public class RH_sQt {
 		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
 		double error = 0.0339052;
 		
-		double cost = RHcomplete_sQt(demandMean, stdParameter, 
-									 holdingCost, fixedCost, unitCost, penaltyCost, 
-									 partitions, means, piecewiseProb, error,
-									 initialStock, pace);
-		System.out.println(cost);
+		boolean print = false;
+		
+		int count = 100;
+		for(int c=0; c<count; c++) {
+			double cost = RHcomplete_sQt(demandMean, stdParameter, 
+					 holdingCost, fixedCost, unitCost, penaltyCost, 
+					 partitions, means, piecewiseProb, error,
+					 initialStock, pace, 
+					 print);
+			System.out.println(cost);
+		}
+
 	
 	}
 
