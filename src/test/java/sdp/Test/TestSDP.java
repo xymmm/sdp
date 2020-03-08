@@ -120,7 +120,7 @@ public class TestSDP {
    public void testInstanceA() {
       InstanceDouble instance = getInstanceA();
       
-      sSsolution solution = sS.solveInstance(instance,false);
+      sSsolution solution = sS.solveInstance(instance,false, false);
       
       double expectedTotalCost = 1100.4741964293196;
       assertEquals(
@@ -133,7 +133,7 @@ public class TestSDP {
    public void testInstanceB() {
       InstanceDouble instance = getInstanceB();
       
-      sSsolution solution = sS.solveInstance(instance,false);
+      sSsolution solution = sS.solveInstance(instance,false, false);
       
       double expectedTotalCost = 1765.903451217189;
       assertEquals(
@@ -146,7 +146,7 @@ public class TestSDP {
    public void testInstanceC() {
       InstanceDouble instance = getInstanceC();
       
-      sSsolution solution = sS.solveInstance(instance,false);
+      sSsolution solution = sS.solveInstance(instance,false, false);
       
       double expectedTotalCost = 724.244847692616;
       assertEquals(

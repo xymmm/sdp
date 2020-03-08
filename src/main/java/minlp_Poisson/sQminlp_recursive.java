@@ -188,7 +188,7 @@ public class sQminlp_recursive {
 					//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
 					String s_string = Double.toString(levelBinary+1);
 					boolean flag = writeTxtFile(s_string, tempFile);
-					System.out.println();
+					//System.out.println();
 				}else {
 					System.out.println("binary search proceeds, right interval.");
 					binarySearch(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight, rangedQ);
@@ -199,7 +199,7 @@ public class sQminlp_recursive {
 					//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
 					String s_string = Double.toString(levelBinary+1);
 					boolean flag = writeTxtFile(s_string, tempFile);
-					System.out.println();
+					//System.out.println();
 				}else {
 					System.out.println("binary search proceeds, left interval.");
 					binarySearch(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary, rangedQ);

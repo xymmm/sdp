@@ -170,9 +170,6 @@ public class simulationNormalMINLP {
 		System.out.println("Total CPU time: "+timer.format());
 
 		System.out.println(normalInstance.statCost.average());
-		
-		
-		//simNormal(normalInstance, true);
 	}
 
 }

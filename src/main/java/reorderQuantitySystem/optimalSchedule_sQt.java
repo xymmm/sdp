@@ -10,11 +10,15 @@ import sdp.data.InstanceDouble;
 
 public class optimalSchedule_sQt {
 	
-	public static sQsystemSolution optimalSchedule_sQt(InstanceDouble instance) {
+	public static sQsystemSolution optimalSchedule_sQt(InstanceDouble instance, boolean Normal) {
 		
-		double demandProbabilities [][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
-		//double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
+		double[][] demandProbabilities = null;
+		if(Normal == true) {
+			demandProbabilities = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail); //normal
+		}else {
+			demandProbabilities = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
 
+		}
 		double costPrevious;
 		double costCurrent;
 		double costLater;
@@ -51,7 +55,7 @@ public class optimalSchedule_sQt {
 				LocalMinCostsList.add(costCurrent);
 				minGsList.add(g-1);
 			}
-			if(g%10000 == 0) System.out.println("Computation completed for generator = "+g);
+			//if(g%10000 == 0) System.out.println("Computation completed for generator = "+g);
 			g = g+1;
 		}while(g < maxG);
 				
@@ -91,7 +95,8 @@ public class optimalSchedule_sQt {
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {20, 40, 60, 40};
-		double[] demandMean = {1,2,1.5,3};
+		//double[] demandMean = {1,2,1.5,3};
+		double[] demandMean = {2,4,6,4};
 		
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
@@ -106,7 +111,7 @@ public class optimalSchedule_sQt {
 				stdParameter
 				);
 
-		sQsystemSolution sQtsolution = optimalSchedule_sQt(instance);
+		sQsystemSolution sQtsolution = optimalSchedule_sQt(instance,false);
 		
 		System.out.println(sQtsolution.optimalCost);
 		System.out.println(Arrays.toString(sQtsolution.optimalSchedule));

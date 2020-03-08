@@ -128,7 +128,7 @@ public class sS {
 	}
 	
 	/** compute the expected total cost and get optimal actions **/
-	public static sSsolution solveInstance(InstanceDouble instance, boolean initialOrder) {
+	public static sSsolution solveInstance(InstanceDouble instance, boolean initialOrder, boolean Normal) {
 		/** model stages? **/
 		int Stages = instance.getStages();
 
@@ -158,8 +158,12 @@ public class sS {
 		 * The probability of each possible demand in each period is computed and stored in a 2D array, demandProbabilities[][].
 		 * The first index represents the possible demand value ranged from 0 to maxDemand, and the second index represents the time period.
 		 * **/
-		//double demandProbabilities [][] = computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
-		double demandProbabilities [][] = computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
+		double demandProbabilities [][] = null;
+		if(Normal == false) {
+			demandProbabilities = computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		}else {
+			demandProbabilities = computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
+		}
 
 		/** Compute ETC 
 		 *
@@ -228,14 +232,16 @@ public class sS {
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
+		int minInventory = -2000;
+		int maxInventory = 2000;
 		int maxQuantity = 500;
 
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {2,4,6,4};
-		double[] demandMean = {20, 40, 60, 40};
+		double[] demandMean = {20, 0.1, 60, 40};
+		
+		boolean Normal = true;
 
 		InstanceDouble instance = new InstanceDouble(
 										fixedOrderingCost,
@@ -250,17 +256,17 @@ public class sS {
 										stdParameter
 										);
 
-		sSsolution solution = solveInstance(instance, true);	//with initial order 
+		sSsolution solution = solveInstance(instance, true, Normal);	//with initial order 
 
 		presentsSresults(solution, instance);
 		
-		for(int i=0; i<solution.inventory.length; i++) {
+		/*for(int i=0; i<solution.inventory.length; i++) {
 			System.out.print("i: "+ (i+instance.minInventory) + "\t");
 			for(int t=0; t<instance.demandMean.length; t++) {
 				System.out.print(solution.optimalCost[i][t] + "\t");
 			}
 			System.out.println();
-		}
+		}*/
 	}
 
 }

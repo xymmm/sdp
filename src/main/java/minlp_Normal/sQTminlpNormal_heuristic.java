@@ -175,9 +175,9 @@ public class sQTminlpNormal_heuristic {
 					//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
 					String s_string = Double.toString(levelBinary+1);
 					boolean flag = writeTxtFile(s_string, tempFile);
-					System.out.println();
+					//System.out.println();
 				}else {
-					System.out.println("binary search proceeds, right interval.");
+					//System.out.println("binary search proceeds, right interval.");
 					binarySearchsQtHeuristic(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight, currentQ);
 				}
 			}else {//[input, binary]
@@ -186,20 +186,20 @@ public class sQTminlpNormal_heuristic {
 					//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
 					String s_string = Double.toString(levelBinary+1);
 					boolean flag = writeTxtFile(s_string, tempFile);
-					System.out.println();
+					//System.out.println();
 				}else {
-					System.out.println("binary search proceeds, left interval.");
+					//System.out.println("binary search proceeds, left interval.");
 					binarySearchsQtHeuristic(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary, currentQ);
 				}				
 			}
 		}else {//pace is not large/small enough
 			if( costLeft < orderingCost) {
-				System.out.println("Cost of initial input invnetory is too small, move left");
+				//System.out.println("Cost of initial input invnetory is too small, move left");
 				binarySearchsQtHeuristic(i1 - pace, pace, sQmodel,
 						costDifferencesQtHeuristic(sQmodel, i1-pace, currentQ), 
 						costDifferencesQtHeuristic(sQmodel, i1, currentQ), currentQ);
 			}else {
-				System.out.println("Cost of initial input invnetory is too large, move right");
+				//System.out.println("Cost of initial input invnetory is too large, move right");
 				binarySearchsQtHeuristic(i1 + pace, pace, sQmodel, 
 						costDifferencesQtHeuristic(sQmodel, i1, currentQ), 
 						costDifferencesQtHeuristic(sQmodel, i1+pace, currentQ), currentQ);
@@ -218,8 +218,8 @@ public class sQTminlpNormal_heuristic {
 		for(int t=0; t<demandMean.length; t++) {
 			if(schedule[t] == 0.0) {
 				reorderPoint[t] = Double.NEGATIVE_INFINITY;
-				System.out.println("no replenishment placed.");
-				System.out.println();
+				//System.out.println("no replenishment placed.");
+				//System.out.println();
 			}else {
 				if(t==demandMean.length-1) {
 					try {

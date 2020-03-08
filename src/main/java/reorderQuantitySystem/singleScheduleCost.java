@@ -89,7 +89,7 @@ public class singleScheduleCost {
 		return optimalCostByInventory;
 	}
 	
-	
+	/*
 	public static void main(String args[]) {
 		
 		//create instance
@@ -142,9 +142,9 @@ public class singleScheduleCost {
 				System.out.print(costsQ[i][t]+ "\t");
 			}
 			System.out.println();
-		}*/
+		}
 	}
-
+*/
 
 
 }

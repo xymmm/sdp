@@ -18,197 +18,138 @@ import ilog.opl.IloOplModelDefinition;
 import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
 import minlp_Normal.sQminlpNormal_oneRun;
+import umontreal.ssj.probdist.NormalDist;
+import umontreal.ssj.rng.MRG32k3a;
 
 public class RH_sQt {
 	
-	double[] 	demand;	
-	double		holdingCost;
-	double		fixedCost;
-	double		penaltyCost;
-	double		unitCost;	
-	double		initialStock;	
+	double[] 	demandMean;
+	double 		holdingCost;
+	double 		fixedCost;
+	double 		unitCost;
+	double 		penaltyCost;
+	double 		initialStock;
+	double 		stdParameter;
+	int 		partitions;
+	double[] 	means;
+	double[] 	piecewiseProb;
+	double 		error;	
 	String 		instancIdentifier;
 	
-	public RH_sQt(	double[] demand, double holdingCost, double fixedCost, double penaltyCost, double unitCost, double initialStock, 
-								String instancIdentifier) {
-		this.demand 		= demand;
-		this.fixedCost 		= fixedCost;
+	public RH_sQt(double[] demandMean, double holdingCost, double fixedCost,  double unitCost, double penaltyCost, 
+				  double initialStock, double stdParameter, 
+				  int partitions, double[] means, double[] piecewiseProb, double error,
+				  String instanceIdentifier) {
+		this.demandMean 	= demandMean;
 		this.holdingCost 	= holdingCost;
-		this.penaltyCost	= penaltyCost;
-		this.unitCost		= unitCost;
-		this.initialStock	= initialStock;
+		this.fixedCost 		= fixedCost;
+		this.unitCost 		= unitCost;
+		this.penaltyCost 	= penaltyCost;		
+		this.initialStock 	= initialStock;
+		this.stdParameter = stdParameter;	
+		this.partitions 	= partitions;		
+		this.means = means;
+		this.piecewiseProb = piecewiseProb;
+		this.error = error;
 	}
 	
-	public InputStream getRHmodelStream(File file) {
-	      FileInputStream is = null;
-	      try{
-	         is = new FileInputStream(file);
-	      }catch(IOException e){
-	         e.printStackTrace();
-	      }
-	      return is;
+	/** generate Normal random number as demand **/
+	static MRG32k3a randomStream = new MRG32k3a();	
+	static {
+	   long seed[] = {1234,1234,1234,1234,1234,1234};
+	   randomStream.setSeed(seed);
+	}	
+	static double generateNormalDemand(double demandMean, double stdParameter) {
+		double demand = NormalDist.inverseF(demandMean, 
+				demandMean*stdParameter, randomStream.nextDouble());
+		return Math.round(demand);
 	}
-	
-	/**solve a single step of receding horizon with MINLP, RETURN the optimal quantity of current period**/
-	public singleRHminlpSolution_sQt solveSingleRHsQt(String model_name) throws IloException {
-		IloOplFactory oplF = new IloOplFactory();
-		IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
-		IloCplex cplex = oplF.createCplex();
-		IloOplModelSource modelSource=oplF.createOplModelSourceFromStream(getRHmodelStream(new File("./opl_models/"+model_name+".mod")),model_name);
-		IloOplSettings settings = oplF.createOplSettings(errHandler);
-		IloOplModelDefinition def=oplF.createOplModelDefinition(modelSource,settings);
-		IloOplModel opl=oplF.createOplModel(def,cplex);
-		cplex.setParam(IloCplex.IntParam.Threads, 8);
-		cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);
-		
-		IloOplDataSource dataSource = new singleRHdata_sQt(oplF);
-        opl.addDataSource(dataSource);
-        opl.generate();
-        cplex.setOut(null);
-        //double start = cplex.getCplexImpl().getCplexTime();
-        boolean status =  cplex.solve();
-        //double end = cplex.getCplexImpl().getCplexTime();
-        
-        if(status) {
-        	double[] Q = new double[demand.length];
-        	double[] stockhlb = new double[demand.length];
-        	double[] stockplb = new double[demand.length];
-        	for(int t=0; t<Q.length; t++) {
-        		Q[t]  		= cplex.getValue(opl.getElement("Q").asNumVarMap().get(t+1));
-        		stockhlb[t]	= cplex.getValue(opl.getElement("stockhlb").asNumVarMap().get(t+1));
-        		stockplb[t]	= cplex.getValue(opl.getElement("stockplb").asNumVarMap().get(t+1));
-        	}
-        	opl.postProcess();
-        	oplF.end();
-        	System.gc();
-        	return new singleRHminlpSolution_sQt(Q, stockhlb, stockplb);
-        }else {
-        	double[] Q = new double[demand.length];
-        	double[] stockhlb = new double[demand.length];
-        	double[] stockplb = new double[demand.length];
-			System.out.println("No solution!");
-			oplF.end();
-			System.gc();
-        	for(int t=0; t<Q.length; t++) {
-        		Q[t]  		= Double.NaN;
-        		stockhlb[t]	= Double.NaN;
-        		stockplb[t]	= Double.NaN;
-        	}
-        	return new singleRHminlpSolution_sQt(Q, stockhlb, stockplb);
-        }//if-else
-	}
-	
-	
-	/**import data to .mod**/
-	class singleRHdata_sQt extends IloCustomOplDataSource{
-		singleRHdata_sQt(IloOplFactory oplF){super(oplF);}
-		public void customRead(){
-			IloOplDataHandler handler = getDataHandler();
-			//start import data
-			handler.startElement("nbmonths"); handler.addIntItem(demand.length); handler.endElement();
-			handler.startElement("demand"); handler.startArray();            
-			for (int j = 0 ; j<demand.length ; j++) {handler.addNumItem(demand[j]);}
-			handler.endArray(); handler.endElement();
-			handler.startElement("fc"); handler.addNumItem(fixedCost); handler.endElement();
-			handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
-			handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
-			handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
-			handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();        
-		}
 
-	}
-	
-	
+
 	/**For one step of receding horizon. 
-	 * 'demand' is generated in the main, containing all information of demand that is being dealt with.
-	 * initialStock is substituted as the closing inventory of last iteration**/
-	public static singleRHsolution_sQt oneStepRH_sQt(double[] demand, double stdParameter, 
+	 * solve problem FROM the current period with mean of demand
+	 * initialStock is substituted as the closing inventory of last iteration
+	 * @throws Exception **/
+	public static singleRHsolution oneStepRH_sQt(double[] demandMean, double randomDemand, double stdParameter, 
 									 double holdingCost, double fixedCost, double unitCost, double penaltyCost, 
-									 double initialStock, int currentTimeIndex) {
-		double[] futureDemand = RecedingHorizon.sQt.generateNormalDemandSeries.demandRecedingHorizon(demand, currentTimeIndex);
-		//System.out.println("t = "+(currentTimeIndex+1)+"\t"+"future demand: "+Arrays.toString(futureDemand));
-		singleRHminlpSolution_sQt solution = null;
-		try {
-			RH_sQt sQtRHmodel = new RH_sQt(
-					futureDemand, 
-					holdingCost, fixedCost, penaltyCost, unitCost, initialStock, null
-					);
-			solution = sQtRHmodel.solveSingleRHsQt("recedingHorizon_sQt_Normal");
-		}catch(IloException e){
-	         e.printStackTrace();
-	    }
-		//System.out.println("MINLP"+"\t"+"Q: "+Arrays.toString(solution.Q));
-		//System.out.println("MINLP"+"\t"+"holding: "+Arrays.toString(solution.stockhlb));
-		//System.out.println("MINLP"+"\t"+"penalty: "+Arrays.toString(solution.stockplb));
-		//System.out.println();
+									 int partitions, double[] means, double[] piecewiseProb, double error,
+									 double initialStock, int currentTimeIndex, double pace) throws Exception {
 		
-		double optimalQ = solution.Q[0];
-		double currentCost = ((optimalQ>0)?1:0)*(fixedCost + optimalQ*unitCost) 
-								+ holdingCost * solution.stockhlb[0] + penaltyCost * solution.stockplb[0];
-		double closingInventory = (solution.stockhlb[0]>0) ? solution.stockhlb[0] : (-solution.stockplb[0]);
-		return new singleRHsolution_sQt(optimalQ, currentCost, closingInventory);
+		//obtain the demandMean from the current period to T
+		double[] futureDemand = generateNormalDemandSeries.futureDemandSegment(demandMean, currentTimeIndex);
+		
+		//solve current MINLP
+		double[] schedule = minlp_Normal.sQTminlpNormal_oneRun.sQTminlpSchedule(
+				futureDemand, fixedCost, unitCost, holdingCost, penaltyCost, 
+				initialStock, stdParameter, 
+				partitions, piecewiseProb, means, error);	//where initialStock will be an input, taking value of previous closing inventory
+		double[] reorderPoints = minlp_Normal.sQTminlpNormal_heuristic.reorderPoint_sQtHeuristic(
+				futureDemand, fixedCost, unitCost, holdingCost, penaltyCost, 
+				initialStock, stdParameter, 
+				partitions, piecewiseProb, means, error, 
+				pace, schedule);							//same for initialStock
+		
+		//get solution to this current period and simulate current period
+		singleRHSimSolution currentPeriodEnd = onePeriodSimulation.singlSimulationRH(
+				schedule[0], reorderPoints[0], 
+				randomDemand, 								//generated demand with demandMean
+				fixedCost, holdingCost, penaltyCost, unitCost, initialStock);//same for the initialStock	
+		double currentCost = currentPeriodEnd.cost;
+		double closingInventory = currentPeriodEnd.closingInventory;
+		return new singleRHsolution(currentCost, closingInventory);
 	}
 	
-	/**Main computation of receding horizon - sQt**/
-	public static RHsolution_sQt RHcomplete_sQt(double[] demand,
-									double stdParameter, double holdingCost, double fixedCost, double unitCost, double penaltyCost,
-									double initialStock) {
-		double[] scheduleQ = new double[demand.length];
-		double[] scheduleCurrentCost = new double[demand.length];
+	
+	/**Main computation of receding horizon - sQt
+	 * @throws Exception **/
+	public static double RHcomplete_sQt(double[] demandMean, double stdParameter, 
+			 									double holdingCost, double fixedCost, double unitCost, double penaltyCost, 
+			 									int partitions, double[] means, double[] piecewiseProb, double error,
+			 									double initialStock, double pace) throws Exception {
+		double[] CurrentCost = new double[demandMean.length];
+		double[] randomDemand = new double[demandMean.length];
+		for(int t=0; t<demandMean.length; t++) {
+			randomDemand[t] = generateNormalDemand(demandMean[t], stdParameter);
+		}
+		System.out.println(Arrays.toString(randomDemand));
 		
-		double[] closingInventory = new double[demand.length];
+		double[] closingInventory = new double[demandMean.length];
 		closingInventory[0] = initialStock;
 		
-		for(int t=0; t<demand.length; t++) {
-			//System.out.println("MINLP"+"\t"+"opening Inventory: "+closingInventory[t]);
-			singleRHsolution_sQt solution = oneStepRH_sQt(demand, stdParameter, 
+		for(int t=0; t<demandMean.length; t++) {
+			singleRHsolution solution = oneStepRH_sQt(demandMean, randomDemand[t], stdParameter, 
 					 holdingCost, fixedCost, unitCost, penaltyCost, 
-					 closingInventory[t], t);
-			scheduleQ[t] = solution.Q;
-			scheduleCurrentCost[t] = solution.currentCost;
-			if(t<=demand.length-2)closingInventory[t] = solution.closingInventory;
+					 partitions, means, piecewiseProb, error,
+					 closingInventory[t], t, pace);	
+			CurrentCost[t] = solution.cost;
+			if(t<demandMean.length-1)closingInventory[t] = solution.closingInventory;
 		}
+
 		
-		double totalCost = sdp.util.sum.summation(scheduleCurrentCost);
-		
-		
-		return new RHsolution_sQt(scheduleQ, scheduleCurrentCost, totalCost);
+		return sdp.util.sum.summation(CurrentCost);
 	}
 	
-	
-	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		double[] demandMean = {20,40,60,40};
 		double stdParameter = 0.25;
-		double holdingCost = 1;
 		double fixedCost = 100;
+		double holdingCost = 1;
 		double unitCost = 0;
 		double penaltyCost = 10;
 		double initialStock = 0;
 		
-
+		double pace = 20;
+		int partitions = 4;
+		double[] piecewiseProb = {0.187555, 0.312445, 0.312445, 0.187555};
+		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
+		double error = 0.0339052;
 		
-		int count = 10;
-		double[] RHcosts = new double[count];
-		for(int i=0; i<count; i++) {
-			double[] demand = RecedingHorizon.sQt.generateNormalDemandSeries.generateNormalDemand(demandMean, stdParameter);
-			//System.out.println("Generated Normal Demand: "+Arrays.toString(demand));
-			//System.out.println();
-			
-			RHsolution_sQt solution = RHcomplete_sQt(demand, stdParameter, 
-					 holdingCost, fixedCost, unitCost, penaltyCost, 
-					 initialStock);
-			//System.out.println("===================================");
-			//System.out.println("RH-Q"+"\t"+Arrays.toString(solution.scheduleQ));
-			//System.out.println("RH-C"+"\t"+Arrays.toString(solution.scheduleCurrentCost));
-			RHcosts[i] = solution.totalCost;
-		}
-		System.out.println(Arrays.toString(RHcosts));
-		System.out.println("average = "+ sdp.util.sum.average(RHcosts));
-		
-
-
-
+		double cost = RHcomplete_sQt(demandMean, stdParameter, 
+									 holdingCost, fixedCost, unitCost, penaltyCost, 
+									 partitions, means, piecewiseProb, error,
+									 initialStock, pace);
+		System.out.println(cost);
+	
 	}
 
 

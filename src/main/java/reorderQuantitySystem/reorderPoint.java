@@ -114,7 +114,7 @@ public class reorderPoint {
 				System.out.print(optimalActionByInventory[i][t]+ "\t");
 			}
 			System.out.println();
-		}*/
+		}
 		
 		
 		//print cost by inventory level and time period
@@ -125,7 +125,7 @@ public class reorderPoint {
 				System.out.print(optimalCostByInventory[i][t]+ "\t");
 			}
 			System.out.println();
-		}
+		}*/
 		
 		
 		//print cost given a schedule
@@ -133,7 +133,7 @@ public class reorderPoint {
 		return reorderPoint;
 	}
 	
-	
+	/*
 	public static void main(String args[]) {
 		double fixedOrderingCost = 10;
 		double unitCost = 0;
@@ -164,7 +164,8 @@ public class reorderPoint {
 				stdParameter
 				);
 
-		sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance);
+		boolean Normal = false;
+		sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);
 		
 		System.out.println(sQsolution.optimalCost);
 		System.out.println(Arrays.toString(sQsolution.optimalSchedule));
@@ -173,7 +174,6 @@ public class reorderPoint {
 		System.out.println(Arrays.toString(reorderPoint));
 
 	}
-
-
+	*/
 
 }
