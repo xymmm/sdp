@@ -8,7 +8,7 @@ float v = ...;
 float meandemand[months]=...;
 float Q = ...;
 
-int initialStock = ...;
+float initialStock = ...;
 
 int nbpartitions=...;
 range partitions=1..nbpartitions;
@@ -31,7 +31,6 @@ minimize sum(t in months)( fc*purchase[t]+h*stockhlb[t]+p*stockplb[t] + v*U[t]);
 //constraints
 subject to{
 
-//for sQt small instances
 Q<=9;
 
  stock[0] == initialStock;

@@ -1,20 +1,13 @@
 package minlp_Normal;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
 
 import ilog.concert.IloException;
 import ilog.opl.IloCplex;
@@ -27,8 +20,6 @@ import ilog.opl.IloOplModel;
 import ilog.opl.IloOplModelDefinition;
 import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
-import minlp_Poisson.sQminlpInstance;
-import minlp_Poisson.sQminlp_recursive;
 
 public class sQminlpNormal_recursive {
 
@@ -247,8 +238,30 @@ public class sQminlpNormal_recursive {
 	}
 
 
-
-
+/*
+	public static void main(String[] args) throws IloException {
+		
+		double[] demandMean = {60, 40};
+		double fixedCost = 100;
+		double holdingCost = 1;
+		double unitCost = 0;
+		double penaltyCost = 10;
+		double inventoryLevel = 0;
+		double stdParameter = 0.25;
+		
+		int partitions = 4;
+		double[] piecewiseProb = {0.187555, 0.312445, 0.312445, 0.187555};
+		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
+		double error = 0.0339052;
+		
+		sQminlpNormal_recursive sQmodelInput = new sQminlpNormal_recursive(
+				demandMean, holdingCost, fixedCost,  unitCost, penaltyCost, 
+				inventoryLevel, stdParameter, 
+				partitions,  means, piecewiseProb, error,
+				null, 84);
+		double c1 = sQmodelInput.solveMINLP_recursive_Normal("sQsingleNormal_recursive");
+		System.out.println(c1);
+	}*/
 
 
 

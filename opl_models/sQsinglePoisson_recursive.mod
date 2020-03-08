@@ -6,9 +6,8 @@ float h=...;
 float p=...;
 float v = ...;
 float meandemand[months]=...;
-float Q = ...;
 
-int initialStock = ...;
+float initialStock = ...;
 
 int nbpartitions=...;
 range partitions=1..nbpartitions;
@@ -22,6 +21,8 @@ dvar float+ stockplb[0..nbmonths];
 dvar boolean purchase[months];
 dvar float+ U[1..nbmonths];
 dvar boolean P[months][months];
+
+dvar float+ Q;
 
 float mean_matrix[i in months, j in months] = sum(m in i..j) meandemand[m];
 

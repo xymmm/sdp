@@ -70,23 +70,19 @@ public class sQTminlp_recursive {
         IloOplModelDefinition def=oplF.createOplModelDefinition(modelSource,settings);
         IloOplModel opl=oplF.createOplModel(def,cplex);
         cplex.setParam(IloCplex.IntParam.Threads, 8);
-        cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);
-        
+        cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);       
         IloOplDataSource dataSource = new sQTminlp_recursive.sQtRecursiveData(oplF);
         opl.addDataSource(dataSource);
         opl.generate();
-
-        cplex.setOut(null);
-        
+        cplex.setOut(null);      
         boolean status =  cplex.solve();        
-        if ( status )
-        {   
+        if ( status ){   
         	double objective = cplex.getObjValue();
         	opl.postProcess();
         	oplF.end();
         	System.gc();
         	return objective;
-        } else {
+        }else{
         	System.out.println("No solution!");
         	oplF.end();
         	System.gc();
@@ -100,9 +96,7 @@ public class sQTminlp_recursive {
 		sQtRecursiveData(IloOplFactory oplF){
             super(oplF);
         }
-
-        public void customRead(){
-        
+        public void customRead(){       
          IloOplDataHandler handler = getDataHandler();
          //problem parameters
             handler.startElement("nbmonths"); handler.addIntItem(demandMean.length); handler.endElement();
@@ -113,16 +107,14 @@ public class sQTminlp_recursive {
             handler.startElement("meandemand"); handler.startArray();
             for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
             handler.endArray(); handler.endElement();
-            handler.startElement("initialStock"); handler.addIntItem(initialStock); handler.endElement();
-            
+            handler.startElement("initialStock"); handler.addIntItem(initialStock); handler.endElement();          
             //piecewise
-            handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
-            
+            handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();          
             double partitionProb = 1.0/partitions;
             handler.startElement("prob"); handler.startArray();
             for (int j = 0 ; j<partitions; j++){handler.addNumItem(partitionProb);}
             handler.endArray(); handler.endElement();
-            
+            //picecwise - lambda matrix
             double[][][] coefficients = sQminlp_oneRun.getLamdaMatrix (demandMean, partitions, 100000);
             handler.startElement("lamda_matrix");
             handler.startArray();

@@ -21,6 +21,8 @@ dvar boolean purchase[months];
 dvar boolean P[months][months];
 dvar float+ U[months];
 
+dvar float purchaseDouble[months];
+
 dvar float+ Q;
 
 float mean_matrix[i in months, j in months] = sum(m in i..j) meandemand[m];
@@ -34,6 +36,9 @@ subject to{
  stock[0] == initialStock;
  stockhlb[0]==maxl(stock[0],0);
  stockplb[0]==maxl(-stock[0],0);
+ 
+forall(t in months) purchase[t] == 1 => purchaseDouble[t] == 1;
+forall(t in months) purchase[t] == 0 => purchaseDouble[t] == 0;
 
 forall(t in months) purchase[t] == 1 => U[t]==Q;
 forall(t in months) purchase[t] == 0 => U[t]==0;
