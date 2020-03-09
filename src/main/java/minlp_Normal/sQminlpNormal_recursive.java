@@ -208,8 +208,8 @@ public class sQminlpNormal_recursive {
 		for(int t=0; t<demandMean.length; t++) {
 			if(schedule[t] == 0.0) {
 				reorderPoint[t] = Double.NEGATIVE_INFINITY;
-				System.out.println("no replenishmeng placed.");
-				System.out.println();
+				//System.out.println("no replenishmeng placed.");
+				//System.out.println();
 			}else {
 				try {
 					sQminlpNormal_recursive sQmodel = new sQminlpNormal_recursive(
@@ -218,9 +218,9 @@ public class sQminlpNormal_recursive {
 							partitions,  means, piecewiseProb, error,
 							null, schedule[t]
 							);
-					System.out.println("orderingCost = " + (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost));
-					double costLeft = costDifference(sQmodel, initialStock); System.out.println("costLeft = "+ costLeft);
-					double costRight = costDifference(sQmodel, initialStock + pace); System.out.println("costRight = "+ costRight);
+					//System.out.println("orderingCost = " + (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost));
+					double costLeft = costDifference(sQmodel, initialStock); //System.out.println("costLeft = "+ costLeft);
+					double costRight = costDifference(sQmodel, initialStock + pace); //System.out.println("costRight = "+ costRight);
 					binarySearch(initialStock, pace, sQmodel, costLeft, costRight);
 				}catch(IloException e){
 					e.printStackTrace();
