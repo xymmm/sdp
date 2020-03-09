@@ -135,18 +135,21 @@ public class simulationNormalMINLP {
 	public static void main(String[] args) {
 
 		/** declare instance parameters **/
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 500;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		double penaltyCost = 5;
 		
 		double initialStock = 0;
 
-		double stdParameter = 0.25;
-		double[] demandMean = {20, 40, 60, 40};
-		double[] reorderPoints = {12, Integer.MIN_VALUE, 51, Integer.MIN_VALUE};
+		double stdParameter = 0.1;
+		double[] demandMean = {71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11};
+		
+		double[] reorderPoints = 
+			{Double.MIN_VALUE, 16.0, Double.MIN_VALUE, Double.MIN_VALUE, 101.0, Double.MIN_VALUE, Double.MIN_VALUE, 151.0, Double.MIN_VALUE, 151.0, Double.MIN_VALUE, Double.MIN_VALUE, 13.0, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
+		double[] schedule = 
+			{0.0, 440.9078296611664, 0.0, 0.0, 440.9078296611664, 0.0, 0.0, 440.9078296611664, 0.0, 440.9078296611664, 0.0, 0.0, 440.9078296611664, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-		double[] schedule = {83.74276954312995, 0.0, 83.74276954312995, 0.0};
 
 		simNormalInstance normalInstance = new simNormalInstance(
 				demandMean, 
@@ -162,7 +165,7 @@ public class simulationNormalMINLP {
 		
 		Chrono timer = new Chrono();
 		
-		int count = 100000;
+		int count = 2;
 		simulationNormalMINLPmultipleRuns(normalInstance, count);
 		
 		normalInstance.statCost.setConfidenceIntervalStudent();
