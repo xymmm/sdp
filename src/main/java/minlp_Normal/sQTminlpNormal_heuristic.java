@@ -216,8 +216,10 @@ public class sQTminlpNormal_heuristic {
 
 		//solve reorderpoints
 		for(int t=0; t<demandMean.length; t++) {
-			if(schedule[t] <= 1.0) {
+			if((schedule[t] <= 1.0)||(schedule[t] >= 2000)) {
+				
 				reorderPoint[t] = Double.NEGATIVE_INFINITY;
+				
 				//System.out.println("no replenishment placed.");
 				//System.out.println();
 			}else {

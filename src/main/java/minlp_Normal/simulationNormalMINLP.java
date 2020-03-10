@@ -135,20 +135,25 @@ public class simulationNormalMINLP {
 	public static void main(String[] args) {
 
 		/** declare instance parameters **/
-		double fixedOrderingCost = 500;
+		double fixedOrderingCost = 1000;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 20;
 		
 		double initialStock = 0;
 
-		double stdParameter = 0.1;
-		double[] demandMean = {71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11};
+		double stdParameter = 0.3;
+		double[] demandMean = {11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11};
 		
 		double[] reorderPoints = 
-			{Double.MIN_VALUE, 16.0, Double.MIN_VALUE, Double.MIN_VALUE, 101.0, Double.MIN_VALUE, Double.MIN_VALUE, 151.0, Double.MIN_VALUE, 151.0, Double.MIN_VALUE, Double.MIN_VALUE, 13.0, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
+				{Double.MIN_VALUE, 701.0, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, 
+				 Double.MIN_VALUE, 1301.0, Double.MIN_VALUE, Double.MIN_VALUE, 1201.0, 
+				 Double.MIN_VALUE, Double.MIN_VALUE, 1001.0, Double.MIN_VALUE, Double.MIN_VALUE, 
+				 601.0, Double.MIN_VALUE, Double.MIN_VALUE, 301.0, Double.MIN_VALUE, 
+				 Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE
+				};
 		double[] schedule = 
-			{0.0, 440.9078296611664, 0.0, 0.0, 440.9078296611664, 0.0, 0.0, 440.9078296611664, 0.0, 440.9078296611664, 0.0, 0.0, 440.9078296611664, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+			{0, 228.61697293780023, 0.0, 0.0, 0.0, 0.0, 419.2895284829585, 0.0, 0.0, 562.6347704449851, 0.0, 0.0, 558.5244324600249, 0.0, 0.0, 378.2346312484141, 0.0, 0.0, 252.62021372727992, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 
 		simNormalInstance normalInstance = new simNormalInstance(

@@ -8,13 +8,13 @@ public class mainComputation_NormalMINLP {
 	
 	public static void main(String args[]) throws Exception {
 		
-		double[] demandMean = {71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11};
-		double fixedCost = 1500;//5,10,20
+		double[] demandMean = {11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11};
+		double fixedCost = 500;//5,10,20
 		double unitCost = 0;//0,1
 		double holdingCost = 1;
-		double penaltyCost = 5;//2,3
+		double penaltyCost = 20;//2,3
 		double initialStock = 0;
-		double stdParameter = 0.2;
+		double stdParameter = 0.1;
 
 		int partitions = 4;
 		double[] piecewiseProb = {0.187555, 0.312445, 0.312445, 0.187555};
@@ -51,7 +51,7 @@ public class mainComputation_NormalMINLP {
 				s_sQt				
 				);
 		
-		int count = 100000;
+		int count = 2;
 		minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(normalInstance_sQt, count);
 		normalInstance_sQt.statCost.setConfidenceIntervalStudent();
 		double sQt_simCost = normalInstance_sQt.statCost.average();
