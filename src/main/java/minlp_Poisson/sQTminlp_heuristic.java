@@ -198,7 +198,7 @@ public class sQTminlp_heuristic {
 					boolean flag = writeTxtFile(s_string, tempFile);
 					//System.out.println();
 				}else {
-					System.out.println("binary search proceeds, right interval.");
+					//System.out.println("binary search proceeds, right interval.");
 					binarySearchsQtHeuristic(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight, currentQ, rangedQ);
 				}
 			}else {//[input, binary]
@@ -209,18 +209,18 @@ public class sQTminlp_heuristic {
 					boolean flag = writeTxtFile(s_string, tempFile);
 					//System.out.println();
 				}else {
-					System.out.println("binary search proceeds, left interval.");
+					//System.out.println("binary search proceeds, left interval.");
 					binarySearchsQtHeuristic(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary, currentQ, rangedQ);
 				}				
 			}
 		}else {//pace is not large/small enough
 			if( costLeft < orderingCost) {
-				System.out.println("Cost of initial input invnetory is too small, move left");
+				//System.out.println("Cost of initial input invnetory is too small, move left");
 				binarySearchsQtHeuristic(i1 - pace, pace, sQmodel,
 						costDifferencesQtHeuristic(sQmodel, i1-pace, currentQ, rangedQ), 
 						costDifferencesQtHeuristic(sQmodel, i1, currentQ, rangedQ), currentQ, rangedQ);
 			}else {
-				System.out.println("Cost of initial input invnetory is too large, move right");
+				//System.out.println("Cost of initial input invnetory is too large, move right");
 				binarySearchsQtHeuristic(i1 + pace, pace, sQmodel, 
 						costDifferencesQtHeuristic(sQmodel, i1, currentQ, rangedQ), 
 						costDifferencesQtHeuristic(sQmodel, i1+pace, currentQ, rangedQ), currentQ, rangedQ);
@@ -238,10 +238,10 @@ public class sQTminlp_heuristic {
 
 		//solve reorderpoints
 		for(int t=0; t<demandMean.length; t++) {
-			if(schedule[t] == 0.0) {
+			if(schedule[t] < 1.0) {
 				reorderPoint[t] = Double.NEGATIVE_INFINITY;
-				System.out.println("no replenishment placed.");
-				System.out.println();
+				//System.out.println("no replenishment placed.");
+				//System.out.println();
 			}else {
 				if(t==demandMean.length-1) {		//for the last period, only apply the method as sQ, so refer to sQminlp_recursive
 					try {

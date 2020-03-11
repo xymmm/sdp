@@ -9,6 +9,8 @@ import minlp_Normal.sQTminlpNormal_oneRun;
 import minlp_Normal.sQminlpNormal_oneRun;
 import minlp_Normal.sQminlpNormal_recursive;
 import minlp_Normal.simNormalInstance;
+import reorderQuantitySystem.sQsystemSolution;
+import sQ.sdp.sQsolution;
 import sS.sSsolution;
 import sdp.data.InstanceDouble;
 
@@ -21,7 +23,7 @@ public class computationAnalysis_2 {
 		double[] fixedOrderingCost = {500, 1000, 1500};
 		double[] unitCost		   = {0,1};
 		double[] penaltyCost	   = {5, 10, 20};
-		double[] stdParameter	   = {0.3};//{0.1, 0.2, 0.3};
+		double[] stdParameter	   = {0.1, 0.2, 0.3};
 
 		double initialStock = 0;
 
@@ -43,12 +45,12 @@ public class computationAnalysis_2 {
 
 		double[][] demandMean = {
 				//{20, 40, 60, 40}
-				//{11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11}
+				{11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11}
 				//{23,32,42,55,70,86,103,120,136,150,161,168,170,168,161,150,136,120,103,86,70,55,42,32,23},
 				//{130,150,127,76,27,10,36,88,136,149,121,68,22,11,42,96,140,148,114,60,18,14,50,104,144},
 				//{122,130,120,98,77,70,81,103,124,130,118,95,75,71,84,107,126,129,115,91,73,72,87,110,127},
 				//{100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100},
-				{178,178,136,211,119,165,47,100,62,31,43,199,172,96,69,8,29,135,97,70,248,57,11,94,13}
+				//{178,178,136,211,119,165,47,100,62,31,43,199,172,96,69,8,29,135,97,70,248,57,11,94,13}
 				//{2,51,152,467,268,489,446,248,281,363,155,293,220,93,107,234,124,184,223,101,123,99,31,82,1},
 				//{47,81,236,394,164,287,508,391,754,694,261,195,320,111,191,160,55,84,58,1,1,1,1,1,1},
 				//{44,116,264,144,146,198,74,183,204,114,165,318,119,482,534,136,260,299,76,218,323,102,174,284,1},
@@ -124,8 +126,15 @@ public class computationAnalysis_2 {
 							
 
 							//============================== sQ minlp ==========================
-							//schedule
+							
 							long timesQStart = System.currentTimeMillis();
+							//sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);
+							sQsolution sQsolution = sQ.sdp.sQ.solvesQInstance(instance);
+							Results[s][f][p][u][d][2] = sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][(int) (instance.initialInventory - instance.minInventory)][0];
+							long timesQend = System.currentTimeMillis();
+							Results[s][f][p][u][d][5] = (double) (timesQend - timesQStart)/1000.0;
+							/*
+							//schedule							
 							double[] sQschedule = sQminlpNormal_oneRun.sQminlpSchedule(
 									demandMean[d], fixedOrderingCost[f], unitCost[u], holdingCost, penaltyCost[p],
 									initialStock, stdParameter[s], partitions, piecewiseProb, means, error);		
@@ -152,8 +161,8 @@ public class computationAnalysis_2 {
 							minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(normalInstance_sQ, count);
 							normalInstance_sQ.statCost.setConfidenceIntervalStudent();
 							Results[s][f][p][u][d][2] = normalInstance_sQ.statCost.average();
-							long timesQend = System.currentTimeMillis();
-							Results[s][f][p][u][d][5] = (double) (timesQend - timesQStart)/1000.0;
+							*/
+							
 							//System.out.println("Simulation cost = "+Results[s][f][p][u][d][2]);
 							//System.out.println();
 							//System.out.println("sS time = "+Results[s][f][p][u][d][3]);

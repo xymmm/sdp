@@ -110,8 +110,8 @@ public class simulationPoissonMINLP {
 				if(print == true) System.out.println();
 			}while(currentStageIndex < PoissonInstance.demandMean.length);
 			
-			//System.out.println(xLabel);
-			//System.out.println(yLabel);
+			System.out.println(xLabel);
+			System.out.println(yLabel);
 			return cost;
 		}
 		
@@ -121,21 +121,21 @@ public class simulationPoissonMINLP {
 				PoissonInstance.statCost.add(simPoisson(PoissonInstance, false));
 			}
 		}
-/*
+
 		public static void main(String[] args) {
 
-			/** declare instance parameters **
-			double fixedOrderingCost = 100;
+			/** declare instance parameters ***/
+			double fixedOrderingCost = 5;
 			double unitCost = 0;
 			double holdingCost = 1;
-			double penaltyCost = 10;
+			double penaltyCost = 3;
 			
 			double initialStock = 0;
 
-			double[] demandMean = {20, 40, 60, 40};
-			double[] reorderPoints = {12, Integer.MIN_VALUE, 54, Integer.MIN_VALUE};
+			double[] demandMean = {2, 1.5, 4, 4, 1.5, 2};
+			double[] reorderPoints = {3, 5, 5, 1, 0, 0};
 
-			double[] schedule = {81.4499857142863, 0.0, 81.4499857142863, 0.0};
+			double[] schedule = {7, 7, 7, 7, 7, 7};
 
 			simPoissonInstance PoissonInstance = new simPoissonInstance(
 					demandMean, 
@@ -150,7 +150,7 @@ public class simulationPoissonMINLP {
 			
 			Chrono timer = new Chrono();
 			
-			int count = 100000;
+			int count = 10;
 			simulationPoissonMINLPmultipleRuns(PoissonInstance, count);
 			
 			PoissonInstance.statCost.setConfidenceIntervalStudent();
@@ -159,6 +159,6 @@ public class simulationPoissonMINLP {
 
 			System.out.println(PoissonInstance.statCost.average());
 		}
-*/
+
 
 }

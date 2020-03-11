@@ -190,7 +190,7 @@ public class sQminlp_recursive {
 					boolean flag = writeTxtFile(s_string, tempFile);
 					//System.out.println();
 				}else {
-					System.out.println("binary search proceeds, right interval.");
+					//System.out.println("binary search proceeds, right interval.");
 					binarySearch(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight, rangedQ);
 				}
 			}else {//[input, binary]
@@ -201,16 +201,16 @@ public class sQminlp_recursive {
 					boolean flag = writeTxtFile(s_string, tempFile);
 					//System.out.println();
 				}else {
-					System.out.println("binary search proceeds, left interval.");
+					//System.out.println("binary search proceeds, left interval.");
 					binarySearch(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary, rangedQ);
 				}				
 			}
 		}else {//pace is not large/small enough
 			if( costLeft < orderingCost) {
-				System.out.println("Cost of initial input invnetory is too small, move left");
+				//System.out.println("Cost of initial input invnetory is too small, move left");
 				binarySearch(i1 - pace, pace, sQmodel,costDifference(sQmodel, i1-pace, rangedQ), costDifference(sQmodel, i1, rangedQ), rangedQ);
 			}else {
-				System.out.println("Cost of initial input invnetory is too large, move right");
+				//System.out.println("Cost of initial input invnetory is too large, move right");
 				binarySearch(i1 + pace, pace, sQmodel, costDifference(sQmodel, i1, rangedQ), costDifference(sQmodel, i1+pace, rangedQ), rangedQ);
 			}
 		}
@@ -223,18 +223,18 @@ public class sQminlp_recursive {
 		double[] reorderPoint = new double[demandMean.length];
 		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		for(int t=0; t<demandMean.length; t++) {
-			if(schedule[t] == 0.0) {
+			if((schedule[t] < 1.0)||(schedule[t] >= ((rangedQ) ? 9 : 500))) {
 				reorderPoint[t] = Double.NEGATIVE_INFINITY;
-				System.out.println("no replenishmeng placed.");
-				System.out.println();
+				//System.out.println("no replenishmeng placed.");
+				//System.out.println();
 			}else {
 				try {
 					sQminlp_recursive sQmodel = new sQminlp_recursive(
 							demandMeanInput[t], holdingCost, fixedCost,  unitCost, penaltyCost, 
 							initialStock,  partitions, null, schedule[t]);
-					System.out.println("orderingCost = " + (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost));
-					double costLeft = costDifference(sQmodel, initialStock, rangedQ); System.out.println("costLeft = "+ costLeft);
-					double costRight = costDifference(sQmodel, initialStock + pace, rangedQ); System.out.println("costRight = "+ costRight);
+					//System.out.println("orderingCost = " + (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost));
+					double costLeft = costDifference(sQmodel, initialStock, rangedQ); //System.out.println("costLeft = "+ costLeft);
+					double costRight = costDifference(sQmodel, initialStock + pace, rangedQ); //System.out.println("costRight = "+ costRight);
 					binarySearch(initialStock, pace, sQmodel, costLeft, costRight, rangedQ);
 				}catch(IloException e){
 					e.printStackTrace();

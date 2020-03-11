@@ -151,15 +151,23 @@ public class RH_sQt {
 		
 		boolean print = false;
 		
-		int count = 100;
+		long timeStart = System.currentTimeMillis();
+		
+		int count = 1000;
+		double[] costAll = new double[count];
+		
 		for(int c=0; c<count; c++) {
-			double cost = RHcomplete_sQt(demandMean, stdParameter, 
+			costAll[c] = RHcomplete_sQt(demandMean, stdParameter, 
 					 holdingCost, fixedCost, unitCost, penaltyCost, 
 					 partitions, means, piecewiseProb, error,
 					 initialStock, pace, 
 					 print);
-			System.out.println(cost);
+			System.out.println(costAll[c]);
 		}
+		System.out.println();
+		System.out.println("Average = "+sdp.util.sum.average(costAll));
+		System.out.println("time = "+ (System.currentTimeMillis() - timeStart)/1000.0);
+		
 
 	
 	}

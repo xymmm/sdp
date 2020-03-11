@@ -6,7 +6,6 @@ float h=...;
 float p=...;
 float v = ...;
 float meandemand[months]=...;
-float Q = ...;
 
 float initialStock = ...;
 
@@ -23,6 +22,8 @@ dvar boolean purchase[months];
 dvar float+ U[1..nbmonths];
 dvar boolean P[months][months];
 
+dvar float+ Q;
+
 float mean_matrix[i in months, j in months] = sum(m in i..j) meandemand[m];
 
 //objective function
@@ -31,6 +32,7 @@ minimize sum(t in months)( fc*purchase[t]+h*stockhlb[t]+p*stockplb[t] + v*U[t]);
 //constraints
 subject to{
 
+//for sQt small instances
 Q<=9;
 
  stock[0] == initialStock;
