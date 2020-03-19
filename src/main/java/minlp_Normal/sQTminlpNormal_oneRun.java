@@ -92,8 +92,8 @@ public class sQTminlpNormal_oneRun{
 			oplF.end();
 			System.gc();
             for(int t = 0; t < Q.length; t++){
-                Q[t] = Double.NaN;
-                }
+                Q[t] = demandMean[t];
+            }
 			return Q;
 		} 
 	}	

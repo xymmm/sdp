@@ -156,53 +156,59 @@ public class sQTminlpNormal_heuristic {
 	}
 
 	public static void binarySearchsQtHeuristic(double initialInputLevel, double pace, sQTminlpNormal_heuristic sQmodel,
-			double costLeft, double costRight, double currentQ) throws Exception {
+			double costLeft, double costRight, double currentQ, int t) throws Exception {
 
 		File tempFile = new File ("src/main/java/minlp_Normal/tempRminlp.txt"); //to save reorder point as a string in the file
 		double orderingCost = (currentQ==0.0)? 0 : (sQmodel.fixedCost + currentQ*sQmodel.unitCost);
 		double i1 = initialInputLevel; 
 		//System.out.println("cost("+i1+") = " + costLeft +"\t" + "cost("+(i1+pace)+") = "+costRight);
 
-		if( (costLeft - orderingCost)*(costRight - orderingCost)<0 ) {
-			double levelBinary = i1 + Math.floor(0.5*pace); 
-			double costBinary = costDifferencesQtHeuristic(sQmodel, levelBinary, currentQ);
-			//System.out.println("cost(binary="+levelBinary+") = " + costBinary);
+		if((costLeft == Double.NaN)||(costRight == Double.NaN)) {
+			String s_string = Double.toString(sQmodel.demandMean[t] + 1);
+			boolean flag = writeTxtFile(s_string, tempFile);
+		}else {
 
-			//judge if costBinary > orderingCost or not
-			if(costBinary > orderingCost) {//[binary, input]
-				double costBinaryClose = costDifferencesQtHeuristic (sQmodel, levelBinary + 1, currentQ);
-				if((costBinaryClose < orderingCost)||(levelBinary == i1 + pace)) {
-					//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
-					String s_string = Double.toString(levelBinary+1);
-					boolean flag = writeTxtFile(s_string, tempFile);
-					//System.out.println();
-				}else {
-					//System.out.println("binary search proceeds, right interval.");
-					binarySearchsQtHeuristic(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight, currentQ);
+			if( (costLeft - orderingCost)*(costRight - orderingCost)<0 ) {
+				double levelBinary = i1 + Math.floor(0.5*pace); 
+				double costBinary = costDifferencesQtHeuristic(sQmodel, levelBinary, currentQ);
+				//System.out.println("cost(binary="+levelBinary+") = " + costBinary);
+
+				//judge if costBinary > orderingCost or not
+				if(costBinary > orderingCost) {//[binary, input]
+					double costBinaryClose = costDifferencesQtHeuristic (sQmodel, levelBinary + 1, currentQ);
+					if((costBinaryClose < orderingCost)||(levelBinary == i1 + pace)) {
+						//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
+						String s_string = Double.toString(levelBinary+1);
+						boolean flag = writeTxtFile(s_string, tempFile);
+						//System.out.println();
+					}else {
+						//System.out.println("binary search proceeds, right interval.");
+						binarySearchsQtHeuristic(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight, currentQ,t);
+					}
+				}else {//[input, binary]
+					double costBinaryClose = costDifferencesQtHeuristic (sQmodel, levelBinary - 1, currentQ);
+					if((costBinaryClose > orderingCost)||(levelBinary == i1)) {
+						//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
+						String s_string = Double.toString(levelBinary+1);
+						boolean flag = writeTxtFile(s_string, tempFile);
+						//System.out.println();
+					}else {
+						//System.out.println("binary search proceeds, left interval.");
+						binarySearchsQtHeuristic(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary, currentQ,t);
+					}				
 				}
-			}else {//[input, binary]
-				double costBinaryClose = costDifferencesQtHeuristic (sQmodel, levelBinary - 1, currentQ);
-				if((costBinaryClose > orderingCost)||(levelBinary == i1)) {
-					//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
-					String s_string = Double.toString(levelBinary+1);
-					boolean flag = writeTxtFile(s_string, tempFile);
-					//System.out.println();
+			}else {//pace is not large/small enough
+				if( costLeft < orderingCost) {
+					//System.out.println("Cost of initial input invnetory is too small, move left");
+					binarySearchsQtHeuristic(i1 - pace, pace, sQmodel,
+							costDifferencesQtHeuristic(sQmodel, i1-pace, currentQ), 
+							costDifferencesQtHeuristic(sQmodel, i1, currentQ), currentQ,t);
 				}else {
-					//System.out.println("binary search proceeds, left interval.");
-					binarySearchsQtHeuristic(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary, currentQ);
-				}				
-			}
-		}else {//pace is not large/small enough
-			if( costLeft < orderingCost) {
-				//System.out.println("Cost of initial input invnetory is too small, move left");
-				binarySearchsQtHeuristic(i1 - pace, pace, sQmodel,
-						costDifferencesQtHeuristic(sQmodel, i1-pace, currentQ), 
-						costDifferencesQtHeuristic(sQmodel, i1, currentQ), currentQ);
-			}else {
-				//System.out.println("Cost of initial input invnetory is too large, move right");
-				binarySearchsQtHeuristic(i1 + pace, pace, sQmodel, 
-						costDifferencesQtHeuristic(sQmodel, i1, currentQ), 
-						costDifferencesQtHeuristic(sQmodel, i1+pace, currentQ), currentQ);
+					//System.out.println("Cost of initial input invnetory is too large, move right");
+					binarySearchsQtHeuristic(i1 + pace, pace, sQmodel, 
+							costDifferencesQtHeuristic(sQmodel, i1, currentQ), 
+							costDifferencesQtHeuristic(sQmodel, i1+pace, currentQ), currentQ,t);
+				}
 			}
 		}
 	}
@@ -217,9 +223,9 @@ public class sQTminlpNormal_heuristic {
 		//solve reorderpoints
 		for(int t=0; t<demandMean.length; t++) {
 			if((schedule[t] <= 1.0)||(schedule[t] >= 2000)) {
-				
+
 				reorderPoint[t] = Double.NEGATIVE_INFINITY;
-				
+
 				//System.out.println("no replenishment placed.");
 				//System.out.println();
 			}else {
@@ -233,7 +239,7 @@ public class sQTminlpNormal_heuristic {
 						//System.out.println("orderingCost = " + (sQmodelBR.fixedCost + Q[t]*sQmodelBR.unitCost));
 						double costLeft = minlp_Normal.sQminlpNormal_recursive.costDifference(sQmodelBR, initialStock); 
 						double costRight = minlp_Normal.sQminlpNormal_recursive.costDifference(sQmodelBR, initialStock + pace); 
-						minlp_Normal.sQminlpNormal_recursive.binarySearch(initialStock, pace, sQmodelBR, costLeft, costRight);
+						minlp_Normal.sQminlpNormal_recursive.binarySearch(initialStock, pace, sQmodelBR, costLeft, costRight,t);
 					}catch(IloException e){
 						e.printStackTrace();
 					}	
@@ -247,7 +253,7 @@ public class sQTminlpNormal_heuristic {
 							null, futureQ);
 					double costLeft = costDifferencesQtHeuristic(sQmodelBRT, initialStock, schedule[t]); 
 					double costRight = costDifferencesQtHeuristic(sQmodelBRT, initialStock + pace, schedule[t]); 
-					binarySearchsQtHeuristic(initialStock, pace, sQmodelBRT, costLeft, costRight, schedule[t]);				
+					binarySearchsQtHeuristic(initialStock, pace, sQmodelBRT, costLeft, costRight, schedule[t],t);				
 				}
 				//record reorder point in an array
 				File tempFile = new File ("src/main/java/minlp_Normal/tempRminlp.txt"); 		
@@ -261,9 +267,9 @@ public class sQTminlpNormal_heuristic {
 		return reorderPoint;
 	}
 
-	
-	
-	
+
+
+
 	/*************************************************************************************/
 	public static boolean writeTxtFile(String content,File fileName)throws Exception{
 		RandomAccessFile mm=null;

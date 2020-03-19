@@ -127,7 +127,7 @@ public class sQminlpNormal_recursive {
 			handler.startElement("error"); handler.addNumItem(error); handler.endElement();         
 		}
 	}
-	
+
 	/***********************************************************************************************************************************/
 	/*****************************************BINARY SEARCH*****************************************************************************/
 	/***********************************************************************************************************************************/
@@ -155,53 +155,60 @@ public class sQminlpNormal_recursive {
 	}
 
 	public static void binarySearch(double initialInputLevel, double pace, sQminlpNormal_recursive sQmodel,
-									double costLeft, double costRight) throws Exception {
+			double costLeft, double costRight, int t) throws Exception {
 		File tempFile = new File ("src/main/java/minlp_Normal/tempRminlp.txt"); //to save reorder point as a string in the file
 		double orderingCost = (sQmodel.Q==0.0)? 0 : (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost);
 		double i1 = initialInputLevel; 
-		if( (costLeft - orderingCost)*(costRight - orderingCost)<0 ) {
-			double levelBinary = i1 + Math.floor(0.5*pace); 
-			double costBinary = costDifference(sQmodel, levelBinary);
-			//judge if costBinary > orderingCost or not
-			if(costBinary > orderingCost) {//[binary, input]
-				double costBinaryClose = costDifference (sQmodel, levelBinary + 1);
-				if((costBinaryClose < orderingCost)||(levelBinary == i1 + pace)) {
-					//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
-					String s_string = Double.toString(levelBinary+1);
-					boolean flag = writeTxtFile(s_string, tempFile);
-					//System.out.println();
-				}else {
-					//System.out.println("binary search proceeds, right interval.");
-					binarySearch(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight);
+
+		if((costLeft == Double.NaN)||(costRight == Double.NaN)) {
+			String s_string = Double.toString(sQmodel.demandMean[t] + 1);
+			boolean flag = writeTxtFile(s_string, tempFile);
+		}else {
+
+			if( (costLeft - orderingCost)*(costRight - orderingCost)<0 ) {
+				double levelBinary = i1 + Math.floor(0.5*pace); 
+				double costBinary = costDifference(sQmodel, levelBinary);
+				//judge if costBinary > orderingCost or not
+				if(costBinary > orderingCost) {//[binary, input]
+					double costBinaryClose = costDifference (sQmodel, levelBinary + 1);
+					if((costBinaryClose < orderingCost)||(levelBinary == i1 + pace)) {
+						//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
+						String s_string = Double.toString(levelBinary+1);
+						boolean flag = writeTxtFile(s_string, tempFile);
+						//System.out.println();
+					}else {
+						//System.out.println("binary search proceeds, right interval.");
+						binarySearch(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight,t);
+					}
+				}else {//[input, binary]
+					double costBinaryClose = costDifference (sQmodel, levelBinary - 1);
+					if((costBinaryClose > orderingCost)||(levelBinary == i1)) {
+						//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
+						String s_string = Double.toString(levelBinary+1);
+						boolean flag = writeTxtFile(s_string, tempFile);
+						//System.out.println();
+					}else {
+						//System.out.println("binary search proceeds, left interval.");
+						binarySearch(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary,t);
+					}				
 				}
-			}else {//[input, binary]
-				double costBinaryClose = costDifference (sQmodel, levelBinary - 1);
-				if((costBinaryClose > orderingCost)||(levelBinary == i1)) {
-					//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
-					String s_string = Double.toString(levelBinary+1);
-					boolean flag = writeTxtFile(s_string, tempFile);
-					//System.out.println();
+			}else {//pace is not large/small enough
+				if( costLeft < orderingCost) {
+					//System.out.println("Cost of initial input invnetory is too small, move left");
+					binarySearch(i1 - pace, pace, sQmodel,costDifference(sQmodel, i1-pace), costDifference(sQmodel, i1),t);
 				}else {
-					//System.out.println("binary search proceeds, left interval.");
-					binarySearch(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary);
-				}				
-			}
-		}else {//pace is not large/small enough
-			if( costLeft < orderingCost) {
-				//System.out.println("Cost of initial input invnetory is too small, move left");
-				binarySearch(i1 - pace, pace, sQmodel,costDifference(sQmodel, i1-pace), costDifference(sQmodel, i1));
-			}else {
-				//System.out.println("Cost of initial input invnetory is too large, move right");
-				binarySearch(i1 + pace, pace, sQmodel, costDifference(sQmodel, i1), costDifference(sQmodel, i1+pace));
+					//System.out.println("Cost of initial input invnetory is too large, move right");
+					binarySearch(i1 + pace, pace, sQmodel, costDifference(sQmodel, i1), costDifference(sQmodel, i1+pace),t);
+				}
 			}
 		}
 	}
-	
+
 	public static double[] reorderPoint_sQheuristic(
 			double[] demandMean, double fixedCost, double unitCost, double holdingCost, double penaltyCost, 
 			double initialStock, double stdParameter,
 			int partitions, double[] piecewiseProb, double[] means, double error, double pace, double[] schedule) throws Exception {
-		
+
 		//compute reorder point
 		double[] reorderPoint = new double[demandMean.length];
 		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
@@ -221,7 +228,7 @@ public class sQminlpNormal_recursive {
 					//System.out.println("orderingCost = " + (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost));
 					double costLeft = costDifference(sQmodel, initialStock); //System.out.println("costLeft = "+ costLeft);
 					double costRight = costDifference(sQmodel, initialStock + pace); //System.out.println("costRight = "+ costRight);
-					binarySearch(initialStock, pace, sQmodel, costLeft, costRight);
+					binarySearch(initialStock, pace, sQmodel, costLeft, costRight,t);
 				}catch(IloException e){
 					e.printStackTrace();
 				}
@@ -238,9 +245,9 @@ public class sQminlpNormal_recursive {
 	}
 
 
-/*
+	/*
 	public static void main(String[] args) throws IloException {
-		
+
 		double[] demandMean = {60, 40};
 		double fixedCost = 100;
 		double holdingCost = 1;
@@ -248,12 +255,12 @@ public class sQminlpNormal_recursive {
 		double penaltyCost = 10;
 		double inventoryLevel = 0;
 		double stdParameter = 0.25;
-		
+
 		int partitions = 4;
 		double[] piecewiseProb = {0.187555, 0.312445, 0.312445, 0.187555};
 		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
 		double error = 0.0339052;
-		
+
 		sQminlpNormal_recursive sQmodelInput = new sQminlpNormal_recursive(
 				demandMean, holdingCost, fixedCost,  unitCost, penaltyCost, 
 				inventoryLevel, stdParameter, 

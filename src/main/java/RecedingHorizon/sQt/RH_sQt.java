@@ -135,12 +135,12 @@ public class RH_sQt {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		double[] demandMean = {20,40,60,40};
-		double stdParameter = 0.25;
-		double fixedCost = 100;
+		double[] demandMean = {209,91,33,79,2,76,109,115,224,22,48,136,13,211,85,86,180,37,50,73,195,77,246,3};
+		double stdParameter = 0.1;
+		double fixedCost = 250;
 		double holdingCost = 1;
 		double unitCost = 0;
-		double penaltyCost = 10;
+		double penaltyCost = 2;
 		double initialStock = 0;
 		
 		double pace = 20;
@@ -149,11 +149,11 @@ public class RH_sQt {
 		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
 		double error = 0.0339052;
 		
-		boolean print = false;
+		boolean print = true;
 		
 		long timeStart = System.currentTimeMillis();
 		
-		int count = 1000;
+		int count = 2;
 		double[] costAll = new double[count];
 		
 		for(int c=0; c<count; c++) {

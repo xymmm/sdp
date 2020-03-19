@@ -57,16 +57,19 @@ public class sQ {
 	}
 
 	/** main computation **/
-	public static sQsolution solvesQInstance(InstanceDouble instance) {
+	public static sQsolution solvesQInstance(InstanceDouble instance, boolean Normal) {
 
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
 		}
-		
+		double[][] demandProbabilities = null;
+		if(Normal) {
+			demandProbabilities = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
+		}else {
+			demandProbabilities= sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
+		}
 		//demandProbabilities[stages][demandValue] = Prob(dt = demandValue), dt is the realized demand of the random varuable d_t
-		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
-		//double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
 		
 		double totalCost[][][] = new double[instance.maxQuantity+1][inventory.length][instance.getStages()];
 		boolean optimalAction[][][] = new boolean [instance.maxQuantity + 1][inventory.length][instance.getStages()];
@@ -158,6 +161,8 @@ public class sQ {
 		double[] demandMean = {20, 40, 60, 40};
 		//double[] demandMean = {2,4,6,4};
 		
+		boolean Normal = true;
+		
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
 				unitCost,
@@ -172,7 +177,7 @@ public class sQ {
 				);
 
 		/** Solve the classic instance **/
-		sQsolution sQsolution = solvesQInstance(instance);
+		sQsolution sQsolution = solvesQInstance(instance, Normal);
 		
 		/*
 		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];
