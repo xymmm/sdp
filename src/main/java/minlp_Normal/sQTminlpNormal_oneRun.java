@@ -81,6 +81,9 @@ public class sQTminlpNormal_oneRun{
 			double[] Q = new double[demandMean.length];
             for(int t = 0; t < Q.length; t++){
                 Q[t] = cplex.getValue(opl.getElement("Q").asNumVarMap().get(t+1));
+                if((Q[t]<0)||(Q[t] > 500)) {
+                	Q[t] = demandMean[t];
+                }
              }
 			opl.postProcess();
 			oplF.end();
@@ -92,7 +95,13 @@ public class sQTminlpNormal_oneRun{
 			oplF.end();
 			System.gc();
             for(int t = 0; t < Q.length; t++){
-                Q[t] = demandMean[t];
+            	/*
+            	if(demandMean[t] * penaltyCost < fixedCost + unitCost * demandMean[t]) {
+            		Q[t] = demandMean[t];
+            	}else {
+            		Q[t] = 0;
+            	}*/
+                Q[t] = 0;
             }
 			return Q;
 		} 

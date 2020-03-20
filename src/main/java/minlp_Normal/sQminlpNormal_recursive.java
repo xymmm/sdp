@@ -159,46 +159,51 @@ public class sQminlpNormal_recursive {
 		File tempFile = new File ("src/main/java/minlp_Normal/tempRminlp.txt"); //to save reorder point as a string in the file
 		double orderingCost = (sQmodel.Q==0.0)? 0 : (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost);
 		double i1 = initialInputLevel; 
-
-		if((costLeft == Double.NaN)||(costRight == Double.NaN)) {
-			String s_string = Double.toString(sQmodel.demandMean[t] + 1);
+		if((i1<-300)||(i1>300)) {
+			String s_string = Double.toString(i1);
 			boolean flag = writeTxtFile(s_string, tempFile);
 		}else {
 
-			if( (costLeft - orderingCost)*(costRight - orderingCost)<0 ) {
-				double levelBinary = i1 + Math.floor(0.5*pace); 
-				double costBinary = costDifference(sQmodel, levelBinary);
-				//judge if costBinary > orderingCost or not
-				if(costBinary > orderingCost) {//[binary, input]
-					double costBinaryClose = costDifference (sQmodel, levelBinary + 1);
-					if((costBinaryClose < orderingCost)||(levelBinary == i1 + pace)) {
-						//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
-						String s_string = Double.toString(levelBinary+1);
-						boolean flag = writeTxtFile(s_string, tempFile);
-						//System.out.println();
-					}else {
-						//System.out.println("binary search proceeds, right interval.");
-						binarySearch(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight,t);
+			if((costLeft == Double.NaN)||(costRight == Double.NaN)) {
+				String s_string = Double.toString(sQmodel.demandMean[t] + 1);
+				boolean flag = writeTxtFile(s_string, tempFile);
+			}else {
+
+				if( (costLeft - orderingCost)*(costRight - orderingCost)<0 ) {
+					double levelBinary = i1 + Math.floor(0.5*pace); 
+					double costBinary = costDifference(sQmodel, levelBinary);
+					//judge if costBinary > orderingCost or not
+					if(costBinary > orderingCost) {//[binary, input]
+						double costBinaryClose = costDifference (sQmodel, levelBinary + 1);
+						if((costBinaryClose < orderingCost)||(levelBinary == i1 + pace)) {
+							//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
+							String s_string = Double.toString(levelBinary+1);
+							boolean flag = writeTxtFile(s_string, tempFile);
+							//System.out.println();
+						}else {
+							//System.out.println("binary search proceeds, right interval.");
+							binarySearch(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight,t);
+						}
+					}else {//[input, binary]
+						double costBinaryClose = costDifference (sQmodel, levelBinary - 1);
+						if((costBinaryClose > orderingCost)||(levelBinary == i1)) {
+							//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
+							String s_string = Double.toString(levelBinary+1);
+							boolean flag = writeTxtFile(s_string, tempFile);
+							//System.out.println();
+						}else {
+							//System.out.println("binary search proceeds, left interval.");
+							binarySearch(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary,t);
+						}				
 					}
-				}else {//[input, binary]
-					double costBinaryClose = costDifference (sQmodel, levelBinary - 1);
-					if((costBinaryClose > orderingCost)||(levelBinary == i1)) {
-						//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
-						String s_string = Double.toString(levelBinary+1);
-						boolean flag = writeTxtFile(s_string, tempFile);
-						//System.out.println();
+				}else {//pace is not large/small enough
+					if( costLeft < orderingCost) {
+						//System.out.println("Cost of initial input invnetory is too small, move left");
+						binarySearch(i1 - pace, pace, sQmodel,costDifference(sQmodel, i1-pace), costDifference(sQmodel, i1),t);
 					}else {
-						//System.out.println("binary search proceeds, left interval.");
-						binarySearch(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary,t);
-					}				
-				}
-			}else {//pace is not large/small enough
-				if( costLeft < orderingCost) {
-					//System.out.println("Cost of initial input invnetory is too small, move left");
-					binarySearch(i1 - pace, pace, sQmodel,costDifference(sQmodel, i1-pace), costDifference(sQmodel, i1),t);
-				}else {
-					//System.out.println("Cost of initial input invnetory is too large, move right");
-					binarySearch(i1 + pace, pace, sQmodel, costDifference(sQmodel, i1), costDifference(sQmodel, i1+pace),t);
+						//System.out.println("Cost of initial input invnetory is too large, move right");
+						binarySearch(i1 + pace, pace, sQmodel, costDifference(sQmodel, i1), costDifference(sQmodel, i1+pace),t);
+					}
 				}
 			}
 		}
