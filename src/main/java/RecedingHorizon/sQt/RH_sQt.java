@@ -56,8 +56,8 @@ public class RH_sQt {
 	/** generate Normal random number as demand **/
 	static MRG32k3a randomStream = new MRG32k3a();	
 	static {
-	   //long seed[] = {1234,1234,1234,1234,1234,1234};
-		long seed[] = {5678,5678,5678,5678,5678,5678};
+	   long seed[] = {1234,1234,1234,1234,1234,1234};
+		//long seed[] = {5678,5678,5678,5678,5678,5678};
 	   randomStream.setSeed(seed);
 	}	
 	static double generateNormalDemand(double demandMean, double stdParameter) {

@@ -40,21 +40,21 @@ public class computationAnalysis_2 {
 		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
 		double error = 0.0339052;
 
-		double pace = 50;
-		int count = 500000;
+		double pace = 32;
+		int count = 50000;
 
 		double[][] demandMean = {
 				//{20, 40, 60, 40}
-				//{11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11}
-				{23,32,42,55,70,86,103,120,136,150,161,168,170,168,161,150,136,120,103,86,70,55,42,32,23},
-				{130,150,127,76,27,10,36,88,136,149,121,68,22,11,42,96,140,148,114,60,18,14,50,104,144},
-				{122,130,120,98,77,70,81,103,124,130,118,95,75,71,84,107,126,129,115,91,73,72,87,110,127},
-				{100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100},
-				{178,178,136,211,119,165,47,100,62,31,43,199,172,96,69,8,29,135,97,70,248,57,11,94,13},
-				{2,51,152,467,268,489,446,248,281,363,155,293,220,93,107,234,124,184,223,101,123,99,31,82,1},
-				{47,81,236,394,164,287,508,391,754,694,261,195,320,111,191,160,55,84,58,1,1,1,1,1,1},
-				{44,116,264,144,146,198,74,183,204,114,165,318,119,482,534,136,260,299,76,218,323,102,174,284,1},
-				{49,188,64,279,453,224,223,517,291,547,646,224,215,440,116,185,211,26,55,1,1,1,1,1,1}
+				{11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11}
+				//{23,32,42,55,70,86,103,120,136,150,161,168,170,168,161,150,136,120,103,86,70,55,42,32,23},
+				//{130,150,127,76,27,10,36,88,136,149,121,68,22,11,42,96,140,148,114,60,18,14,50,104,144},
+				//{122,130,120,98,77,70,81,103,124,130,118,95,75,71,84,107,126,129,115,91,73,72,87,110,127},
+				//{100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100},
+				//{178,178,136,211,119,165,47,100,62,31,43,199,172,96,69,8,29,135,97,70,248,57,11,94,13},
+				//{2,51,152,467,268,489,446,248,281,363,155,293,220,93,107,234,124,184,223,101,123,99,31,82,1},
+				//{47,81,236,394,164,287,508,391,754,694,261,195,320,111,191,160,55,84,58,1,1,1,1,1,1},
+				//{44,116,264,144,146,198,74,183,204,114,165,318,119,482,534,136,260,299,76,218,323,102,174,284,1},
+				//{49,188,64,279,453,224,223,517,291,547,646,224,215,440,116,185,211,26,55,1,1,1,1,1,1}
 		};
 
 		double[][][][][][] Results = new double[stdParameter.length][fixedOrderingCost.length][penaltyCost.length][unitCost.length][demandMean.length][6];
@@ -74,7 +74,7 @@ public class computationAnalysis_2 {
 							System.out.println("unit cost = "+unitCost[u]);
 
 							//============================== sS ==========================
-							long timesSstart = System.currentTimeMillis();
+							/*long timesSstart = System.currentTimeMillis();
 							InstanceDouble instance = new InstanceDouble(
 									fixedOrderingCost[f],
 									unitCost[u],
@@ -93,8 +93,8 @@ public class computationAnalysis_2 {
 							long timesSend = System.currentTimeMillis();
 							Results[s][f][p][u][d][3] = (double) (timesSend - timesSstart)/1000.0;
 							//System.out.println("optimal sS cost = "+Results[s][f][p][u][d][0]);
-
-							/*
+*/
+							
 							//============================== sQt minlp ==========================
 							long timesQtStart = System.currentTimeMillis();
 							double[] sQtschedule = sQTminlpNormal_oneRun.sQTminlpSchedule(
@@ -107,7 +107,6 @@ public class computationAnalysis_2 {
 
 							//System.out.println("optimal schedule for sQt policy is "+Arrays.toString(sQtschedule));
 							//System.out.println("Associated reorder poing is "+Arrays.toString(s_sQt));
-
 
 							simNormalInstance normalInstance_sQt = new simNormalInstance(
 									demandMean[d], 
@@ -127,11 +126,11 @@ public class computationAnalysis_2 {
 							long timesQtEnd = System.currentTimeMillis();
 							//System.out.println("Simulation cost = "+Results[s][f][p][u][d][1]);
 							Results[s][f][p][u][d][4] = (double) (timesQtEnd - timesQtStart)/1000.0;
-							 */
+							 
 
 							//============================== sQ minlp ==========================
 
-							long timesQStart = System.currentTimeMillis();
+							/*long timesQStart = System.currentTimeMillis();
 							//sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);
 							sQsolution sQsolution = sQ.sdp.sQ.solvesQInstance(instance, Normal);
 							Results[s][f][p][u][d][2] = sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][(int) (instance.initialInventory - instance.minInventory)][0];
