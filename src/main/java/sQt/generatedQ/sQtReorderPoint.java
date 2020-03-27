@@ -65,7 +65,7 @@ public class sQtReorderPoint {
 	}
 
 	/****compute cost function f(Q,t,i) with given t and Q****/
-	public static sQtReorderPointSolution costVaryingWithInventory(int[] Q, InstanceDouble instance, boolean initialOrder){
+	public static sQtReorderPointSolution costVaryingWithInventory(int[] Q, InstanceDouble instance, boolean initialOrder, boolean Normal){
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
@@ -77,8 +77,12 @@ public class sQtReorderPoint {
 		double[][] costOrder = new double[instance.getStages()][inventory.length];
 		double[][] costNoOrder = new double[instance.getStages()][inventory.length];
 
-		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
-		//double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);//normal
+		double demandProbabilities [][] = null;
+		if(Normal == false) {
+			demandProbabilities = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		}else {
+			demandProbabilities = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
+		}
 		
 		long startTime = System.currentTimeMillis();
 		
@@ -144,23 +148,26 @@ public class sQtReorderPoint {
 	
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 500;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 20;
 
 		double tail = 0.00000001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
-		int maxQuantity = 9;
+		int minInventory = -1500;
+		int maxInventory = 1500;
+		int maxQuantity = 800;
 
-		double stdParameter = 0.25;
+		double stdParameter = 0.1;
+		
+		boolean Normal = true;
 
-		double[] demandMean = {2,4,6,4};
+		double[] demandMean = {130,150,127,76,27,10,36,88,136,149,121,68,22,11,42,96,140,148,114,60,18,14,50,104,144};
 
 		
-		int[] Q = {8, 0, 9, 0};
+		int[] Q = {197,288,164,85,58,146,255,171,418,274,157,86,66,160,268,178,394,266,158,94,74,72,282,175,51
+};
 		
 
 		InstanceDouble instance = new InstanceDouble(
@@ -176,19 +183,19 @@ public class sQtReorderPoint {
 				stdParameter
 				);
 		
-		sQtReorderPointSolution sQgivenQ = costVaryingWithInventory(Q,instance,true);
+		sQtReorderPointSolution sQgivenQ = costVaryingWithInventory(Q,instance,true, Normal);
 		
 		double costGivenQ[][] = sQgivenQ.costGivenQ;
 		int[] sGivenQ = sQgivenQ.getsGivenQ(instance, sQgivenQ);
 		
-		
+		/*
 		for(int t=0; t<1;t++) {
 			for(int i=0; i<costGivenQ[t].length; i++) {
 		    System.out.println(i+minInventory + "\t" + sQgivenQ.costGivenQ[t][i]);
 			}
 			System.out.println();
 			plotTwoCostGivenQ(sQgivenQ.costOrder, sQgivenQ.costNoOrder, Q[t], t, instance);
-		}
+		}*/
 		
 	    
 		System.out.print("reorderPoints = {");

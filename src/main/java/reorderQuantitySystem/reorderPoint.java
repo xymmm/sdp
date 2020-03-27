@@ -3,7 +3,6 @@ package reorderQuantitySystem;
 import java.util.Arrays;
 
 import sS.sS;
-import sdp.data.Instance;
 import sdp.data.InstanceDouble;
 
 public class reorderPoint {
@@ -133,23 +132,23 @@ public class reorderPoint {
 		return reorderPoint;
 	}
 	
-	/*
+	
 	public static void main(String args[]) {
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 500;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 20;
 
 		double tail = 0.00000001;
 
-		int minInventory = -100;
-		int maxInventory = 100;
-		int maxQuantity = 9;
+		int minInventory = -1500;
+		int maxInventory = 1500;
+		int maxQuantity = 800;
 
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {200, 240, 260, 240};
-		double[] demandMean = {2,4,6,4};
+		double[] demandMean = {76,27};
 		
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
@@ -174,6 +173,6 @@ public class reorderPoint {
 		System.out.println(Arrays.toString(reorderPoint));
 
 	}
-	*/
+	
 
 }

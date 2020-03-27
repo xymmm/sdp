@@ -1,9 +1,5 @@
 package sQ.sdp;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
 
 import org.jfree.chart.ChartFactory;
@@ -14,30 +10,18 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import reorderQuantitySystem.sQsystemSolution;
 import sS.sS;
 import sdp.data.Instance;
 import sdp.data.InstanceDouble;
-import umontreal.ssj.util.Chrono;
 
 public class sQ {
-	
-	/** print optimal quantity **/
-	public static void printOptimalQuantity(InstanceDouble instance, sQsolution sQsolution) {
-		System.out.println("Optimal Q for all periods is: ");
-		System.out.println(sQsolution.getOpt_a(instance)+1);
-	}
-	
-	/** print cost of optimal quantity **/
-	public static void printOpitmalCost(InstanceDouble instance, sQsolution sQsolution){
-		System.out.println("Optimal cost with initial inventory level " +(instance.initialInventory)+" is: ");
-		System.out.println(sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][(int) (instance.initialInventory - instance.minInventory)][0]);
-	}
 
 	/** Plot costs - cost with no action and with a given Q for a given stage**/
 	static void plotComparedCosts(Instance instance, sQsolution sQsolution, int t) {
 		XYSeries series = new XYSeries("sQ plot");
 		for(int a=0;a<instance.maxQuantity;a++) {
-			series.add(a,sQsolution.totalCost[a][instance.initialInventory - instance.minInventory][t]);
+			series.add(a,sQsolution.optimalCost);
 		}
 		XYDataset xyDataset = new XYSeriesCollection(series);
 		JFreeChart chart = ChartFactory.createXYLineChart("SDP with (s,Q) policy", "Feasible Replenishment Quantity", "Expected total cost",
@@ -47,38 +31,25 @@ public class sQ {
 		frame.setSize(1500,1200);
 	}
 	
-	public static void presentsQresults(InstanceDouble instance, sQsolution sQsolution) {
-		//plotComparedCosts(instance, sQsolution, 0);
-		//printReorderPoints(instance, sQsolution);
-		//System.out.println();
-		printOptimalQuantity(instance, sQsolution);
-		System.out.println();
-		printOpitmalCost(instance, sQsolution);
-	}
 
 	/** main computation **/
-	public static sQsolution solvesQInstance(InstanceDouble instance, boolean Normal) {
+	public static sQsystemSolution solvesQInstance(InstanceDouble instance, boolean Normal) {
 
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
 		}
+		
 		double[][] demandProbabilities = null;
 		if(Normal) {
 			demandProbabilities = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
 		}else {
 			demandProbabilities= sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);//Poisson
 		}
-		//demandProbabilities[stages][demandValue] = Prob(dt = demandValue), dt is the realized demand of the random varuable d_t
 		
 		double totalCost[][][] = new double[instance.maxQuantity+1][inventory.length][instance.getStages()];
 		boolean optimalAction[][][] = new boolean [instance.maxQuantity + 1][inventory.length][instance.getStages()];
-		
-		/** for check **/
-		double[][][] costOrder = new double[instance.maxQuantity+1][inventory.length][instance.getStages()];
-		double[][][] costNoOrder = new double[instance.maxQuantity+1][inventory.length][instance.getStages()];
 
-		long startTime = System.currentTimeMillis();
 		for(int a=0; a<=instance.maxQuantity;a++) { //"a" represents the action index, so the actual action volume is a+1
 			for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
 				for(int i=0;i<inventory.length;i++) { // Inventory   
@@ -123,27 +94,42 @@ public class sQ {
 					totalCostOrder /= scenarioProbOrder;
 					totalCostNoOrder /= scenarioProbNo;
 					
-					costOrder[a][i][t] 		= totalCostOrder;
-					costNoOrder[a][i][t] 	= totalCostNoOrder;
-					
 					totalCost[a][i][t] = Math.min(totalCostNoOrder, totalCostOrder);
 					optimalAction[a][i][t] = totalCostNoOrder < totalCostOrder ? false : true;
 				}
 			}
 		}
-		long endTime=System.currentTimeMillis();
-		long timeConsumedsQ = endTime - startTime;
-		System.out.println(timeConsumedsQ + " ms");
 		
-		//writeToText(costOrder);
-		//writeToText(costNoOrder);
+		//get optimal Q
+		int a = 0;
+		int minIndex = a;
+		double minCost = totalCost[minIndex][(int) (instance.initialInventory - instance.minInventory)][0]; //Time zero
+		do {
+			if(minCost > totalCost[a+1][(int) (instance.initialInventory - instance.minInventory)][0]) {
+				minCost = totalCost[a+1][(int) (instance.initialInventory - instance.minInventory)][0];
+				minIndex = a+1;
+			}
+			a = a + 1;
+		}while(a < instance.maxQuantity - 1);
+		int opt_a = minIndex+1;
 		
-		return new sQsolution(totalCost, optimalAction, inventory, timeConsumedsQ);
+		//get optimal schedule
+		boolean[] optimalActionGivenQ = optimalAction[opt_a][(int) (instance.initialInventory - instance.minInventory)];
+		double[] optimalActionDouble = new double[instance.demandMean.length];
+		int[] schedule =  new int[instance.demandMean.length];
+		for(int t=0; t<instance.demandMean.length; t++) {
+			optimalActionDouble[t] = (optimalActionGivenQ[t] == true) ? 1 : 0;
+			schedule[t] = (int) (optimalActionDouble[t] * opt_a);
+		}
+		
+		double optimalCost = totalCost[opt_a][(int) (instance.initialInventory - instance.minInventory)][0];
+
+		
+		return new sQsystemSolution(schedule, optimalCost, demandProbabilities);
 	}
 
-	public static void main(String[] args) {
 
-		Chrono timer = new Chrono();
+	public static void main(String[] args) {
 
 		double fixedOrderingCost = 100;
 		double unitCost = 0;
@@ -177,64 +163,29 @@ public class sQ {
 				);
 
 		/** Solve the classic instance **/
-		sQsolution sQsolution = solvesQInstance(instance, Normal);
-		
-		/*
-		boolean optActPeriod0[][] = new boolean[instance.maxInventory - instance.minInventory + 1][instance.maxQuantity + 1];
-		for(int i = 0; i < optActPeriod0.length; i++) {
-			for(int a = 0; a < optActPeriod0[i].length; a++) {
-				optActPeriod0[i][a] = sQsolution.optimalAction[a][i][0];
-			}	
-		}
-		System.out.println(Arrays.deepToString(optActPeriod0)); //Careful, BIG MATRIX
-		 */
-
-		presentsQresults(instance, sQsolution);
-		
+		sQsystemSolution sQsolution = solvesQInstance(instance, Normal);
+			
 		//present ETC of inventory 0 with the optimal quantity
-		System.out.println();
+		/*System.out.println();
 		for(int t=0; t<instance.getStages();t++) {
-			System.out.println("a: " + (sQsolution.getOpt_a(instance)+1) + "\t"
+			System.out.println("a: " + sQsolution.opt_a + "\t"
 								+ "t: "+ (t+1)+ "\t"  
-								+sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][(int) (instance.initialInventory - instance.minInventory)][t]);
+								+sQsolution.totalCost[sQsolution.opt_a][(int) (instance.initialInventory - instance.minInventory)][t]);
 		}
+	*/
 		
-		//print cost for i and t under the optimal quantity
-		for(int i=0; i<sQsolution.inventory.length;i++) {
-			System.out.print("i: "+ (i+instance.minInventory) + "\t");
-			for(int t=0; t<instance.demandMean.length; t++) {
-				System.out.print(sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][i][t] + "\t");
-			}
-			System.out.println();
-		}
+		int[] reorderPoint = reorderQuantitySystem.reorderPoint.computeReorderPoint(instance, sQsolution);
+		System.out.println("optimal cost = "+sQsolution.optimalCost);
+		System.out.println("optimal schedule = " + Arrays.toString(sQsolution.optimalSchedule));
+		System.out.println("reorder points = " + Arrays.toString(reorderPoint));
 		
-		//writeToText(sQsolution.totalCost);
+
+
+
 		
 
 	}
 	
-	
-	
-	public static void writeToText(double[][][] totalCost){
-		FileWriter fw = null;
-		try {
-			File f = new File("E:\\sQresultCheck.txt");
-			fw = new FileWriter(f, true);//true, continue to write
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		PrintWriter pw = new PrintWriter(fw);
-		pw.println(Arrays.deepToString(totalCost));
-		pw.println();pw.println();pw.println();
-		pw.flush();
-		try {
-			fw.flush();
-			pw.close();
-			fw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 
 }

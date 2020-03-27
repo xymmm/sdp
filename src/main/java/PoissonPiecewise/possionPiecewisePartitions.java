@@ -107,7 +107,12 @@ public class possionPiecewisePartitions {
 
 
 	public static void main(String[] args) {
-		double [] demandMeanInput = {2.5, 1, 3.5, 4.5, 1.5, 3};
+		double [] demandMeanInput = {//76,	
+											//27,		
+													10,		36,		88,
+									 136,	149,	121,	68,		22,
+									 11,	42,		96,		140,	148,
+									 114,	60};
 		int nbSamples = 100000;
 		int partitions = 4;
 		//for(int d=0; d<demandMeanInput.length; d++) {

@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import reorderQuantitySystem.sQsystemSolution;
 import sQ.sdp.sQ;
 import sQ.sdp.sQsolution;
 import sS.sSsolution;
@@ -55,7 +56,7 @@ public class sQtest_singleQ {
 	   public void testInstanceClassic() {
 	      InstanceDouble instance = getInstanceClassic();
 	      
-	     sQsolution sQsolution = sQ.solvesQInstance(instance, true);
+	     sQsystemSolution sQsolution = sQ.solvesQInstance(instance, true);
 	      
 	     /*
 	      double expectedTotalCost = 2500.0;
@@ -68,7 +69,7 @@ public class sQtest_singleQ {
 	      double expectedTotalCost = 5.7411040216635155E17;
 	      assertEquals(
 	    		  expectedTotalCost,
-	    		  sQsolution.totalCost[0][0][2],
+	    		  sQsolution.optimalCost,
 	    		  0.001
 	    		  );
 	   }
@@ -108,12 +109,12 @@ public class sQtest_singleQ {
 	   public void testInstanceA() {
 	      InstanceDouble instance = getInstanceA();
 	      
-	      sQsolution sQsolution = sQ.solvesQInstance(instance, true);
+	      sQsystemSolution sQsolution = sQ.solvesQInstance(instance, true);
 	      
 	      double expectedTotalCost = 9.571778965387995E20;
 	      assertEquals(
 	            expectedTotalCost,
-	            sQsolution.totalCost[0][0][8],
+	            sQsolution.optimalCost,
 	            0.001);
 	   }
 	   	   
@@ -152,12 +153,12 @@ public class sQtest_singleQ {
 	   public void testInstanceB() {
 	      InstanceDouble instance = getInstanceB();
 	      
-	      sQsolution sQsolution = sQ.solvesQInstance(instance, true);
+	      sQsystemSolution sQsolution = sQ.solvesQInstance(instance, true);
 	      
 	      double expectedTotalCost = 1.2041562679020247E28;
 	      assertEquals(
 	            expectedTotalCost,
-	            sQsolution.totalCost[0][0][8],
+	            sQsolution.optimalCost,
 	            0.001);
 	   }
 	   
@@ -196,12 +197,12 @@ public class sQtest_singleQ {
 	   public void testInstanceC() {
 	      InstanceDouble instance = getInstanceC();
 	      
-	      sQsolution sQsolution = sQ.solvesQInstance(instance, true);
+	      sQsystemSolution sQsolution = sQ.solvesQInstance(instance, true);
 	      
 	      double expectedTotalCost = 2.3525420541466773E23;
 	      assertEquals(
 	            expectedTotalCost,
-	            sQsolution.totalCost[0][0][8],
+	            sQsolution.optimalCost,
 	            0.001);
 	   }
 	   
