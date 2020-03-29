@@ -223,26 +223,26 @@ public class sS {
 	/** main computation **/
 	public static void main(String[] args) {
 
+		Chrono timer = new Chrono();
+		
+		double fixedOrderingCost = 100;
+		double unitCost = 0;
 		double holdingCost = 1;
-
-		double fixedOrderingCost = 500;
-		double unitCost		   	 = 0;
-		double penaltyCost	   	 = 20;
-		double stdParameter	   = 0.1;
-
-		double initialStock = 0;
+		double penaltyCost = 10;
 
 		double tail = 0.00000001;
 
-		int minInventory = -1500;
-		int maxInventory = 1500;
-		int maxQuantity = 800;
+		int minInventory = -2000;
+		int maxInventory = 2000;
+		int maxQuantity = 500;
 
-		boolean Normal = false;
+		double stdParameter = 0.25;
 
 		//int[] demandMean = {2,4,6,4};
-		double[] demandMean = {76,27,10,36,88,136,149,121,68,22,11,42,96,140,148,114,60};
+		double[] demandMean = {20, 0.1, 60, 40};
 		
+		boolean Normal = true;
+
 		InstanceDouble instance = new InstanceDouble(
 										fixedOrderingCost,
 										unitCost,

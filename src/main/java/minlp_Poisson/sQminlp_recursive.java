@@ -28,8 +28,6 @@ import ilog.opl.IloOplModelDefinition;
 import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
 import minlp_Normal.sQminlpNormal_recursive;
-import sS.sSsolution;
-import sdp.data.InstanceDouble;
 
 public class sQminlp_recursive {
 
@@ -180,6 +178,9 @@ public class sQminlp_recursive {
 		File tempFile = new File ("src/main/java/minlp_Poisson/tempRminlp.txt"); //to save reorder point as a string in the file
 		double orderingCost = (sQmodel.Q==0.0)? 0 : (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost);
 		double i1 = initialInputLevel; 
+		System.out.println("cost("+i1+") = " + costLeft +"\t" + "cost("+(i1+pace)+") = "+costRight);
+		
+		
 		if( (costLeft - orderingCost)*(costRight - orderingCost)<0 ) {
 			double levelBinary = i1 + Math.floor(0.5*pace); 
 			double costBinary = costDifference(sQmodel, levelBinary, rangedQ);
@@ -190,7 +191,7 @@ public class sQminlp_recursive {
 					System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
 					String s_string = Double.toString(levelBinary+1);
 					boolean flag = writeTxtFile(s_string, tempFile);
-					System.out.println();
+					//System.out.println();
 				}else {
 					System.out.println("binary search proceeds, right interval.");
 					binarySearch(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight, rangedQ);
@@ -201,7 +202,7 @@ public class sQminlp_recursive {
 					System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
 					String s_string = Double.toString(levelBinary+1);
 					boolean flag = writeTxtFile(s_string, tempFile);
-					System.out.println();
+					//System.out.println();
 				}else {
 					System.out.println("binary search proceeds, left interval.");
 					binarySearch(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary, rangedQ);
@@ -227,14 +228,14 @@ public class sQminlp_recursive {
 		for(int t=0; t<demandMean.length; t++) {
 			if((schedule[t] < 1.0)||(schedule[t] >= ((rangedQ) ? 9 : 500))) {
 				reorderPoint[t] = Double.NEGATIVE_INFINITY;
-				System.out.println("no replenishmeng placed.");
-				System.out.println();
+				//System.out.println("no replenishmeng placed.");
+				//System.out.println();
 			}else {
 				try {
 					sQminlp_recursive sQmodel = new sQminlp_recursive(
 							demandMeanInput[t], holdingCost, fixedCost,  unitCost, penaltyCost, 
 							initialStock,  partitions, null, schedule[t]);
-					System.out.println("orderingCost = " + (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost));
+					//System.out.println("orderingCost = " + (sQmodel.fixedCost + sQmodel.Q*sQmodel.unitCost));
 					double costLeft = costDifference(sQmodel, initialStock, rangedQ); //System.out.println("costLeft = "+ costLeft);
 					double costRight = costDifference(sQmodel, initialStock + pace, rangedQ); //System.out.println("costRight = "+ costRight);
 					binarySearch(initialStock, pace, sQmodel, costLeft, costRight, rangedQ);
@@ -251,52 +252,6 @@ public class sQminlp_recursive {
 		}
 		return reorderPoint;
 	}
-	
-	
-	public static void main(String[] args) throws Exception {
-		
-		double fixedCost = 500;
-		double unitCost = 0;
-		double holdingCost = 1;
-		double penaltyCost = 20;
-		double initialStock = 0;
-		int partitions = 10;		
-		
-		double pace = 8;
-		boolean rangedQ = false;
-		
-		double demandMean [][] = {
-				//{27,10,36,88,136,149,121,68,22,11,42,96,140,148,114,60}
-				{60, 40}
-		};
-		
-		int count = 1000;
-		boolean Normal = false;
-		double tail = 0.00000001;
-		double stdParameter = 0.25;
-
-		int minInventory = -1500;
-		int maxInventory = 1500;
-		int maxQuantity = 800;
-		
-		for(int i=0; i<demandMean.length; i++) {
-			
-			InstanceDouble instance = new InstanceDouble(fixedCost, unitCost, holdingCost, penaltyCost,
-					demandMean[i], tail, minInventory, maxInventory, maxQuantity, stdParameter );
-								
-			
-			
-		//**********************sQt for Poisson Demand*************************
-		long timeStartsQt = System.currentTimeMillis();
-		double[] sQtschedule = {102.92795714285764, 41.8920571428547};
-		double[] s_sQt = sQTminlp_heuristic.reorderPoint_sQtHeuristic(demandMean[i], fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, pace, sQtschedule, rangedQ);
-		System.out.println("Associated reorder point is "+Arrays.toString(s_sQt));
-
-		}
-	}
-	
-	
-	
 	
 
 //**************************************************************************************************

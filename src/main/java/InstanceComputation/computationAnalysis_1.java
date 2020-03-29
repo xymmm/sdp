@@ -40,7 +40,7 @@ public class computationAnalysis_1 {
 		
 		double demandMean [][] = {
 				//{1, 2, 4, 5, 6, 3},
-				//{4, 5, 6, 3 ,2, 1},
+				{4, 5, 6, 3 ,2, 1},
 				//{2.5, 1, 3.5, 4.5, 1.5, 3},
 				//{3.5, 1, 2, 4.5, 1, 3},
 				//{3, 3, 3, 3, 3, 3},
@@ -48,7 +48,7 @@ public class computationAnalysis_1 {
 				//{4, 7, 3.5, 2, 3, 1},
 				//{1, 2.5, 3.5, 4, 3, 2},
 				//{2.5, 1, 3.5, 4.5, 1.5, 5.5},
-				{2, 1.5, 4, 4, 1.5, 2}
+				//{2, 1.5, 4, 4, 1.5, 2}
 		};
 		
 		double[][][][] results = new double[demandMean.length][unitCostA.length][KPgroup.length][5];
@@ -74,11 +74,11 @@ public class computationAnalysis_1 {
 					sSsolution sSsolution = sS.sS.solveInstance(instance, true, Normal);	//with initial order 
 					results[d][u][g][0] = sSsolution.optimalCost[(int) (instance.initialInventory - instance.minInventory)][0];
 					resultsTime[d][u][g][0] = (System.currentTimeMillis() - timesSsdp)/1000.0;*/
-					/**sQt*
+					/**sQt**/
 					long timesQtsdp = System.currentTimeMillis();
 					sQsystemSolution sQtsolution = reorderQuantitySystem.optimalSchedule_sQt.optimalSchedule_sQt(instance, Normal);
 					results[d][u][g][1] = sQtsolution.optimalCost;
-					resultsTime[d][u][g][1] = (System.currentTimeMillis() - timesQtsdp)/1000.0;*/
+					resultsTime[d][u][g][1] = (System.currentTimeMillis() - timesQtsdp)/1000.0;
 					/**sQ**/
 					//long timesQsdp = System.currentTimeMillis();
 					sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);

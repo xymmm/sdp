@@ -29,7 +29,7 @@ import minlp_Normal.sQTminlpNormal_heuristic;
 import minlp_Normal.sQminlpNormal_recursive;
 
 public class sQTminlp_heuristic {
-	
+
 	double[] 	demandMean;
 	double 		holdingCost;
 	double 		fixedCost;
@@ -38,18 +38,18 @@ public class sQTminlp_heuristic {
 	double 		initialStock;
 	int 		partitions;
 	double[]	optQ;		//future Q schedule
-	
+
 	String instanceIdentifier;
-	
+
 	public sQTminlp_heuristic(double[] demandMean, 
-				   double holdingCost,
-				   double fixedCost,
-				   double unitCost,
-				   double penaltyCost,
-				   double initialStock,
-				   int 	  partitions,
-				   String instanceIdentifier, 
-				   double[] optQ) {
+			double holdingCost,
+			double fixedCost,
+			double unitCost,
+			double penaltyCost,
+			double initialStock,
+			int 	  partitions,
+			String instanceIdentifier, 
+			double[] optQ) {
 		this.demandMean 	= demandMean;
 		this.holdingCost 	= holdingCost;
 		this.fixedCost 		= fixedCost;
@@ -59,106 +59,137 @@ public class sQTminlp_heuristic {
 		this.partitions 	= partitions;
 		this.optQ 			= optQ;
 	}
-	
+
 	public InputStream getMINLPmodelStream(File file) {
-	      FileInputStream is = null;
-	      try{
-	         is = new FileInputStream(file);
-	      }catch(IOException e){
-	         e.printStackTrace();
-	      }
-	      return is;
+		FileInputStream is = null;
+		try{
+			is = new FileInputStream(file);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		return is;
 	}
-	
+
 	/**main solving block *****************************************************/
 	//where Q[0] is an input
 	public double solveMINLP_heuristic (String model_name) throws IloException{
 		IloOplFactory oplF = new IloOplFactory();
-        IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
-        IloCplex cplex = oplF.createCplex();
-        IloOplModelSource modelSource=oplF.createOplModelSourceFromStream(getMINLPmodelStream(new File("./opl_models/"+model_name+".mod")),model_name);
-        IloOplSettings settings = oplF.createOplSettings(errHandler);
-        IloOplModelDefinition def=oplF.createOplModelDefinition(modelSource,settings);
-        IloOplModel opl=oplF.createOplModel(def,cplex);
-        cplex.setParam(IloCplex.IntParam.Threads, 8);
-        cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);       
-        IloOplDataSource dataSource = new sQTminlp_heuristic.sQtRecursiveData(oplF);
-        opl.addDataSource(dataSource);
-        opl.generate();
-        cplex.setOut(null);      
-        boolean status =  cplex.solve();        
-        if ( status ){   
-        	double objective = cplex.getObjValue();
-        	opl.postProcess();
-        	oplF.end();
-        	System.gc();
-        	return objective;
-        }else{
-        	System.out.println("No solution!");
-        	oplF.end();
-        	System.gc();
-        	return Double.NaN;
-        } 
+		IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
+		IloCplex cplex = oplF.createCplex();
+		IloOplModelSource modelSource=oplF.createOplModelSourceFromStream(getMINLPmodelStream(new File("./opl_models/"+model_name+".mod")),model_name);
+		IloOplSettings settings = oplF.createOplSettings(errHandler);
+		IloOplModelDefinition def=oplF.createOplModelDefinition(modelSource,settings);
+		IloOplModel opl=oplF.createOplModel(def,cplex);
+		cplex.setParam(IloCplex.IntParam.Threads, 8);
+		cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);       
+		IloOplDataSource dataSource = new sQTminlp_heuristic.sQtRecursiveData(oplF);
+		opl.addDataSource(dataSource);
+		opl.generate();
+		cplex.setOut(null);      
+		boolean status =  cplex.solve();        
+		if ( status ){   
+			double objective = cplex.getObjValue();
+			opl.postProcess();
+			oplF.end();
+			System.gc();
+			return objective;
+		}else{
+			System.out.println("No solution!");
+			oplF.end();
+			System.gc();
+			return Double.NaN;
+		} 
 
 	}
-	
+
+
+	public double solve_lastPeriod (String model_name) throws IloException{
+		IloOplFactory oplF = new IloOplFactory();
+		IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
+		IloCplex cplex = oplF.createCplex();
+		IloOplModelSource modelSource=oplF.createOplModelSourceFromStream(getMINLPmodelStream(new File("./opl_models/"+model_name+".mod")),model_name);
+		IloOplSettings settings = oplF.createOplSettings(errHandler);
+		IloOplModelDefinition def=oplF.createOplModelDefinition(modelSource,settings);
+		IloOplModel opl=oplF.createOplModel(def,cplex);
+		cplex.setParam(IloCplex.IntParam.Threads, 8);
+		cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);       
+		IloOplDataSource dataSource = new sQTminlp_heuristic.sQtRecursiveData(oplF);
+		opl.addDataSource(dataSource);
+		opl.generate();
+		cplex.setOut(null);      
+		boolean status =  cplex.solve();        
+		if ( status ){   
+			double objective = cplex.getObjValue();
+			opl.postProcess();
+			oplF.end();
+			System.gc();
+			return objective;
+		}else{
+			System.out.println("No solution!");
+			oplF.end();
+			System.gc();
+			return Double.NaN;
+		} 
+
+	}
+
 	/**import data to .mod**/
 	class sQtRecursiveData extends IloCustomOplDataSource{
 		sQtRecursiveData(IloOplFactory oplF){
-            super(oplF);
-        }
-        public void customRead(){       
-         IloOplDataHandler handler = getDataHandler();
-         //problem parameters
-            handler.startElement("nbmonths"); handler.addIntItem(demandMean.length); handler.endElement();
-            handler.startElement("fc"); handler.addNumItem(fixedCost); handler.endElement();
-            handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
-            handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
-            handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
-            handler.startElement("meandemand"); handler.startArray();
-            for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
-            handler.endArray(); handler.endElement();
-            handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();          
-            //piecewise
-            handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();          
-            double partitionProb = 1.0/partitions;
-            handler.startElement("prob"); handler.startArray();
-            for (int j = 0 ; j<partitions; j++){handler.addNumItem(partitionProb);}
-            handler.endArray(); handler.endElement();
-            //picecwise - lambda matrix
-            double[][][] coefficients = sQminlp_oneRun.getLamdaMatrix (demandMean, partitions, 100000);
-            handler.startElement("lamda_matrix");
-            handler.startArray();
-            for(int t=0; t<demandMean.length; t++) {
-            	handler.startArray();
-            	for(int j=0; j<demandMean.length; j++) {
-            		handler.startArray();
-            		for(int p = 0; p<partitions; p++) {
-            			handler.addNumItem(coefficients[t][j][p]);
-            		}
-            		handler.endArray(); 
-            	}
-            	handler.endArray(); 
-            }
-            handler.endArray(); 
-            handler.endElement();
-        }
+			super(oplF);
+		}
+		public void customRead(){       
+			IloOplDataHandler handler = getDataHandler();
+			//problem parameters
+			handler.startElement("nbmonths"); handler.addIntItem(demandMean.length); handler.endElement();
+			handler.startElement("fc"); handler.addNumItem(fixedCost); handler.endElement();
+			handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
+			handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
+			handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
+			handler.startElement("meandemand"); handler.startArray();
+			for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
+			handler.endArray(); handler.endElement();
+			handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();          
+			//piecewise
+			handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();          
+			double partitionProb = 1.0/partitions;
+			handler.startElement("prob"); handler.startArray();
+			for (int j = 0 ; j<partitions; j++){handler.addNumItem(partitionProb);}
+			handler.endArray(); handler.endElement();
+			//picecwise - lambda matrix
+			double[][][] coefficients = sQminlp_oneRun.getLamdaMatrix (demandMean, partitions, 100000);
+			handler.startElement("lamda_matrix");
+			handler.startArray();
+			for(int t=0; t<demandMean.length; t++) {
+				handler.startArray();
+				for(int j=0; j<demandMean.length; j++) {
+					handler.startArray();
+					for(int p = 0; p<partitions; p++) {
+						handler.addNumItem(coefficients[t][j][p]);
+					}
+					handler.endArray(); 
+				}
+				handler.endArray(); 
+			}
+			handler.endArray(); 
+			handler.endElement();
+		}
 	}
-	
+
 	/***********************************************************************************************************************************/
 	/*****************************************BINARY SEARCH for sQt heuristic***********************************************************/
 	/***********************************************************************************************************************************/
 	public static double costDifferencesQtHeuristic (sQTminlp_heuristic sQmodel, double inventoryLevel, double currentQ, boolean rangedQ) {
 		double inventoryPlusQ = inventoryLevel + currentQ;
 		double difference = 0;		
-		
+
 		String FileName = null;	
 		if(rangedQ == true) {
 			FileName = "sQtPoisson_recursive_Qranged";
 		}else {
 			FileName = "sQtPoisson_recursive";
 		}
-		
+
 		try {
 			sQTminlp_heuristic sQmodelInput = new sQTminlp_heuristic(
 					sQmodel.demandMean, sQmodel.holdingCost, sQmodel.fixedCost,  sQmodel.unitCost, sQmodel.penaltyCost, 
@@ -179,7 +210,7 @@ public class sQTminlp_heuristic {
 	public static void binarySearchsQtHeuristic(double initialInputLevel, double pace, sQTminlp_heuristic sQmodel,
 			double costLeft, double costRight, double currentQ, boolean rangedQ) throws Exception {	
 
-		File tempFile = new File ("src/main/java/minlp_Poisson/tempRminlp.txt"); //to save reorder point as a string in the file
+		File tempFile = new File ("src/main/java/minlp_Normal/tempRminlp.txt"); //to save reorder point as a string in the file
 		double orderingCost = (currentQ==0.0)? 0 : (sQmodel.fixedCost + currentQ*sQmodel.unitCost);
 		double i1 = initialInputLevel; 
 		System.out.println("cost("+i1+") = " + costLeft +"\t" + "cost("+(i1+pace)+") = "+costRight);
@@ -198,7 +229,7 @@ public class sQTminlp_heuristic {
 					boolean flag = writeTxtFile(s_string, tempFile);
 					System.out.println();
 				}else {
-					System.out.println("binary search proceeds, right interval.");
+					//System.out.println("binary search proceeds, right interval.");
 					binarySearchsQtHeuristic(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight, currentQ, rangedQ);
 				}
 			}else {//[input, binary]
@@ -241,20 +272,34 @@ public class sQTminlp_heuristic {
 			if(schedule[t] < 1.0) {
 				reorderPoint[t] = Double.NEGATIVE_INFINITY;
 				System.out.println("no replenishment placed.");
-				System.out.println();
+				//System.out.println();
 			}else {
 				if(t==demandMean.length-1) {		//for the last period, only apply the method as sQ, so refer to sQminlp_recursive
-					try {
-						sQminlp_recursive sQmodelBR = new sQminlp_recursive(
-								demandMeanInput[t], holdingCost, fixedCost,  unitCost, penaltyCost, 
-								initialStock, partitions, null, schedule[t]);
-						System.out.println("orderingCost = " + (sQmodelBR.fixedCost + schedule[t]*sQmodelBR.unitCost));
-						double costLeft = minlp_Poisson.sQminlp_recursive.costDifference(sQmodelBR, initialStock, Qranged); 
-						double costRight = minlp_Poisson.sQminlp_recursive.costDifference(sQmodelBR, initialStock + pace, Qranged); 
-						minlp_Poisson.sQminlp_recursive.binarySearch(initialStock, pace, sQmodelBR, costLeft, costRight, Qranged);
-					}catch(IloException e){
-						e.printStackTrace();
-					}	
+					double[] cost = new double[101];
+					for(int i=0; i<cost.length; i++) {
+						String FileName = null;	
+						if(Qranged == true) {
+							FileName = "sQtPoisson_recursive_Qranged";
+						}else {
+							FileName = "sQtPoisson_recursive";
+						}					
+						try {
+							sQTminlp_heuristic sQmodelInput = new sQTminlp_heuristic(
+									demandMean, holdingCost, fixedCost,  unitCost, penaltyCost, 
+									i-50, partitions, null, schedule);
+							cost[i] = sQmodelInput.solveMINLP_heuristic(FileName);
+						}catch(IloException e){
+							e.printStackTrace();
+						}
+					}
+					double targetCost = sdp.util.globleMinimum.getGlobalMinimum(cost) + schedule[t] *unitCost + fixedCost;
+					for(int i=0; i<cost.length-1; i++) {
+						if((cost[i]>targetCost)&&(cost[i] < targetCost)) {
+							reorderPoint[t] = i+50;
+						}
+						break;
+					}
+					System.out.println("s0 = "+reorderPoint[t]);
 				}else{
 					double[] futureQ = sdp.util.decomposeDoubleArray.decomposeArray(schedule, demandMean.length-t-1);
 					//System.out.println("future Q: "+Arrays.toString(futureQ));
@@ -268,21 +313,21 @@ public class sQTminlp_heuristic {
 					binarySearchsQtHeuristic(initialStock, pace, sQmodelBRT, costLeft, costRight, schedule[t], Qranged);				
 				}
 				//record reorder point in an array
-				File tempFile = new File ("src/main/java/minlp_Poisson/tempRminlp.txt"); 		
+				if(t<demandMean.length-1) {
+				File tempFile = new File ("src/main/java/minlp_Normal/tempRminlp.txt"); 		
 				FileReader fr = new FileReader(tempFile);
 				BufferedReader br = new BufferedReader(fr);
 				String read = "";
 				read = br.readLine();
-				reorderPoint[t] = Double.parseDouble(read);
+				reorderPoint[t] = Double.parseDouble(read);}
 			}
-			System.out.println("reorderPoint["+(t+1)+"] = "+reorderPoint[t]);
 		}
 		return reorderPoint;
 	}
 
-	
-	
-	
+
+
+
 	/*************************************************************************************/
 	public static boolean writeTxtFile(String content,File fileName)throws Exception{
 		RandomAccessFile mm=null;

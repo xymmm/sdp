@@ -190,7 +190,7 @@ public class sQTminlpNormal_heuristic {
 							//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
 							String s_string = Double.toString(levelBinary+1);
 							boolean flag = writeTxtFile(s_string, tempFile);
-							System.out.println();
+							//System.out.println();
 						}else {
 							//System.out.println("binary search proceeds, right interval.");
 							binarySearchsQtHeuristic(levelBinary, Math.round(0.5*pace), sQmodel, costBinary, costRight, currentQ,t);
@@ -201,7 +201,7 @@ public class sQTminlpNormal_heuristic {
 							//System.out.println("cost("+(levelBinary + 1) +") = " +costBinaryClose);
 							String s_string = Double.toString(levelBinary+1);
 							boolean flag = writeTxtFile(s_string, tempFile);
-							System.out.println();
+							//System.out.println();
 						}else {
 							//System.out.println("binary search proceeds, left interval.");
 							binarySearchsQtHeuristic(i1, Math.round(0.5*pace), sQmodel, costLeft, costBinary, currentQ,t);
@@ -274,7 +274,6 @@ public class sQTminlpNormal_heuristic {
 				read = br.readLine();
 				reorderPoint[t] = Double.parseDouble(read);
 			}
-			System.out.println("reorderPoint["+(t+1)+"] = "+reorderPoint[t]);
 		}
 		return reorderPoint;
 	}

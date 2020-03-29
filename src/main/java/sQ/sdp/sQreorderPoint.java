@@ -38,14 +38,12 @@ public class sQreorderPoint {
 
 
 	/****compute cost function f(Q,t,i) with given t and Q****/
-	public static sQreorderPointSolution costVaryingWithInventory(sQsolution sQsolution, InstanceDouble instance, boolean initialOrder){
-
+	public static sQreorderPointSolution costVaryingWithInventory(int Q, InstanceDouble instance, boolean initialOrder){
+		long startTime = System.currentTimeMillis();
 		int[] inventory = new int [instance.maxInventory - instance.minInventory + 1];
 		for(int i=0;i<inventory.length;i++) {
 			inventory[i] = i + instance.minInventory;
 		}
-		double[][] demandProbabilities = sQsolution.demandProbabilities;
-
 
 		double[][] costGivenQ = new double [instance.getStages()][inventory.length];
 		boolean[][] actionGivenQ = new boolean[instance.getStages()][inventory.length];
@@ -53,71 +51,69 @@ public class sQreorderPoint {
 		double[][] costOrder = new double[instance.getStages()][inventory.length];
 		double[][] costNoOrder = new double[instance.getStages()][inventory.length];
 
+		double demandProbabilities [][] = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
+		//double demandProbabilities[][] = sS.computeNormalDemandProbability(instance.demandMean, instance.stdParameter, instance.maxDemand, instance.tail);
 
-		double[] reorderPoints = new double[instance.getStages()];
-
-		for(int t=instance.getStages()-1;t>=0;t--) { // Time
-			if(sQsolution.schedule[t] == 0.0) {
-				reorderPoints [t] = Double.NEGATIVE_INFINITY;
-			}else {
-				for(int i=0;i<inventory.length;i++) { // Inventory   
-					/** a = Q (given) **/
-					double Q = ((t==0)&&(!initialOrder)) ?  0 : sQsolution.schedule[t];
-					double totalCostOrder = sS.computePurchasingCost(Q, instance.fixedOrderingCost, instance.unitCost); 
-					double scenarioProb = 0;
-					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
-						if((inventory[i] + Q - d <= instance.maxInventory) && (inventory[i] + Q - d >= instance.minInventory)) {
-							totalCostOrder += demandProbabilities[t][d]*(
-									sS.computeImmediateCost(
-											inventory[i], 
-											Q, 
-											d, 
-											instance.holdingCost, 
-											instance.penaltyCost, 
-											instance.fixedOrderingCost, 
-											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : costGivenQ[t+1][(int) (i+Q-d)]) 
-									);
-							scenarioProb += demandProbabilities[t][d];
-						}
+		for(int t=instance.getStages()-1;t>=0;t--) { // Time			   
+			for(int i=0;i<inventory.length;i++) { // Inventory   
+				/** a = Q (given) **/
+				Q = ((t==0)&&(!initialOrder)) ?  0 : Q;
+				double totalCostOrder = sS.computePurchasingCost(Q, instance.fixedOrderingCost, instance.unitCost); 
+				double scenarioProb = 0;
+				for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+					if((inventory[i] + Q - d <= instance.maxInventory) && (inventory[i] + Q - d >= instance.minInventory)) {
+						totalCostOrder += demandProbabilities[t][d]*(
+								sS.computeImmediateCost(
+										inventory[i], 
+										Q, 
+										d, 
+										instance.holdingCost, 
+										instance.penaltyCost, 
+										instance.fixedOrderingCost, 
+										instance.unitCost)
+								+ ((t==instance.getStages()-1) ? 0 : costGivenQ[t+1][i+Q-d]) 
+								);
+						scenarioProb += demandProbabilities[t][d];
 					}
-					totalCostOrder /= scenarioProb;
-					costOrder[t][i] = totalCostOrder;
-
-					/** a = 0**/
-					double totalCostNoOrder = 0;
-					scenarioProb = 0;
-					for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
-						if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {
-							totalCostNoOrder += demandProbabilities[t][d]*(
-									sS.computeImmediateCost(
-											inventory[i], 
-											0, 
-											d, 
-											instance.holdingCost, 
-											instance.penaltyCost, 
-											instance.fixedOrderingCost, 
-											instance.unitCost)
-									+ ((t==instance.getStages()-1) ? 0 : costGivenQ[t+1][i-d]) 
-									);
-							scenarioProb += demandProbabilities[t][d];
-						}
-					}
-					totalCostNoOrder /= scenarioProb;
-					costNoOrder[t][i] = totalCostNoOrder;
-
-					costGivenQ[t][i] = Math.min(totalCostNoOrder, totalCostOrder);
-					actionGivenQ[t][i] = totalCostNoOrder < totalCostOrder ? false : true;
 				}
+				totalCostOrder /= scenarioProb;
+				costOrder[t][i] = totalCostOrder;
+
+				/** a = 0**/
+				double totalCostNoOrder = 0;
+				scenarioProb = 0;
+				for(int d=0;d<demandProbabilities[t].length;d++) { // Demand
+					if((inventory[i] - d <= instance.maxInventory) && (inventory[i] - d >= instance.minInventory)) {
+						totalCostNoOrder += demandProbabilities[t][d]*(
+								sS.computeImmediateCost(
+										inventory[i], 
+										0, 
+										d, 
+										instance.holdingCost, 
+										instance.penaltyCost, 
+										instance.fixedOrderingCost, 
+										instance.unitCost)
+								+ ((t==instance.getStages()-1) ? 0 : costGivenQ[t+1][i-d]) 
+								);
+						scenarioProb += demandProbabilities[t][d];
+					}
+				}
+				totalCostNoOrder /= scenarioProb;
+				costNoOrder[t][i] = totalCostNoOrder;
+
+				costGivenQ[t][i] = Math.min(totalCostNoOrder, totalCostOrder);
+				actionGivenQ[t][i] = totalCostNoOrder < totalCostOrder ? false : true;
 			}
 		}
+		
+		long endTime = System.currentTimeMillis();
+		long timeConsumed = endTime - startTime;
 
-
-		return new sQreorderPointSolution(inventory, costGivenQ, actionGivenQ, costOrder, costNoOrder);
+		return new sQreorderPointSolution(inventory, costGivenQ, actionGivenQ, costOrder, costNoOrder, timeConsumed);
 	}
 
 
-/*
+
 	public static void main(String[] args) {
 
 		double fixedOrderingCost = 100;
@@ -138,8 +134,6 @@ public class sQreorderPoint {
 
 		int Q = 84;
 
-		boolean Normal = true;
-
 		//double[] costLimit = {20000, 15000, 10000, 5200};
 
 		int[] s_compare = new int[demandMean.length];
@@ -147,20 +141,20 @@ public class sQreorderPoint {
 
 		for(int d=0; d<1;d++) {
 
-			/** create and resolve instance**
+			/** create and resolve instance**/
 			InstanceDouble instance = new InstanceDouble(fixedOrderingCost, unitCost, holdingCost, penaltyCost, demandMeanInput[d], 
 					tail, minInventory, maxInventory, maxQuantity, stdParameter );	
 			//determine s by compare c(s) and c(s+Q)
-			sQreorderPointSolution sQgivenQ = costVaryingWithInventory(Q,instance,false, Normal);
+			sQreorderPointSolution sQgivenQ = costVaryingWithInventory(Q,instance,false);
 
-			/**print and plot ETC**
+			/**print and plot ETC**/
 			System.out.println("cost with initial stock = "+instance.initialInventory+" is "+sQgivenQ.costGivenQ[0][(int) (instance.initialInventory-instance.minInventory)]);
 			sdp.util.plotOneDimensionArray.plotCostGivenQGivenStage(sQgivenQ.costGivenQ[0], sQgivenQ.inventory, "inventory level", "expected cost", "Expected cost without initial order t=1");//cost
 			for(int i=500; i<701; i++) {
-				System.out.println(sQgivenQ.costGivenQ[0][i]);
+			System.out.println(sQgivenQ.costGivenQ[0][i]);
 			}
 
-			/**resolve reorder points by cost differences**
+			/**resolve reorder points by cost differences**/
 			double[] costDifference = new double[maxInventory-minInventory+1-Q];
 			//System.out.println("=============================================== t="+(d+1));
 			for(int j=0; j<costDifference.length; j++) {
@@ -176,7 +170,7 @@ public class sQreorderPoint {
 				}
 			}
 
-			/**determine s by compare c(order) and c(no order)**
+			/**determine s by compare c(order) and c(no order)**/
 			sQreorderPointSolution sQgivenQorder = costVaryingWithInventory(Q, instance, true);
 
 			//plotTwoCostGivenQ(sQgivenQorder.costOrder[0], sQgivenQorder.costNoOrder[0], Q, 0, instance,costLimit[d]);
@@ -192,6 +186,5 @@ public class sQreorderPoint {
 
 
 	}
-	*/
 
 }

@@ -1,6 +1,6 @@
 /*********************************************
  * OPL 12.8.0.0 Model
- * Author: Xiyua
+ * Author: Xiyuan
  * Creation Date: Nov 4, 2019 at 3:55:33 PM
  *********************************************/
 
@@ -37,6 +37,8 @@ minimize sum(t in months)( fc*purchase[t]+h*stockhlb[t]+p*stockplb[t] +  v*U[t])
 
 //constraints
 subject to{
+ 
+ purchase[1] == 0;
 
  stock[0] == initialStock;
  stockhlb[0]==maxl(stock[0],0);
@@ -56,10 +58,6 @@ forall (t in months, j in 1..t)
   
 forall (t in months)
    		sum(k in 1..t) purchase[k] == 0 => P[1][t] == 1;  
-
-forall(t in months) Q[t] <= 9;
-
-purchase[1] == 1;
    
 /** Original formulation for Poisson holding cost / complementary loss **/
 forall(t in months, p in partitions)

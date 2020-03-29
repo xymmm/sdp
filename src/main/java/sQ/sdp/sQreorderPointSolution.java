@@ -10,17 +10,20 @@ public class sQreorderPointSolution {
 	public  boolean[][] actionGivenQ;
 	public double[][] costOrder;
 	public double[][] costNoOrder;
+	public long timeConsumed;
 
 	public sQreorderPointSolution(int[] inventory,
 			double[][] costGivenQ, 
 			boolean[][] actionGivenQ,
 			double[][] costOrder,
-			double[][] costNoOrder) {
+			double[][] costNoOrder,
+			long timeConsumed) {
 		this.costGivenQ = costGivenQ;
 		this.actionGivenQ = actionGivenQ;
 		this.costOrder = costOrder;
 		this.costNoOrder = costNoOrder;
 		this.inventory = inventory;
+		this.timeConsumed = timeConsumed;
 	}
 	
 	public static int[] getsGivenQ(InstanceDouble instance, sQreorderPointSolution sQgivenQsolution) {

@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.apache.commons.math3.distribution.PoissonDistribution;
 
 public class possionPiecewisePartitions {
-	
+
 	/**formulate 3D matrix for d_jt with p partitions**/
 	public static double[][][] lamdaMatrix(double[] demandMean, int partitions, int nbSamples){
 		double[][][] lamdaMatrix = new double [demandMean.length][demandMean.length][partitions];
@@ -22,7 +22,7 @@ public class possionPiecewisePartitions {
 		}
 		return lamdaMatrix;
 	}
-	
+
 	public static int convolution(double[] demandMean, int indexLower, int indexUpper) {
 		int sum = 0;
 		for(int i=indexLower; i<=indexUpper; i++) {
@@ -30,7 +30,7 @@ public class possionPiecewisePartitions {
 		}
 		return sum;
 	}
-	
+
 	/** to compute probability of subregions**/
 	public static double[] computeProb(int partitions) {
 		double[] prob = new double[(int) partitions];
@@ -50,7 +50,7 @@ public class possionPiecewisePartitions {
 		}while(count < accumulativeProb.length);
 		return accumulativeProb;
 	}
-	
+
 	/** to compute expectations of subregions**/
 	public static double[] conditionalExpectationGivenPartitions(double lamda, int nbSamples, int partitions) {
 		double[] prob = computeProb(partitions);
@@ -74,7 +74,41 @@ public class possionPiecewisePartitions {
 
 		return exp;
 	}
+
+
+
+/**
+	public static void main(String[] args) {
+		double[] demandMean = {2.5, 1, 3.5, 4.5, 1.5, 3};
+		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
+		//System.out.println(Arrays.deepToString(demandMeanInput));
+		int nbSamples = 100000;
+		int partitions = 4;
+		for(int d=0; d<demandMeanInput.length; d++) {
+			double[][][] coefficients = lamdaMatrix(demandMeanInput[d], partitions, nbSamples);
+			System.out.println(Arrays.deepToString(coefficients));	
+			writeToText(coefficients);		
+
+		}
+	}
+
+
+	/** Test E[d|\Omega_i] 
+	 *  if included in .main, by //testExpectedValues();**/
+	/**
+	public static void testExpectedValues() {
+	   int lamda = 14; 
+	   int nbSamples = 100000;
+	   int partitions = 5;
+	   double[] targetEv = {8.99635, 11.918, 13.841, 15.8981, 19.4344};
+	   double[] results = conditionalExpectationGivenPartitions(lamda, nbSamples, partitions);
+	   System.out.println("Target: "+Arrays.toString(targetEv));
+	   System.out.println("Result: "+Arrays.toString(results));
+	}
+	 **/
+
 	
+	/*****************************************************************************/
 	//write to text
 	public static void writeToText(double[][][] coefficients){
 		FileWriter fw = null;
@@ -97,6 +131,8 @@ public class possionPiecewisePartitions {
 		}
 	}
 	
+	
+	/*
 	public static double[] getDemandMeanArray(double[] demandMeanInput, int indexStart) {
 		double[] demandMean = new double[demandMeanInput.length - indexStart];
 		for(int j=0; j<demandMean.length; j++) {
@@ -104,44 +140,7 @@ public class possionPiecewisePartitions {
 		}
 		return demandMean;
 	}
-
-
-	public static void main(String[] args) {
-		double [] demandMeanInput = {//76,	
-											//27,		
-													10,		36,		88,
-									 136,	149,	121,	68,		22,
-									 11,	42,		96,		140,	148,
-									 114,	60};
-		int nbSamples = 100000;
-		int partitions = 4;
-		//for(int d=0; d<demandMeanInput.length; d++) {
-			for(int i=0; i<1; i++) {
-				double[] demandMean = getDemandMeanArray(demandMeanInput, i);
-				double[][][] coefficients = lamdaMatrix(demandMean, partitions, nbSamples);
-				System.out.println(Arrays.deepToString(coefficients));	
-				writeToText(coefficients);		
-			}
-		//}
-		
-
-		
-	}
+*/	
 	
-	
-	
-	/** Test E[d|\Omega_i] 
-	 *  if included in .main, by //testExpectedValues();**/
-	/**
-	public static void testExpectedValues() {
-	   int lamda = 14; 
-	   int nbSamples = 100000;
-	   int partitions = 5;
-	   double[] targetEv = {8.99635, 11.918, 13.841, 15.8981, 19.4344};
-	   double[] results = conditionalExpectationGivenPartitions(lamda, nbSamples, partitions);
-	   System.out.println("Target: "+Arrays.toString(targetEv));
-	   System.out.println("Result: "+Arrays.toString(results));
-	}
-	**/
-
+	 
 }

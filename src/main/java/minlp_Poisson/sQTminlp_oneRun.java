@@ -97,7 +97,7 @@ public class sQTminlp_oneRun {
 			for(int t = 0; t < Q.length; t++){
 				Q[t] = Double.NaN;
 			}
-			return Q[0];
+			return 0;
 		} 
 
 	}
@@ -157,14 +157,13 @@ public class sQTminlp_oneRun {
 			double initialStock, 
 			int partitions, boolean Qranged) {
 		
-		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
-		
 		String FileName = null;	
 		if(Qranged == true) {
 			FileName = "sQtPoisson_Qranged";
 		}else {
 			FileName = "sQtPoisson";
 		}
+		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		
 		double[] schedule = new double[demandMean.length];
 		for(int t=0; t<demandMean.length; t++) {
@@ -176,41 +175,11 @@ public class sQTminlp_oneRun {
 					null
 					);
 			schedule[t] = sQmodel.solveMINLP_recursive(FileName);
-			System.out.println("schedule["+(t+1)+"] = "+schedule[t]);
 		}catch(IloException e){
 			e.printStackTrace();
 		}
 		}
 		return schedule;
-	}
-	
-	public static void main(String[] args) {
-		
-		double fixedCost = 500;
-		double unitCost = 0;
-		double holdingCost = 1;
-		double penaltyCost = 20;
-		double initialStock = 0;
-		int partitions = 8;		
-		
-		double pace = 8;
-		boolean rangedQ = false;
-		
-		//double demandMean [] = {76, 27,10,36,88,136,149,121,68,22,11,42,96,140,148,114,60};
-		double[] demandMean = {20, 40, 60, 40};
-
-		int count = 10000;
-		boolean Normal = false;
-		double tail = 0.00000001;
-		double stdParameter = 0.25;
-
-		int minInventory = -1500;
-		int maxInventory = 1500;
-		int maxQuantity = 800;
-		
-		double[] schedule = sQTminlpSchedule(
-				demandMean, fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, false);
-		
 	}
 
 }

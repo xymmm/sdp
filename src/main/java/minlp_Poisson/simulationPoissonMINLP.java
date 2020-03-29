@@ -86,7 +86,7 @@ public class simulationPoissonMINLP {
 				if(print == true) System.out.println("Updated inventory level is "+inventoryLevel);			
 				if(actionDecision == 1) {
 					xLabel.add(currentStageIndex);
-					yLabel.add(inventoryLevel + PoissonInstance.schedule[currentStageIndex]);
+					yLabel.add(inventoryLevel);
 				}
 				
 				//generate, check and meet demand
@@ -125,20 +125,18 @@ public class simulationPoissonMINLP {
 		public static void main(String[] args) {
 
 			/** declare instance parameters ***/
-			double fixedOrderingCost = 500;
-			double unitCost = 0;
+			double fixedOrderingCost = 5;
+			double unitCost = 1;
 			double holdingCost = 1;
-			double penaltyCost = 20;
+			double penaltyCost = 3;
 			
 			double initialStock = 0;
 
-			double[] demandMean = {130,150,127,76,27,10,36,88,136,149,121,68,22,11,42,96,140,148,114,60,18,14,50,104,144};
+			double[] demandMean = {4, 5, 6, 3 ,2, 1};
 			
-			double[] reorderPoints = {110,181,147,84,16,4,26,67,138,178,131,72,7,4,36,75,143,158,113,53,15,1,96,186,118};
+			double[] schedule = {9, 7, 9, 5.71, 3.67, 0.46};
+			double[] reorderPoints = {4, 5, 5, 2, 0, -5};
 
-			double[] schedule = {197,288,164,85,58,146,255,171,418,274,157,86,66,160,268,178,394,266,158,94,74,72,282,175,51
-			};
-			
 			simPoissonInstance PoissonInstance = new simPoissonInstance(
 					demandMean, 
 					fixedOrderingCost,
@@ -152,7 +150,7 @@ public class simulationPoissonMINLP {
 			
 			Chrono timer = new Chrono();
 			
-			int count = 10000;
+			int count = 1000;
 			simulationPoissonMINLPmultipleRuns(PoissonInstance, count);
 			
 			PoissonInstance.statCost.setConfidenceIntervalStudent();

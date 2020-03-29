@@ -66,7 +66,8 @@ public class sQminlp_oneRun{
 	      return is;
 	}
 	
-	public sQminlpPoissonSolution solveMINLP_oneRun (String model_name) throws IloException{		
+	//public sQminlpPoissonSolution solveMINLP_oneRun (String model_name) throws IloException{		
+	public double solveMINLP_oneRun (String model_name) throws IloException{		
 		IloOplFactory oplF = new IloOplFactory();
         IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
         IloCplex cplex = oplF.createCplex();
@@ -96,7 +97,8 @@ public class sQminlp_oneRun{
         	opl.postProcess();
         	oplF.end();
         	System.gc();
-        	return new sQminlpPoissonSolution(purchase, Q);
+        	//return new sQminlpPoissonSolution(purchase, Q);
+        	return Q;
         } else {
         	System.out.println("No solution!");
         	//opl.end();
@@ -104,7 +106,8 @@ public class sQminlp_oneRun{
         	//errHandler.end();
         	//cplex.end();
         	System.gc();
-        	return new sQminlpPoissonSolution(null, Double.NaN);
+        	//return new sQminlpPoissonSolution(null, Double.NaN);
+        	return 0;
         } 
 
 	}
@@ -166,14 +169,18 @@ public class sQminlp_oneRun{
 					null
 					);
 			if(Qranged == true) {
-				sQminlpPoissonSolution solution = sQmodel.solveMINLP_oneRun("sQsinglePoisson_Qranged");
+				//sQminlpPoissonSolution solution = sQmodel.solveMINLP_oneRun("sQsinglePoisson_Qranged");
+				double Q = sQmodel.solveMINLP_oneRun("sQsinglePoisson_Qranged");
 				for(int t=0; t<demandMean.length; t++) {
-					schedule[t] = solution.Q * solution.purchase[t];
+					//schedule[t] = solution.Q * solution.purchase[t];
+					schedule[t] = Q;
 				}
 			}else {
-				sQminlpPoissonSolution solution = sQmodel.solveMINLP_oneRun("sQsinglePoisson");
+				//sQminlpPoissonSolution solution = sQmodel.solveMINLP_oneRun("sQsinglePoisson");
+				double Q = sQmodel.solveMINLP_oneRun("sQsinglePoisson");
 				for(int t=0; t<demandMean.length; t++) {
-					schedule[t] = solution.Q * solution.purchase[t];
+					//schedule[t] = solution.Q * solution.purchase[t];
+					schedule[t] = Q;
 				}
 			}
 			
