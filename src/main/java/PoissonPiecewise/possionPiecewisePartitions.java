@@ -75,7 +75,14 @@ public class possionPiecewisePartitions {
 		return exp;
 	}
 
-
+	public static double[][][][] lambdaMatrixAllPeriods(double[] demandMean, int partitions, int nbSamples){
+		double[][][][] coefficients = new double[demandMean.length][demandMean.length][demandMean.length][partitions];
+		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
+		for(int d=0; d<demandMean.length; d++) {
+			coefficients[d] = lamdaMatrix(demandMeanInput[d], partitions, nbSamples);
+		}
+		return coefficients;
+	}
 
 /**
 	public static void main(String[] args) {
@@ -88,7 +95,6 @@ public class possionPiecewisePartitions {
 			double[][][] coefficients = lamdaMatrix(demandMeanInput[d], partitions, nbSamples);
 			System.out.println(Arrays.deepToString(coefficients));	
 			writeToText(coefficients);		
-
 		}
 	}
 
