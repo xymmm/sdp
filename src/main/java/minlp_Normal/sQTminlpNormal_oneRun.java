@@ -35,9 +35,9 @@ public class sQTminlpNormal_oneRun{
 	double 		error;	
 	String 		instanceIdentifier;
 	public sQTminlpNormal_oneRun(double[] demandMean, double holdingCost, double fixedCost,  double unitCost, double penaltyCost, 
-								double initialStock, double stdParameter, 
-								int partitions, double[] means, double[] piecewiseProb, double error,
-				   String instanceIdentifier) {
+			double initialStock, double stdParameter, 
+			int partitions, double[] means, double[] piecewiseProb, double error,
+			String instanceIdentifier) {
 		this.demandMean 	= demandMean;
 		this.holdingCost 	= holdingCost;
 		this.fixedCost 		= fixedCost;
@@ -50,18 +50,18 @@ public class sQTminlpNormal_oneRun{
 		this.piecewiseProb = piecewiseProb;
 		this.error = error;
 	}
-	
+
 	public InputStream getMINLPmodelStream(File file) {
-	      FileInputStream is = null;
-	      try{
-	         is = new FileInputStream(file);
-	      }catch(IOException e){
-	         e.printStackTrace();
-	      }
-	      return is;
+		FileInputStream is = null;
+		try{
+			is = new FileInputStream(file);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		return is;
 	}
-	
-	public double[] solvesQtminlpNormal (String model_name) throws IloException{
+
+	public double solvesQtminlpNormal (String model_name) throws IloException{
 		IloOplFactory oplF = new IloOplFactory();
 		IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
 		IloCplex cplex = oplF.createCplex();
@@ -78,6 +78,8 @@ public class sQTminlpNormal_oneRun{
 		boolean status =  cplex.solve();        
 		if ( status )
 		{   
+			double Q = cplex.getValue(opl.getElement("Q").asNumVarMap().get(1));
+			/*
 			double[] Q = new double[demandMean.length];
             for(int t = 0; t < Q.length; t++){
                 Q[t] = cplex.getValue(opl.getElement("Q").asNumVarMap().get(t+1));
@@ -88,76 +90,79 @@ public class sQTminlpNormal_oneRun{
 			opl.postProcess();
 			oplF.end();
 			System.gc();
+			 */
 			return Q;
 		} else {
 			double[] Q = new double[demandMean.length];
 			System.out.println("No solution!");
 			oplF.end();
 			System.gc();
-            for(int t = 0; t < Q.length; t++){
-            	/*
+			for(int t = 0; t < Q.length; t++){
+				/*
             	if(demandMean[t] * penaltyCost < fixedCost + unitCost * demandMean[t]) {
             		Q[t] = demandMean[t];
             	}else {
             		Q[t] = 0;
             	}*/
-                Q[t] = 0;
-            }
-			return Q;
+				Q[t] = 0;
+			}
+			return demandMean[0];
 		} 
 	}	
 	/**import data to .mod**/
 	class sQTsingleDataNormal extends IloCustomOplDataSource{
 		sQTsingleDataNormal(IloOplFactory oplF){
-            super(oplF);
-        }
-        public void customRead(){
-     
-         IloOplDataHandler handler = getDataHandler();
-            handler.startElement("nbmonths"); handler.addIntItem(demandMean.length); handler.endElement();
-            handler.startElement("fc"); handler.addNumItem(fixedCost); handler.endElement();
-            handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
-            handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
-            handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
-            
-            handler.startElement("meandemand"); handler.startArray();            
-            for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
-            handler.endArray(); handler.endElement();
-            
-            handler.restartElement("stdParameter"); handler.addNumItem(stdParameter); handler.endElement();           
-            handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();
-            
-            //piecewise
-            handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
- 
-            handler.startElement("means"); handler.startArray();
-            for (int j = 0 ; j<partitions; j++){handler.addNumItem(means[j]);}
-            handler.endArray(); handler.endElement();
-            
-            handler.startElement("prob"); handler.startArray();
-            for (int j = 0 ; j<partitions; j++){handler.addNumItem(piecewiseProb[j]);}
-            handler.endArray(); handler.endElement();
+			super(oplF);
+		}
+		public void customRead(){
 
-            handler.startElement("error"); handler.addNumItem(error); handler.endElement();         
-        }
+			IloOplDataHandler handler = getDataHandler();
+			handler.startElement("nbmonths"); handler.addIntItem(demandMean.length); handler.endElement();
+			handler.startElement("fc"); handler.addNumItem(fixedCost); handler.endElement();
+			handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
+			handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
+			handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
+
+			handler.startElement("meandemand"); handler.startArray();            
+			for (int j = 0 ; j<demandMean.length ; j++) {handler.addNumItem(demandMean[j]);}
+			handler.endArray(); handler.endElement();
+
+			handler.restartElement("stdParameter"); handler.addNumItem(stdParameter); handler.endElement();           
+			handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();
+
+			//piecewise
+			handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
+
+			handler.startElement("means"); handler.startArray();
+			for (int j = 0 ; j<partitions; j++){handler.addNumItem(means[j]);}
+			handler.endArray(); handler.endElement();
+
+			handler.startElement("prob"); handler.startArray();
+			for (int j = 0 ; j<partitions; j++){handler.addNumItem(piecewiseProb[j]);}
+			handler.endArray(); handler.endElement();
+
+			handler.startElement("error"); handler.addNumItem(error); handler.endElement();         
+		}
 	}
-	
+
 	public static double[] sQTminlpSchedule(
-										double[] demandMean, double fixedCost, double unitCost, double holdingCost, double penaltyCost,
-										double initialStock, double stdParameter, 
-										int partitions, double[] piecewiseProb, double[] means, double error) {
+			double[] demandMean, double fixedCost, double unitCost, double holdingCost, double penaltyCost,
+			double initialStock, double stdParameter, 
+			int partitions, double[] piecewiseProb, double[] means, double error) {
 		double[] schedule = new double[demandMean.length];
-		try {
-			sQTminlpNormal_oneRun sQmodel = new sQTminlpNormal_oneRun(
-					demandMean, holdingCost, fixedCost,  unitCost, penaltyCost, 
-					initialStock, stdParameter, 
-					partitions,  means, piecewiseProb, error,
-					null
-					);
-			schedule = sQmodel.solvesQtminlpNormal("sQtNormal_oneRun");
-		}catch(IloException e){
-	         e.printStackTrace();
-	    }
+		for(int t=0; t<demandMean.length; t++) {
+			try {
+				sQTminlpNormal_oneRun sQmodel = new sQTminlpNormal_oneRun(
+						demandMean, holdingCost, fixedCost,  unitCost, penaltyCost, 
+						initialStock, stdParameter, 
+						partitions,  means, piecewiseProb, error,
+						null
+						);
+				schedule[t] = sQmodel.solvesQtminlpNormal("sQtNormal_oneRun");
+			}catch(IloException e){
+				e.printStackTrace();
+			}
+		}
 		return schedule;
 	}
 

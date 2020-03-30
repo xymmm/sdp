@@ -9,6 +9,7 @@ import minlp_Normal.sQTminlpNormal_oneRun;
 import minlp_Normal.sQminlpNormal_oneRun;
 import minlp_Normal.sQminlpNormal_recursive;
 import minlp_Normal.simNormalInstance;
+import minlp_Poisson.sQTminlp_heuristic;
 import reorderQuantitySystem.sQsystemSolution;
 import sQ.sdp.sQsolution;
 import sS.sSsolution;
@@ -51,10 +52,10 @@ public class computationAnalysis_2 {
 				//{122,130,120,98,77,70,81,103,124,130,118,95,75,71,84,107,126,129,115,91,73,72,87,110,127},
 				//{100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100},
 				//{178,178,136,211,119,165,47,100,62,31,43,199,172,96,69,8,29,135,97,70,248,57,11,94,13},
-				//{2,51,152,467,268,489,446,248,281,363,155,293,220,93,107,234,124,184,223,101,123,99,31,82,1},
-				//{47,81,236,394,164,287,508,391,754,694,261,195,320,111,191,160,55,84,58,1,1,1,1,1,1},
-				//{44,116,264,144,146,198,74,183,204,114,165,318,119,482,534,136,260,299,76,218,323,102,174,284,1},
-				//{49,188,64,279,453,224,223,517,291,547,646,224,215,440,116,185,211,26,55,1,1,1,1,1,1}
+				//{2,51,152,467,268,489,446,248,281,363,155,293,220,93,107,234,124,184,223,101,123,99,31,82,0.1},
+				//{47,81,236,394,164,287,508,391,754,694,261,195,320,111,191,160,55,84,58,0.1,0.1,0.1,0.1,0.1,0.1},
+				//{44,116,264,144,146,198,74,183,204,114,165,318,119,482,534,136,260,299,76,218,323,102,174,284,0.1},
+				//{49,188,64,279,453,224,223,517,291,547,646,224,215,440,116,185,211,26,55,0.1,0.1,0.1,0.1,0.1,0.1}
 		};
 
 		double[][][][][][] Results = new double[stdParameter.length][fixedOrderingCost.length][penaltyCost.length][unitCost.length][demandMean.length][6];
@@ -125,8 +126,28 @@ public class computationAnalysis_2 {
 							Results[s][f][p][u][d][1] = normalInstance_sQt.statCost.average();
 							long timesQtEnd = System.currentTimeMillis();
 							//System.out.println("Simulation cost = "+Results[s][f][p][u][d][1]);
-							Results[s][f][p][u][d][4] = (double) (timesQtEnd - timesQtStart)/1000.0;
-							 
+							//Results[s][f][p][u][d][4] = (double) (timesQtEnd - timesQtStart)/1000.0;
+							
+							double[] s_sQt_sdp = sQTminlp_heuristic.reorderPoint_sQtHeuristic(
+									demandMean[d], fixedOrderingCost[f], unitCost[u], holdingCost, penaltyCost[p], 
+									initialStock, partitions, pace, sQtschedule, false);
+
+							simNormalInstance normalInstance_sQt_sdp = new simNormalInstance(
+									demandMean[d], 
+									fixedOrderingCost[f],
+									unitCost[u],
+									holdingCost, 
+									penaltyCost[p], 
+									initialStock, 
+									stdParameter[s], 
+									sQtschedule, 
+									s_sQt_sdp				
+									);
+
+							minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(normalInstance_sQt_sdp, count);
+							normalInstance_sQt.statCost.setConfidenceIntervalStudent();
+							Results[s][f][p][u][d][2] = normalInstance_sQt.statCost.average();
+
 
 							//============================== sQ minlp ==========================
 
@@ -171,12 +192,13 @@ public class computationAnalysis_2 {
 							//System.out.println("sS time = "+Results[s][f][p][u][d][3]);
 							//System.out.println("sQt time = "+Results[s][f][p][u][d][4]);
 							//System.out.println("sQ time = "+Results[s][f][p][u][d][5]);
-							System.out.println(Results[s][f][p][u][d][0]+"\t"+
+							System.out.println(//Results[s][f][p][u][d][0]+"\t"+
 									Results[s][f][p][u][d][1]+"\t"+
-									Results[s][f][p][u][d][2]+"\t"+
-									Results[s][f][p][u][d][3]+"\t"+
-									Results[s][f][p][u][d][4]+"\t"+
-									Results[s][f][p][u][d][5]+"\t");
+									Results[s][f][p][u][d][2]+"\t"//+
+									//Results[s][f][p][u][d][3]+"\t"+
+									//Results[s][f][p][u][d][4]+"\t"+
+									//Results[s][f][p][u][d][5]+"\t"
+									);
 							System.out.println("====================================================");
 							sdp.util.writeText.writeDoubleArray(Results[s][f][p][u][d],
 									"src/main/java/InstanceComputation/Normal25.txt");
@@ -186,7 +208,7 @@ public class computationAnalysis_2 {
 				}
 			}
 		}
-
+/*
 		System.out.println();
 		//============================Output the results===========================================
 		//=================For each pattern=================
@@ -382,7 +404,7 @@ public class computationAnalysis_2 {
 		System.out.println("===pivot penalty cost===");
 		System.out.println(Arrays.deepToString(pivotP));
 		System.out.println(Arrays.deepToString(pivotPtime));
-
+*/
 	}
 
 }
