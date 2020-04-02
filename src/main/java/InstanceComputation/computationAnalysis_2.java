@@ -30,9 +30,9 @@ public class computationAnalysis_2 {
 
 		double tail = 0.00000001;
 
-		int minInventory = -1500;
-		int maxInventory = 1500;
-		int maxQuantity = 500;
+		int minInventory = -2000;
+		int maxInventory = 2000;
+		int maxQuantity = 1000;
 
 		boolean Normal = true;
 
@@ -46,16 +46,16 @@ public class computationAnalysis_2 {
 
 		double[][] demandMean = {
 				//{20, 40, 60, 40}
-				{11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11}
+				//{11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11},
 				//{23,32,42,55,70,86,103,120,136,150,161,168,170,168,161,150,136,120,103,86,70,55,42,32,23},
 				//{130,150,127,76,27,10,36,88,136,149,121,68,22,11,42,96,140,148,114,60,18,14,50,104,144},
 				//{122,130,120,98,77,70,81,103,124,130,118,95,75,71,84,107,126,129,115,91,73,72,87,110,127},
 				//{100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100},
 				//{178,178,136,211,119,165,47,100,62,31,43,199,172,96,69,8,29,135,97,70,248,57,11,94,13},
-				//{2,51,152,467,268,489,446,248,281,363,155,293,220,93,107,234,124,184,223,101,123,99,31,82,0.1},
-				//{47,81,236,394,164,287,508,391,754,694,261,195,320,111,191,160,55,84,58,0.1,0.1,0.1,0.1,0.1,0.1},
-				//{44,116,264,144,146,198,74,183,204,114,165,318,119,482,534,136,260,299,76,218,323,102,174,284,0.1},
-				//{49,188,64,279,453,224,223,517,291,547,646,224,215,440,116,185,211,26,55,0.1,0.1,0.1,0.1,0.1,0.1}
+				{2,51,152,467,268,489,446,248,281,363,155,293,220,93,107,234,124,184,223,101,123,99,31,82,0.1},
+				{47,81,236,394,164,287,508,391,754,694,261,195,320,111,191,160,55,84,58,0.1,0.1,0.1,0.1,0.1,0.1},
+				{44,116,264,144,146,198,74,183,204,114,165,318,119,482,534,136,260,299,76,218,323,102,174,284,0.1},
+				{49,188,64,279,453,224,223,517,291,547,646,224,215,440,116,185,211,26,55,0.1,0.1,0.1,0.1,0.1,0.1}
 		};
 
 		double[][][][][][] Results = new double[stdParameter.length][fixedOrderingCost.length][penaltyCost.length][unitCost.length][demandMean.length][6];
@@ -75,7 +75,7 @@ public class computationAnalysis_2 {
 							System.out.println("unit cost = "+unitCost[u]);
 
 							//============================== sS ==========================
-							/*long timesSstart = System.currentTimeMillis();
+							long timesSstart = System.currentTimeMillis();
 							InstanceDouble instance = new InstanceDouble(
 									fixedOrderingCost[f],
 									unitCost[u],
@@ -91,84 +91,75 @@ public class computationAnalysis_2 {
 
 							sSsolution sSsolution = sS.sS.solveInstance(instance, true, Normal);
 							Results[s][f][p][u][d][0] = sSsolution.optimalCost[(int) (instance.initialInventory - instance.minInventory)][0];
-							long timesSend = System.currentTimeMillis();
-							Results[s][f][p][u][d][3] = (double) (timesSend - timesSstart)/1000.0;
+							//sdp.util.writeText.writeDouble(Results[s][f][p][u][d][0],
+									//"src/main/java/InstanceComputation/Normal25.txt");
+							System.out.println(Results[s][f][p][u][d][0]);
+							//long timesSend = System.currentTimeMillis();
+							//Results[s][f][p][u][d][3] = (double) (timesSend - timesSstart)/1000.0;
 							//System.out.println("optimal sS cost = "+Results[s][f][p][u][d][0]);
-*/
-							
+
+/*							
 							//============================== sQt minlp ==========================
-							long timesQtStart = System.currentTimeMillis();
+							//long timesQtStart = System.currentTimeMillis();
 							double[] sQtschedule = sQTminlpNormal_oneRun.sQTminlpSchedule(
 									demandMean[d], fixedOrderingCost[f], unitCost[u], holdingCost, penaltyCost[p],
 									initialStock, stdParameter[s], 
 									partitions, piecewiseProb, means, error);
+							System.out.println("Qt = "+Arrays.toString(sQtschedule));
+/*
 							double[] s_sQt = sQTminlpNormal_heuristic.reorderPoint_sQtHeuristic(
 									demandMean[d], fixedOrderingCost[f], unitCost[u], holdingCost, penaltyCost[p], 
-									initialStock, stdParameter[s], partitions, piecewiseProb, means, error, pace, sQtschedule);							
+									initialStock, stdParameter[s], partitions, piecewiseProb, means, error, pace, sQtschedule);
+							System.out.println("st by heuristic = "+Arrays.toString(s_sQt));
 
-							//System.out.println("optimal schedule for sQt policy is "+Arrays.toString(sQtschedule));
-							//System.out.println("Associated reorder poing is "+Arrays.toString(s_sQt));
-
-							simNormalInstance normalInstance_sQt = new simNormalInstance(
-									demandMean[d], 
-									fixedOrderingCost[f],
-									unitCost[u],
-									holdingCost, 
-									penaltyCost[p], 
-									initialStock, 
-									stdParameter[s], 
-									sQtschedule, 
-									s_sQt				
+							simNormalInstance sQtSim = new simNormalInstance(
+									demandMean[d], fixedOrderingCost[f], unitCost[u], holdingCost, penaltyCost[p], 
+									initialStock, stdParameter[s], 
+									sQtschedule, s_sQt				
 									);
 
-							minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(normalInstance_sQt, count);
-							normalInstance_sQt.statCost.setConfidenceIntervalStudent();
-							Results[s][f][p][u][d][1] = normalInstance_sQt.statCost.average();
-							long timesQtEnd = System.currentTimeMillis();
+							minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(sQtSim, count);
+							sQtSim.statCost.setConfidenceIntervalStudent();
+							Results[s][f][p][u][d][1] = sQtSim.statCost.average();System.out.println(Results[s][f][p][u][d][1]);
+							//long timesQtEnd = System.currentTimeMillis();
 							//System.out.println("Simulation cost = "+Results[s][f][p][u][d][1]);
 							//Results[s][f][p][u][d][4] = (double) (timesQtEnd - timesQtStart)/1000.0;
 							
-							double[] s_sQt_sdp = sQTminlp_heuristic.reorderPoint_sQtHeuristic(
-									demandMean[d], fixedOrderingCost[f], unitCost[u], holdingCost, penaltyCost[p], 
-									initialStock, partitions, pace, sQtschedule, false);
+							double[] s_sQt_sdp = sQt.generatedQ.sQtReorderPoint.costVaryingWithInventory(sQtschedule, instance, Normal);
+							System.out.println("st by sdp = "+Arrays.toString(s_sQt_sdp));
 
-							simNormalInstance normalInstance_sQt_sdp = new simNormalInstance(
-									demandMean[d], 
-									fixedOrderingCost[f],
-									unitCost[u],
-									holdingCost, 
-									penaltyCost[p], 
-									initialStock, 
-									stdParameter[s], 
-									sQtschedule, 
-									s_sQt_sdp				
+							simNormalInstance sQtSim_sdp = new simNormalInstance(
+									demandMean[d], fixedOrderingCost[f], unitCost[u], holdingCost, penaltyCost[p], 
+									initialStock,  stdParameter[s], 
+									sQtschedule,  s_sQt_sdp				
 									);
 
-							minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(normalInstance_sQt_sdp, count);
-							normalInstance_sQt.statCost.setConfidenceIntervalStudent();
-							Results[s][f][p][u][d][2] = normalInstance_sQt.statCost.average();
-
+							minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(sQtSim_sdp, count);
+							sQtSim_sdp.statCost.setConfidenceIntervalStudent();
+							Results[s][f][p][u][d][2] = sQtSim_sdp.statCost.average();System.out.println(Results[s][f][p][u][d][2]);
+*/
 
 							//============================== sQ minlp ==========================
 
-							/*long timesQStart = System.currentTimeMillis();
+							long timesQStart = System.currentTimeMillis();
 							//sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);
 							sQsolution sQsolution = sQ.sdp.sQ.solvesQInstance(instance, Normal);
 							Results[s][f][p][u][d][2] = sQsolution.totalCost[sQsolution.getOpt_a(instance)+1][(int) (instance.initialInventory - instance.minInventory)][0];
-							long timesQend = System.currentTimeMillis();
-							Results[s][f][p][u][d][5] = (double) (timesQend - timesQStart)/1000.0;
-							/*
+							//long timesQend = System.currentTimeMillis();
+							//Results[s][f][p][u][d][5] = (double) (timesQend - timesQStart)/1000.0;
+/*							
 							//schedule							
 							double[] sQschedule = sQminlpNormal_oneRun.sQminlpSchedule(
 									demandMean[d], fixedOrderingCost[f], unitCost[u], holdingCost, penaltyCost[p],
-									initialStock, stdParameter[s], partitions, piecewiseProb, means, error);		
-							//reorder point
-							double[] s_sQ = sQminlpNormal_recursive.reorderPoint_sQheuristic(
+									initialStock, stdParameter[s], partitions, piecewiseProb, means, error);
+							System.out.println("optimal schedule for sQ policy is "+Arrays.toString(sQschedule));
+*/							//reorder point
+							/*
+							double[] s_sQ_milp = sQminlpNormal_recursive.reorderPoint_sQheuristic(
 									demandMean[d], fixedOrderingCost[f], unitCost[u], holdingCost, penaltyCost[p], 
 									initialStock, stdParameter[s],
-									partitions, piecewiseProb, means, error, pace, sQschedule);
-							//System.out.println("optimal schedule for sQ policy is "+Arrays.toString(sQschedule));
-							//System.out.println("Associated reorder point is "+Arrays.toString(s_sQ));
+									partitions, piecewiseProb, means, error, pace, sQschedule);						
+							System.out.println("Associated reorder point is "+Arrays.toString(s_sQ_milp));
 
 							simNormalInstance normalInstance_sQ = new simNormalInstance(
 									demandMean[d], 
@@ -179,26 +170,40 @@ public class computationAnalysis_2 {
 									initialStock, 
 									stdParameter[s], 
 									sQschedule, 
-									s_sQ				
+									s_sQ_milp				
 									);
 
 							minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(normalInstance_sQ, count);
 							normalInstance_sQ.statCost.setConfidenceIntervalStudent();
-							Results[s][f][p][u][d][2] = normalInstance_sQ.statCost.average();
-							 */
+							//Results[s][f][p][u][d][2] = normalInstance_sQ.statCost.average();
+							Results[s][f][p][u][d][3] = normalInstance_sQ.statCost.average();System.out.println(Results[s][f][p][u][d][3]);
+
+							double[] s_sQ_sdp = sQt.generatedQ.sQtReorderPoint.costVaryingWithInventory(sQschedule, instance, Normal);
+							System.out.println("st by sdp = "+Arrays.toString(s_sQt_sdp));
+
+							simNormalInstance sQSim_sdp = new simNormalInstance(
+									demandMean[d], fixedOrderingCost[f], unitCost[u], holdingCost, penaltyCost[p], 
+									initialStock, stdParameter[s], 
+									sQschedule, s_sQ_sdp				
+									);
+
+							minlp_Normal.simulationNormalMINLP.simulationNormalMINLPmultipleRuns(sQSim_sdp, count);
+							sQSim_sdp.statCost.setConfidenceIntervalStudent();
+							Results[s][f][p][u][d][4] = sQSim_sdp.statCost.average();System.out.println(Results[s][f][p][u][d][4]);
+*/
 
 							//System.out.println("Simulation cost = "+Results[s][f][p][u][d][2]);
 							//System.out.println();
 							//System.out.println("sS time = "+Results[s][f][p][u][d][3]);
 							//System.out.println("sQt time = "+Results[s][f][p][u][d][4]);
 							//System.out.println("sQ time = "+Results[s][f][p][u][d][5]);
-							System.out.println(//Results[s][f][p][u][d][0]+"\t"+
-									Results[s][f][p][u][d][1]+"\t"+
-									Results[s][f][p][u][d][2]+"\t"//+
+							//System.out.println(//Results[s][f][p][u][d][0]+"\t"+
+									//Results[s][f][p][u][d][1]+"\t"+
+									//Results[s][f][p][u][d][2]+"\t"+
 									//Results[s][f][p][u][d][3]+"\t"+
 									//Results[s][f][p][u][d][4]+"\t"+
 									//Results[s][f][p][u][d][5]+"\t"
-									);
+									//);
 							System.out.println("====================================================");
 							sdp.util.writeText.writeDoubleArray(Results[s][f][p][u][d],
 									"src/main/java/InstanceComputation/Normal25.txt");

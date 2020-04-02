@@ -79,33 +79,12 @@ public class sQTminlpNormal_oneRun{
 		if ( status )
 		{   
 			double Q = cplex.getValue(opl.getElement("Q").asNumVarMap().get(1));
-			/*
-			double[] Q = new double[demandMean.length];
-            for(int t = 0; t < Q.length; t++){
-                Q[t] = cplex.getValue(opl.getElement("Q").asNumVarMap().get(t+1));
-                if((Q[t]<0)||(Q[t] > 500)) {
-                	Q[t] = demandMean[t];
-                }
-             }
-			opl.postProcess();
-			oplF.end();
-			System.gc();
-			 */
 			return Q;
 		} else {
 			double[] Q = new double[demandMean.length];
 			System.out.println("No solution!");
 			oplF.end();
 			System.gc();
-			for(int t = 0; t < Q.length; t++){
-				/*
-            	if(demandMean[t] * penaltyCost < fixedCost + unitCost * demandMean[t]) {
-            		Q[t] = demandMean[t];
-            	}else {
-            		Q[t] = 0;
-            	}*/
-				Q[t] = 0;
-			}
 			return demandMean[0];
 		} 
 	}	
@@ -150,10 +129,11 @@ public class sQTminlpNormal_oneRun{
 			double initialStock, double stdParameter, 
 			int partitions, double[] piecewiseProb, double[] means, double error) {
 		double[] schedule = new double[demandMean.length];
+		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		for(int t=0; t<demandMean.length; t++) {
 			try {
 				sQTminlpNormal_oneRun sQmodel = new sQTminlpNormal_oneRun(
-						demandMean, holdingCost, fixedCost,  unitCost, penaltyCost, 
+						demandMeanInput[t], holdingCost, fixedCost,  unitCost, penaltyCost, 
 						initialStock, stdParameter, 
 						partitions,  means, piecewiseProb, error,
 						null
@@ -164,6 +144,43 @@ public class sQTminlpNormal_oneRun{
 			}
 		}
 		return schedule;
+	}
+	
+	public static void main(String[] args) {
+		double holdingCost = 1;
+
+		double[] fixedOrderingCost = {500, 1000, 1500};
+		double[] unitCost		   = {0,1};
+		double[] penaltyCost	   = {5, 10, 20};
+		double[] stdParameter	   = {0.1, 0.2, 0.3};
+
+		double initialStock = 0;
+
+		double tail = 0.00000001;
+
+		int minInventory = -1500;
+		int maxInventory = 1500;
+		int maxQuantity = 500;
+
+		boolean Normal = true;
+
+		int partitions = 4;
+		double[] piecewiseProb = {0.187555, 0.312445, 0.312445, 0.187555};
+		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
+		double error = 0.0339052;
+
+		double pace = 32;
+		int count = 50000;
+
+		double[][] demandMean = {
+				{20, 40, 60, 40}
+		};
+		
+		double[] Qt = sQTminlpSchedule(
+				 demandMean[0], fixedOrderingCost[0], unitCost[0], holdingCost, penaltyCost[0],
+				 initialStock, stdParameter[0], 
+				 partitions, piecewiseProb, means,  error);
+		System.out.println(Arrays.toString(Qt));
 	}
 
 }

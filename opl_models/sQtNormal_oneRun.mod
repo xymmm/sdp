@@ -45,7 +45,7 @@ subject to{
  stockhlb[0]==maxl(stock[0],0);
  stockplb[0]==maxl(-stock[0],0);
  
-//purchase[1] == 0;	//initial order = 0 when compute reorder point s.
+purchase[1] == 1;	//initial order = 0 when compute reorder point s.
 
 forall(t in months) purchase[t] == 1 => U[t]==Q[t];
 forall(t in months) purchase[t] == 0 => U[t]==0;

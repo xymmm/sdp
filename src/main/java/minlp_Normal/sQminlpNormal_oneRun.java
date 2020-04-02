@@ -61,7 +61,7 @@ public class sQminlpNormal_oneRun{
 		return is;
 	}
 
-	public sQminlpNormalSolution solveMINLP_oneRun_Normal (String model_name) throws IloException{		
+	public double solveMINLP_oneRun_Normal (String model_name) throws IloException{		
 		IloOplFactory oplF = new IloOplFactory();
 		IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
 		IloCplex cplex = oplF.createCplex();
@@ -79,18 +79,20 @@ public class sQminlpNormal_oneRun{
 		if ( status ){   
 			//System.out.println("OBJECTIVE: " + objective);  
 			double Q = cplex.getValue(opl.getElement("Q").asNumVar());
-			double[] purchase = new double[demandMean.length];
+			/*double[] purchase = new double[demandMean.length];
 			for(int t = 0; t < purchase.length; t++){
 				purchase[t] = cplex.getValue(opl.getElement("purchaseDouble").asNumVarMap().get(t+1));
-			}
+			}*/
 			opl.postProcess();
 			oplF.end();
 			System.gc();
-			return new sQminlpNormalSolution(purchase, Q);
+			//return new sQminlpNormalSolution(purchase, Q);
+			return Q;
 		}else{
 			oplF.end();
 			System.gc();
-			return new sQminlpNormalSolution(null, Double.NaN);
+			//return new sQminlpNormalSolution(null, Double.NaN);
+			return sdp.util.sum.average(demandMean);
 		} 
 	}
 
@@ -134,15 +136,45 @@ public class sQminlpNormal_oneRun{
 					partitions,  means, piecewiseProb, error,
 					null
 					);
-			sQminlpNormalSolution solution = sQmodel.solveMINLP_oneRun_Normal("sQsingleNormal_oneRun");
+			//sQminlpNormalSolution solution = sQmodel.solveMINLP_oneRun_Normal("sQsingleNormal_oneRun");
+			double Q = sQmodel.solveMINLP_oneRun_Normal("sQsingleNormal_oneRun");
+
 			for(int t=0; t<demandMean.length; t++) {
-				schedule[t] = solution.Q * solution.purchase[t];
+				schedule[t] = Q;
 			}			
 		}catch(IloException e){
 			e.printStackTrace();
 		}
 		return schedule;
 	}
+	
+	public static void main(String[] args) {
+		double holdingCost = 1;
+
+		double[] fixedOrderingCost = {500, 1000, 1500};
+		double[] unitCost		   = {0,1};
+		double[] penaltyCost	   = {5, 10, 20};
+		double[] stdParameter	   = {0.1, 0.2, 0.3};
+
+		double initialStock = 0;
+
+		int partitions = 4;
+		double[] piecewiseProb = {0.187555, 0.312445, 0.312445, 0.187555};
+		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
+		double error = 0.0339052;
+
+
+		double[][] demandMean = {
+				{20, 40, 60, 40}
+		};
+		
+		double[] Qt = sQminlpSchedule(
+				 demandMean[0], fixedOrderingCost[0], unitCost[0], holdingCost, penaltyCost[0],
+				 initialStock, stdParameter[0], 
+				 partitions, piecewiseProb, means,  error);
+		System.out.println(Arrays.toString(Qt));
+	}
+
 
 
 

@@ -144,7 +144,7 @@ public class sQtReorderPoint {
 			if(optimalSchedule[t] == 0) {
 				reorderPoint[t] = instance.minInventory;
 			}else {
-				for(int i=50; i<inventory.length; i++) {  // Inventory   
+				for(int i= 0- instance.minInventory - 200; i<inventory.length; i++) {  // Inventory   
 					if(optimalActionByInventory[i][t] == false) {
 						reorderPoint[t] = i + instance.minInventory;
 						break;
