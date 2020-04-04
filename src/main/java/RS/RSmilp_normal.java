@@ -43,11 +43,11 @@ public class RSmilp_normal {
 		this.unitCost 		= unitCost;
 		this.penaltyCost 	= penaltyCost;		
 		this.initialStock 	= initialStock;
-		this.stdParameter = stdParameter;
+		this.stdParameter   = stdParameter;
 		this.partitions 	= partitions;		
-		this.means = means;
-		this.piecewiseProb = piecewiseProb;
-		this.error = error;
+		this.means          = means;
+		this.piecewiseProb  = piecewiseProb;
+		this.error          = error;
 	}
 	
 	public InputStream getMINLPmodelStream(File file) {
@@ -82,7 +82,7 @@ public class RSmilp_normal {
 		double[] stock = new double[demandMean.length];
 		
 		if ( status ){   
-			for(int t = 0; t < purchase.length; t++){
+			for(int t = 0; t < demandMean.length; t++){
 				Q[t] = 		  cplex.getValue(opl.getElement("Q").asNumVarMap().get(t+1));				
 				purchase[t] = cplex.getValue(opl.getElement("purchaseDouble").asNumVarMap().get(t+1));
 				stock[t] = 	  cplex.getValue(opl.getElement("stock").asNumVarMap().get(t));
@@ -127,9 +127,20 @@ public class RSmilp_normal {
 		}
 	}
 	
-	public static RSparameters RSmilpS(double[] demandMean, double fixedCost, double unitCost, double holdingCost, double penaltyCost,
+	public static RSparameters RSmilpParameters(
+			double[] demandMean, double fixedCost, double unitCost, double holdingCost, double penaltyCost,
 			double initialStock, double stdParameter, 
 			int partitions, double[] piecewiseProb, double[] means, double error) {
+		
+		System.out.println("_______");
+		System.out.println("demandMean = "+Arrays.toString(demandMean));
+		System.out.println("stdParameter = "+stdParameter);
+		System.out.println("f = "+fixedCost);
+		System.out.println("h = "+holdingCost);
+		System.out.println("p = "+penaltyCost);
+		System.out.println("v = "+unitCost);
+		System.out.println("_______");
+
 		
 		double[] S = new double[demandMean.length];
 		double[] purchase = new double[demandMean.length];
@@ -158,8 +169,10 @@ public class RSmilp_normal {
 	public static void main(String[] args) {
 		
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		
 		double fixedCost = 100;
+		double penaltyCost = 10;
+		
 		double unitCost = 0;
 		
 		double[] demandMean = {20, 40, 60, 40};
@@ -172,9 +185,11 @@ public class RSmilp_normal {
 		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
 		double error = 0.0339052;
 		
-		RSparameters RSparameters = RSmilpS(demandMean, fixedCost, unitCost, holdingCost, penaltyCost,
+		RSparameters RSparameters = RSmilpParameters(
+				demandMean, fixedCost, unitCost, holdingCost, penaltyCost,
 				initialStock, stdParameter, 
 				partitions, piecewiseProb, means, error);
+		
 		double[] orderUpToLevel = RSparameters.S;
 		double[] purchase = RSparameters.purchase;
 		
