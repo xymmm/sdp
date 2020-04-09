@@ -119,18 +119,19 @@ public class RSsimulation {
 
 			/** declare instance parameters ***/
 			double fixedOrderingCost = 100;
-			double penaltyCost = 20;
+			double penaltyCost = 10;
 			
 			double unitCost = 0;
 			double holdingCost = 1;
 			
 			double initialStock = 0;
 
-			double[] demandMean = {6, 77, 25, 44};
+			double[] demandMean = {20,40,60,40};
 			double stdParameter = 0.25;
 			
-			double[] S = {8.153,131.053,54.05,59.789}; 
-			double[] purchase = {1, 1, 0, 1};
+			double[] S = {73.249, 93.249, 121.364, 61.364}; 
+			//double[] S = {73.215, 53.341, 120.832, 60.959};
+			double[] purchase = {1, 0, 1, 0};
 
 			RSmilpSimInstance RSinstance = new RSmilpSimInstance(
 					demandMean, 
@@ -146,7 +147,7 @@ public class RSsimulation {
 			
 			Chrono timer = new Chrono();
 			
-			int count = 100000;
+			int count = 6000000;
 			simulationNormalRSmultipleRuns(RSinstance, count);
 			
 			RSinstance.statCost.setConfidenceIntervalStudent();
