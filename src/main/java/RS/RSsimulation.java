@@ -1,6 +1,7 @@
 package RS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import minlp_Poisson.simPoissonInstance;
@@ -27,6 +28,10 @@ public class RSsimulation {
 	/** update inventory level**/
 	static double updateInventoryLevel(double inventoryLevel, double inventoryAlteration) {
 		return inventoryLevel + inventoryAlteration;
+	}
+	
+	static double updateRSinventory(double inventoryLevel, double S) {
+		return S;
 	}
 	
 	/** compute holding or penalty cost **/
@@ -75,7 +80,10 @@ public class RSsimulation {
 				cost += computePurchasingCost(RSinstance.purchase[currentStageIndex], currentStageIndex, RSinstance.uptoLevel, RSinstance.fixedCost, RSinstance.unitCost);
 				
 				//update inventory level
-				inventoryLevel = updateInventoryLevel(inventoryLevel, RSinstance.purchase[currentStageIndex]*RSinstance.uptoLevel[currentStageIndex]);
+				//inventoryLevel = updateInventoryLevel(inventoryLevel, RSinstance.purchase[currentStageIndex]*RSinstance.uptoLevel[currentStageIndex]);
+				if(RSinstance.purchase[currentStageIndex] >0) {
+					inventoryLevel = updateRSinventory(inventoryLevel, RSinstance.uptoLevel[currentStageIndex]);
+				}
 				if(print == true) System.out.println("Updated inventory level is "+inventoryLevel);			
 				if(RSinstance.purchase[currentStageIndex] > 0) {
 					xLabel.add(currentStageIndex);
@@ -118,20 +126,35 @@ public class RSsimulation {
 		public static void main(String[] args) {
 
 			/** declare instance parameters ***/
-			double fixedOrderingCost = 100;
+			double fixedOrderingCost = 200;
 			double penaltyCost = 10;
 			
-			double unitCost = 0;
+			double unitCost = 1;
 			double holdingCost = 1;
 			
 			double initialStock = 0;
 
-			double[] demandMean = {20,40,60,40};
+			double[] demandMean = {125,114,22,104,91,44,126,63};
+			/*
+			 	{14, 55, 28, 77, 39}
+				{6, 77, 25, 44}
+				{87, 51, 35, 67};
+				{150, 150, 150, 150, 150, 150};
+				{125,114,22,104,91,44,126,63};
+
+			 */
 			double stdParameter = 0.25;
 			
-			double[] S = {73.249, 93.249, 121.364, 61.364}; 
-			//double[] S = {73.215, 53.341, 120.832, 60.959};
-			double[] purchase = {1, 0, 1, 0};
+			//double[] S = {73.249, 93.249, 121.364, 61.364}; 
+			double[] stock = {175.16, 61.162, 39.162, 164.72, 73.725, 29.725, 95.337, 32.337};
+			double[] S = new double[demandMean.length];
+			for(int t=0; t<S.length; t++) {
+				S[t] = stock[t] + demandMean[t];
+			}
+			
+			System.out.println(Arrays.toString(S));
+			
+			double[] purchase = {1,0, 0, 1, 0, 0, 1, 0};
 
 			RSmilpSimInstance RSinstance = new RSmilpSimInstance(
 					demandMean, 
@@ -147,14 +170,14 @@ public class RSsimulation {
 			
 			Chrono timer = new Chrono();
 			
-			int count = 6000000;
+			int count = 5000000;
 			simulationNormalRSmultipleRuns(RSinstance, count);
 			
 			RSinstance.statCost.setConfidenceIntervalStudent();
 			System.out.println(RSinstance.statCost.report(0.9, 3));
 			System.out.println("Total CPU time: "+timer.format());
 
-				System.out.println(RSinstance.statCost.average());
+			System.out.println(RSinstance.statCost.average());
 			}
 	}
 

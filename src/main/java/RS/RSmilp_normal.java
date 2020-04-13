@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import ilog.concert.IloException;
+import ilog.concert.IloNumVar;
 import ilog.opl.IloCplex;
 import ilog.opl.IloCustomOplDataSource;
 import ilog.opl.IloOplDataHandler;
@@ -17,10 +18,12 @@ import ilog.opl.IloOplModel;
 import ilog.opl.IloOplModelDefinition;
 import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
+import minlp_Poisson.sQTminlp_oneRun;
+import umontreal.ssj.util.Chrono;
 
-public class RSmilp_normal {
+public class RSmilp_normal{
 
-	double[] demandMean;
+	double[] 	demandMean;
 	double 		holdingCost;
 	double 		fixedCost;
 	double 		unitCost;
@@ -30,9 +33,9 @@ public class RSmilp_normal {
 	int 		partitions;
 	double[] 	means;
 	double[] 	piecewiseProb;
-	double 		error;
+	double 		error;	
 	String 		instanceIdentifier;
-	
+
 	public RSmilp_normal(double[] demandMean, double holdingCost, double fixedCost,  double unitCost, double penaltyCost, 
 			double initialStock, double stdParameter, 
 			int partitions, double[] means, double[] piecewiseProb, double error,
@@ -43,13 +46,13 @@ public class RSmilp_normal {
 		this.unitCost 		= unitCost;
 		this.penaltyCost 	= penaltyCost;		
 		this.initialStock 	= initialStock;
-		this.stdParameter   = stdParameter;
+		this.stdParameter = stdParameter;	
 		this.partitions 	= partitions;		
-		this.means          = means;
-		this.piecewiseProb  = piecewiseProb;
-		this.error          = error;
+		this.means = means;
+		this.piecewiseProb = piecewiseProb;
+		this.error = error;
 	}
-	
+
 	public InputStream getMINLPmodelStream(File file) {
 		FileInputStream is = null;
 		try{
@@ -60,8 +63,7 @@ public class RSmilp_normal {
 		return is;
 	}
 
-	
-	public RSmilpSolution solveRSmilp (String model_name) throws IloException{		
+	public RSmilpSolution solveRSNormal (String model_name) throws IloException{
 		IloOplFactory oplF = new IloOplFactory();
 		IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
 		IloCplex cplex = oplF.createCplex();
@@ -71,40 +73,36 @@ public class RSmilp_normal {
 		IloOplModel opl=oplF.createOplModel(def,cplex);
 		cplex.setParam(IloCplex.IntParam.Threads, 8);
 		cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);
-		IloOplDataSource dataSource = new RSmilp_normal.RSdata(oplF);
+		IloOplDataSource dataSource = new RSmilp_normal.RSmilpSingle(oplF);
 		opl.addDataSource(dataSource);
 		opl.generate();
 		cplex.setOut(null);
-		boolean status =  cplex.solve();
-		
-		double[] Q = new double[demandMean.length];
-		double[] purchase = new double[demandMean.length];
-		double[] stock = new double[demandMean.length];
-		
+		boolean status =  cplex.solve();        
 		if ( status ){   
-			for(int t = 0; t < demandMean.length; t++){
-				Q[t] = 		  cplex.getValue(opl.getElement("Q").asNumVarMap().get(t+1));				
+			double[] stock = new double[demandMean.length];
+			double[] purchase = new double[demandMean.length];
+			for(int t=0; t<demandMean.length; t++) {
+				stock[t] = cplex.getValue(opl.getElement("stock").asNumVarMap().get(t+1));
 				purchase[t] = cplex.getValue(opl.getElement("purchaseDouble").asNumVarMap().get(t+1));
-				stock[t] = 	  cplex.getValue(opl.getElement("stock").asNumVarMap().get(t));
 			}
-			System.out.println("model solved Q = "+Arrays.toString(Q));
-			System.out.println("model solved stock = "+Arrays.toString(stock));
-			System.out.println("model solved purchase = "+Arrays.toString(purchase));
-			opl.postProcess(); oplF.end(); System.gc();
-			return new RSmilpSolution(purchase, stock, Q);
-		}else{
-			oplF.end(); System.gc();
-			return new RSmilpSolution(purchase, stock, demandMean);
+			//System.out.println("stock by milp: "+Arrays.toString(stock));
+			//System.out.println("purchase by milp: "+Arrays.toString(purchase));
+			return new RSmilpSolution(purchase, stock);
+		}else {
+			double[] stock = new double[demandMean.length];
+			double[] purchase = new double[demandMean.length];
+			oplF.end();
+			System.gc();
+			return new RSmilpSolution(purchase, stock);
 		} 
-	}
-
-	
+	}	
 	/**import data to .mod**/
-	class RSdata extends IloCustomOplDataSource{
-		RSdata(IloOplFactory oplF){
+	class RSmilpSingle extends IloCustomOplDataSource{
+		RSmilpSingle(IloOplFactory oplF){
 			super(oplF);
 		}
 		public void customRead(){
+
 			IloOplDataHandler handler = getDataHandler();
 			handler.startElement("nbmonths"); handler.addIntItem(demandMean.length); handler.endElement();
 			handler.startElement("fc"); handler.addNumItem(fixedCost); handler.endElement();
@@ -116,6 +114,7 @@ public class RSmilp_normal {
 			handler.endArray(); handler.endElement();
 			handler.restartElement("stdParameter"); handler.addNumItem(stdParameter); handler.endElement();           
 			handler.startElement("initialStock"); handler.addNumItem(initialStock); handler.endElement();
+			//piecewise
 			handler.startElement("nbpartitions"); handler.addIntItem(partitions); handler.endElement();
 			handler.startElement("means"); handler.startArray();
 			for (int j = 0 ; j<partitions; j++){handler.addNumItem(means[j]);}
@@ -126,78 +125,89 @@ public class RSmilp_normal {
 			handler.startElement("error"); handler.addNumItem(error); handler.endElement();         
 		}
 	}
-	
-	public static RSparameters RSmilpParameters(
+
+	public static RSmilpSolution RSmilpSchedule(
 			double[] demandMean, double fixedCost, double unitCost, double holdingCost, double penaltyCost,
 			double initialStock, double stdParameter, 
 			int partitions, double[] piecewiseProb, double[] means, double error) {
-		
-		System.out.println("_______");
-		System.out.println("demandMean = "+Arrays.toString(demandMean));
-		System.out.println("stdParameter = "+stdParameter);
-		System.out.println("f = "+fixedCost);
-		System.out.println("h = "+holdingCost);
-		System.out.println("p = "+penaltyCost);
-		System.out.println("v = "+unitCost);
-		System.out.println("_______");
 
-		
 		double[] S = new double[demandMean.length];
-		double[] purchase = new double[demandMean.length];
-		
+		double[] R = new double[demandMean.length];
+
 		try {
 			RSmilp_normal RSmodel = new RSmilp_normal(
-					demandMean, fixedCost, unitCost, holdingCost, penaltyCost,
+					demandMean, holdingCost, fixedCost,  unitCost, penaltyCost, 
 					initialStock, stdParameter, 
-					partitions, piecewiseProb, means, error,
-					null);
-			RSmilpSolution RSsolution = RSmodel.solveRSmilp("RSnormal");
+					partitions,  means, piecewiseProb, error,
+					null
+					);
+			RSmilpSolution milpsolution = RSmodel.solveRSNormal("RSnormal");
 			for(int t=0; t<demandMean.length; t++) {
-				S[t] = RSsolution.Q[t] + RSsolution.stock[t];
-				purchase[t] = RSsolution.purchase[t];
+				S[t] = milpsolution.stock[t] + demandMean[t];
 			}
-
-		}catch(IloException e) {
+			//System.out.println("S by method: "+Arrays.toString(S));
+			R = milpsolution.purchase;
+			//System.out.println("R by method: "+Arrays.toString(R));
+		}catch(IloException e){
 			e.printStackTrace();
 		}
-		System.out.println("method solved S = "+Arrays.toString(S));
-		System.out.println("method solved purchase = "+Arrays.toString(purchase));
-		return new RSparameters(S, purchase);
+		return new RSmilpSolution (R, S);
 	}
-	
-	
+
 	public static void main(String[] args) {
-		
 		double holdingCost = 1;
-		
-		double fixedCost = 100;
-		double penaltyCost = 10;
-		
-		double unitCost = 0;
-		
-		double[] demandMean = {20, 40, 60, 40};
-		double stdParameter = 0.25;
-		
+
+		double[] fixedOrderingCost = {100, 500, 1000, 1500};
+		double[] unitCost		   = {0,1};
+		double[] penaltyCost	   = {10, 5, 10, 20};
+		double[] stdParameter	   = {0.25, 0.1, 0.2, 0.3};
+
 		double initialStock = 0;
 
-		int partitions = 4;
-		double[] piecewiseProb = {0.187555, 0.312445, 0.312445, 0.187555};
-		double[] means = {-1.43535, -0.415223, 0.415223, 1.43535};
-		double error = 0.0339052;
+		int partitions = 10;
+		double[] piecewiseProb = {0.04206108420763477, 0.0836356495308449, 0.11074334596058821, 0.1276821455299152, 0.13587777477101692, 0.13587777477101692, 0.1276821455299152, 0.11074334596058821, 0.0836356495308449, 0.04206108420763477};
+		double[] means = {-2.133986195498256, -1.3976822972668839, -0.918199946431143, -0.5265753462727588, -0.17199013069262026, 0.17199013069262026, 0.5265753462727588, 0.918199946431143, 1.3976822972668839, 2.133986195498256};
+		double error = 0.005885974956458359;
+
+
+		double[][] demandMean = {
+				{20, 40, 60, 40}
+		};
+
+		RSmilpSolution RSmilpSolution = RSmilpSchedule(
+				demandMean[0], fixedOrderingCost[0], unitCost[0], holdingCost, penaltyCost[0],
+				initialStock, stdParameter[0], 
+				partitions, piecewiseProb, means,  error);
 		
-		RSparameters RSparameters = RSmilpParameters(
-				demandMean, fixedCost, unitCost, holdingCost, penaltyCost,
-				initialStock, stdParameter, 
-				partitions, piecewiseProb, means, error);
+		double[] S = RSmilpSolution.stock;
+		double[] R = RSmilpSolution.purchase;
+		System.out.println("final S: "+Arrays.toString(S));
+		System.out.println("final R: "+Arrays.toString(R));
 		
-		double[] orderUpToLevel = RSparameters.S;
-		double[] purchase = RSparameters.purchase;
 		
-		System.out.println(Arrays.toString(orderUpToLevel));
-		System.out.println(Arrays.toString(purchase));
+		RSmilpSimInstance RSinstance = new RSmilpSimInstance(
+				demandMean[0], 
+				stdParameter[0],
+				fixedOrderingCost[0],
+				unitCost[0],
+				holdingCost, 
+				penaltyCost[0], 
+				initialStock, 
+				S, 
+				R				
+				);	
 		
+		Chrono timer = new Chrono();
+		
+		int count = 5000000;
+		RSsimulation.simulationRSmilp.simulationNormalRSmultipleRuns(RSinstance, count);
+		
+		RSinstance.statCost.setConfidenceIntervalStudent();
+		System.out.println(RSinstance.statCost.report(0.9, 3));
+		System.out.println("Total CPU time: "+timer.format());
+
+		System.out.println(RSinstance.statCost.average());
+
 	}
 
-	
-	
 }

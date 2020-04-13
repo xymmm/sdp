@@ -21,13 +21,14 @@ float means[partitions]=...;
 float prob[partitions]=...;
 float error=...;
 
+dvar float purchaseDouble[months];
+
 //variables
 dvar float stock[0..nbmonths];
 dvar float+ stockhlb[0..nbmonths];
 dvar float+ stockplb[0..nbmonths];
 dvar boolean purchase[months];
 
-dvar float purchaseDouble[months];
 
 dvar boolean P[months][months];
 dvar float+ U[1..nbmonths];
@@ -39,7 +40,7 @@ float std_demand[i in months] = stdParameter * meandemand[i];
 float std_matrix[i in months, j in months] = sqrt(sum(m in i..j) pow(std_demand[m],2));
 
 //objective function
-minimize sum(t in months)( fc*purchase[t]+h*stockhlb[t]+p*stockplb[t] +  v*U[t]);
+minimize sum(t in months)( fc*purchase[t]+h*stockhlb[t]+p*stockplb[t]);// +  v*U[t]);
 
 //constraints
 subject to{
@@ -71,7 +72,7 @@ forall (t in months)
 forall(t in months, p in partitions)
   stockhlb[t]>=sum(k in 1..p)prob[k]*stock[t]-sum(j in 1..t)(sum(k in 1..p)prob[k]*means[k]*std_matrix[j][t]*P[j][t]) + (sum(j in 1..t) error*std_matrix[j][t]*P[j][t]);
 
-  forall(t in months) stockhlb[t] >= (sum(j in 1..t) error*std_matrix[j][t]*P[j][t]);
+  //forall(t in months) stockhlb[t] >= (sum(j in 1..t) error*std_matrix[j][t]*P[j][t]);
     
 /**
 * Original formulation as in (Rossi et al., 2015)    
@@ -79,7 +80,7 @@ forall(t in months, p in partitions)
 forall(t in months, p in partitions)
   stockplb[t]>=-stock[t]+sum(k in 1..p)prob[k]*stock[t]-sum(j in 1..t)(sum(k in 1..p)prob[k]*means[k]*std_matrix[j][t]*P[j][t]) + (sum(j in 1..t) error*std_matrix[j][t]*P[j][t]);
  
-  forall(t in months) stockplb[t] >= - stock[t] + (sum(j in 1..t) error*std_matrix[j][t]*P[j][t]);
+ // forall(t in months) stockplb[t] >= - stock[t] + (sum(j in 1..t) error*std_matrix[j][t]*P[j][t]);
 
 }
  

@@ -4,15 +4,12 @@ public class RSmilpSolution {
 	
 	public double[] purchase;
 	public double[]	 stock;
-	public double[]	 Q;
 	
 	public RSmilpSolution(
 			double[] purchase,
-			double[] stock,
-			double[] Q) {
+			double[] stock) {
 		this.purchase = purchase;
 		this.stock = stock;
-		this.Q = Q;
 	}
 
 }
