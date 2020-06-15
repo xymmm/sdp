@@ -10,7 +10,7 @@ public class mainComputation_PoissonMINLP {
 	public static void main(String[] args) throws Exception {
 		
 		double fixedCost = 5;
-		double unitCost = 1;
+		double unitCost = 0;
 		double holdingCost = 1;
 		double penaltyCost = 3;
 		double initialStock = 0;
@@ -24,8 +24,9 @@ public class mainComputation_PoissonMINLP {
 		int maxQuantity = 9;
 		
 		double demandMean [][] = {
+				{2,1,5,3}
 				//{1, 2, 4, 5, 6, 3},
-				{4, 5, 6, 3 ,2, 1}
+				//{4, 5, 6, 3 ,2, 1}
 				//{2.5, 1, 3.5, 4.5, 1.5, 3},
 				//{3.5, 1, 2, 4.5, 1, 3},
 				//{3, 3, 3, 3, 3, 3},
@@ -49,8 +50,8 @@ public class mainComputation_PoissonMINLP {
 		long timeStartsQt = System.currentTimeMillis();
 		double[] sQtschedule = sQTminlp_oneRun.sQTminlpSchedule(demandMean[i], fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, rangedQ);
 		System.out.println("Poisson Demand: optimal schedule for sQt policy is "+Arrays.toString(sQtschedule));
-		//double[] s_sQt = sQTminlp_heuristic.reorderPoint_sQtHeuristic(demandMean[i], fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, pace, sQtschedule, rangedQ);
-		double[] s_sQt = sQt.generatedQ.sQtReorderPoint.costVaryingWithInventory(sQtschedule, instance, Normal);
+		double[] s_sQt = sQTminlp_heuristic.reorderPoint_sQtHeuristic(demandMean[i], fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, pace, sQtschedule, rangedQ);
+		//double[] s_sQt = sQt.generatedQ.sQtReorderPoint.costVaryingWithInventory(sQtschedule, instance, Normal);
 		System.out.println("Associated reorder point is "+Arrays.toString(s_sQt));
 		long timeEndsQt = System.currentTimeMillis();
 		System.out.println("Time consumed for sQt is "+(timeEndsQt - timeStartsQt)/1000.0+"s");
@@ -79,8 +80,8 @@ public class mainComputation_PoissonMINLP {
 		long timeStartsQ = System.currentTimeMillis();
 		double[] sQschedule = sQminlp_oneRun.sQPoissonMinlpSchedule(demandMean[i], fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, rangedQ);
 		System.out.println("Poisson Demand: optimal schedule for sQ policy is "+Arrays.toString(sQschedule));
-		//double[] s_sQ = sQminlp_recursive.reorderPoint_sQheuristic(demandMean[i], fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, pace, sQschedule, rangedQ);
-		double[] s_sQ = sQt.generatedQ.sQtReorderPoint.costVaryingWithInventory(sQschedule, instance, Normal);
+		double[] s_sQ = sQminlp_recursive.reorderPoint_sQheuristic(demandMean[i], fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, pace, sQschedule, rangedQ);
+		//double[] s_sQ = sQt.generatedQ.sQtReorderPoint.costVaryingWithInventory(sQschedule, instance, Normal);
 		System.out.println("Associated reorder point is "+Arrays.toString(s_sQ));
 		long timeEndsQ = System.currentTimeMillis();
 		System.out.println("Time consumed for sQ is "+(timeEndsQ - timeStartsQ)/1000.0+"s");

@@ -6,7 +6,7 @@ import sS.sS;
 import sdp.data.Instance;
 import sdp.data.InstanceDouble;
 
-public class reorderPoint {
+public class reorderPoint_compare {
 
 	/*
 	 * Given an optimal schedule,
@@ -96,7 +96,7 @@ public class reorderPoint {
 			if(solution.optimalSchedule[t] == 0) {
 				reorderPoint[t] = instance.minInventory;
 			}else {
-				for(int i=50; i<inventory.length; i++) {  // Inventory   
+				for(int i=10; i<inventory.length; i++) {  // Inventory   
 					if(optimalActionByInventory[i][t] == false) {
 						reorderPoint[t] = i + instance.minInventory;
 						break;
@@ -114,17 +114,18 @@ public class reorderPoint {
 				System.out.print(optimalActionByInventory[i][t]+ "\t");
 			}
 			System.out.println();
-		}
+		}*/
 		
-		
+		/*
 		//print cost by inventory level and time period
 		System.out.println();
 		for(int i=0; i<inventory.length; i++) {
 			System.out.print((i+instance.minInventory)+" \t");
-			for(int t=0; t<instance.getStages(); t++) {
-				System.out.print(optimalCostByInventory[i][t]+ "\t");
+			for(int t=0; t<1; t++) {
+				//System.out.print(optimalCostByInventory[i][t]+ "\t");
+				System.out.println(costNoOrder[i][t] + "\t" + costOrder[i][t]);
 			}
-			System.out.println();
+			//System.out.println();
 		}*/
 		
 		
@@ -133,23 +134,23 @@ public class reorderPoint {
 		return reorderPoint;
 	}
 	
-	/*
+	
 	public static void main(String args[]) {
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 3;
 
 		double tail = 0.00000001;
 
-		int minInventory = -100;
-		int maxInventory = 100;
+		int minInventory = -50;
+		int maxInventory = 50;
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {200, 240, 260, 240};
-		double[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,1,5,3};
 		
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
@@ -165,15 +166,18 @@ public class reorderPoint {
 				);
 
 		boolean Normal = false;
-		sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);
+		//sQ
+		//sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);
+		//sQt
+		sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQt.optimalSchedule_sQt(instance, Normal);
 		
 		System.out.println(sQsolution.optimalCost);
-		System.out.println(Arrays.toString(sQsolution.optimalSchedule));
+		System.out.println("optimal schedule = "+Arrays.toString(sQsolution.optimalSchedule));
 		
 		int[] reorderPoint = computeReorderPoint(instance, sQsolution);
-		System.out.println(Arrays.toString(reorderPoint));
+		System.out.println("reorder points = "+Arrays.toString(reorderPoint));
 
 	}
-	*/
+	
 
 }

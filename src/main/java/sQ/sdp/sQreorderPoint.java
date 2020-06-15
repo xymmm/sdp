@@ -116,20 +116,20 @@ public class sQreorderPoint {
 
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		double penaltyCost = 3;
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
-		int maxQuantity = 200;
+		int minInventory = -50;
+		int maxInventory = 50;
+		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
 
-		double[] demandMean = {20,40,60,40};
+		double[] demandMean = {2, 1, 5, 3};
 		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 
 		int Q = 84;

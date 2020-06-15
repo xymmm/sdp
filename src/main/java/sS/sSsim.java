@@ -34,27 +34,18 @@ public class sSsim {
 		return inventoryLevel + demand;
 	}
 	
-	/** 5. generate Poisson random number as demand **/
-	static int generateDemand(int inventoryLevel, int actionDecision, sSsimInstance sSsimInstance, int currentStageIndex) {
-		  RandomVariateGenInt genDemand;
-		  RandomStream streamDemand = new MRG32k3a();
-		  genDemand = new PoissonGen(streamDemand, new PoissonDist(sSsimInstance.demandMean[currentStageIndex])); 
-		  int demand = genDemand.nextInt();
-		  
-		  while(checkDemand(inventoryLevel, sSsimInstance, demand) == false) { 
-			  demand = genDemand.nextInt(); 
-		  } 
-		  return -demand;
+	/** 5. generate Poisson random number as demand **/	
+	static MRG32k3a randomStream = new MRG32k3a();	
+	static {
+		long seed[] = {1234,1234,1234,1234,1234,1234};
+		randomStream.setSeed(seed);
+	}	
+	static double generatePoissonDemand(int inventoryLevel, int actionDecision, int[] demandMean, int currentStageIndex) {
+		RandomVariateGenInt genDemand;		  
+		genDemand = new PoissonGen(randomStream, new PoissonDist(demandMean[currentStageIndex])); 
+		int demand = genDemand.nextInt();
+		return (double)-demand;
 	}
-	static boolean checkDemand(int inventoryLevel, sSsimInstance sSsimInstance, int demand) {
-		if(inventoryLevel - demand >= sSsimInstance.minInventory) {
-			return true;
-		}else {
-			return false;
-		}
-	}
-
-	
 	
 	/** 6. compute holding or penalty cost **/
 	static double computeClosingCost(int inventoryLevel, sSsimInstance sSsimInstance) {
@@ -89,7 +80,7 @@ public class sSsim {
 			if(print == true) System.out.println("Updated inventory level is "+inventoryLevel);
 			
 			//4. generate, check and meet demand
-			int demand = generateDemand(inventoryLevel, actionDecision, sSsimInstance, currentStageIndex); // as a negative
+			int demand = (int) generatePoissonDemand(inventoryLevel, actionDecision, sSsimInstance.demandMean, currentStageIndex); // as a negative
 			if(print == true) System.out.println("Demand in this stage is "+(-demand));
 			
 			//update inventory level
@@ -120,17 +111,17 @@ public class sSsim {
 	public static void main(String[] args) {
 
 		/** declare instance parameters **/
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
-		int[] demandMean = {20,40,60,40};
+		double penaltyCost = 3;
+		int[] demandMean = {2, 1, 5, 3};
 
-		int minInventory = -500;
-		int maxInventory = 500;
+		int minInventory = -50;
+		int maxInventory = 50;
 		
-		int[] reorderPoint = {15, 28, 55, 28};
-		int[] actionS = {67, 49, 109, 49};
+		int[] reorderPoint = {0, -1, 3, 1};
+		int[] actionS = {3, 2, 9, 4};
 
 		sSsimInstance sSsystem = new sSsimInstance(
 				fixedOrderingCost,
@@ -152,7 +143,8 @@ public class sSsim {
 		
 		sSsystem.statCost.setConfidenceIntervalStudent();
 		System.out.println(sSsystem.statCost.report(0.9, 3));
-		System.out.println("Total CPU time: "+timer.format());
+		//System.out.println("Total CPU time: "+timer.format());
+		System.out.println("Average = " + sSsystem.statCost.average());
 		
 		
 		//simulatesQinstanceOneRun(sSsystem, true);

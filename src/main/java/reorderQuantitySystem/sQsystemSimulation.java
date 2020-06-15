@@ -113,20 +113,20 @@ public class sQsystemSimulation {
 	public static void main(String[] args) {
 
 		/** declare instance parameters **/
-		double fixedOrderingCost = 100;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 10;
+		double penaltyCost = 3;
 
 		double tail = 0.00000001;
 
-		int minInventory = -500;
-		int maxInventory = 500;
+		int minInventory = -50;
+		int maxInventory = 50;
 		double coe = 0.25;
-		double[] demandMean = {20, 40, 60, 40};
-		int[] reorderPoint = {44, Integer.MIN_VALUE, 69, Integer.MIN_VALUE};
+		double[] demandMean = {2, 1, 5, 3};
+		int[] reorderPoint = {1, 0, 4, 1};
 
-		double[] orderQuantity = {76.04770085752162, 0.0, 91.43783822873831, 0.0};
+		double[] orderQuantity = {3, 3, 8, 5};
 
 		simInstance sQsystem = new simInstance(
 				fixedOrderingCost,

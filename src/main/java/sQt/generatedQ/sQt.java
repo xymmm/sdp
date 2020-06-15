@@ -223,10 +223,10 @@ public class sQt {
 
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 3;
 
 		double tail = 0.00000001;
 
@@ -236,7 +236,7 @@ public class sQt {
 
 		double stdParameter = 0.25;
 
-		double[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,1,5,3};
 
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,

@@ -83,7 +83,7 @@ public class computationAnalysis_1 {
 					//long timesQsdp = System.currentTimeMillis();
 					sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);
 					System.out.println("Optimal reordering schedule under (s,Q) policy is: "+Arrays.toString(sQsolution.optimalSchedule));
-					int[] reorderPointsQ = reorderQuantitySystem.reorderPoint.computeReorderPoint(instance, sQsolution);
+					int[] reorderPointsQ = reorderQuantitySystem.reorderPoint_compare.computeReorderPoint(instance, sQsolution);
 					System.out.println("Reorder point = "+Arrays.toString(reorderPointsQ));
 					//results[d][u][g][2] = sQsolution.optimalCost;
 					//resultsTime[d][u][g][2] = (System.currentTimeMillis() - timesQsdp)/1000.0;

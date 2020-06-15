@@ -21,9 +21,9 @@ public class computationAnalysis_2 {
 
 		double holdingCost = 1;
 
-		double[] fixedOrderingCost = {100};//{500, 1000, 1500};
+		double[] fixedOrderingCost = {5};//{500, 1000, 1500};
 		double[] unitCost		   = {0};//{0,1};
-		double[] penaltyCost	   = {10};//{5, 10, 20};
+		double[] penaltyCost	   = {1};//{5, 10, 20};
 		double[] stdParameter	   = {0.25};//{0.1, 0.2, 0.3};
 
 		double initialStock = 0;
@@ -34,7 +34,7 @@ public class computationAnalysis_2 {
 		int maxInventory = 2000;
 		int maxQuantity = 1000;
 
-		boolean Normal = true;
+		boolean Normal = false;
 
 		/*
 		int partitions = 4;
@@ -51,7 +51,8 @@ public class computationAnalysis_2 {
 		int count = 500000;
 
 		double[][] demandMean = {
-				{20, 40, 60, 40}
+				{1,3,4.5,2}
+				//{20, 40, 60, 40}
 				//{11,17,26,38,53,71,92,115,138,159,175,186,190,186,175,159,138,115,92,71,53,38,26,17,11},
 				//{23,32,42,55,70,86,103,120,136,150,161,168,170,168,161,150,136,120,103,86,70,55,42,32,23},
 				//{130,150,127,76,27,10,36,88,136,149,121,68,22,11,42,96,140,148,114,60,18,14,50,104,144},

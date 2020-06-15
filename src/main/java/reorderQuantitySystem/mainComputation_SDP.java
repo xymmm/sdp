@@ -16,7 +16,7 @@ public class mainComputation_SDP {
 		double tail = 0.00000001;
 
 		double[] fixedOrderingCostA = {5};
-		double[] unitCostA = {1};
+		double[] unitCostA = {0};
 		double[] penaltyCostA = {3};
 
 
@@ -25,13 +25,15 @@ public class mainComputation_SDP {
 		int maxQuantity = 9;
 
 		double stdParameter = 0.25;
+		boolean Normal = false;
 
 		//double[] demandMean = {4, 5, 6, 3 ,2, 1};
 		//double[] demandMean = {1.77, 1.31, 4.30, 3.81, 1.49, 4.54};
 		//double[] demandMean = {20, 40, 60, 40};
 		double demandMean [][] = {
+				{2, 1, 5, 3}
 				//{1, 2, 4, 5, 6, 3},
-				{4, 5, 6, 3 ,2, 1},
+				//{4, 5, 6, 3 ,2, 1},
 				//{2.5, 1, 3.5, 4.5, 1.5, 3},
 				//{3.5, 1, 2, 4.5, 1, 3},
 				//{3, 3, 3, 3, 3, 3},
@@ -42,7 +44,7 @@ public class mainComputation_SDP {
 				//{2, 1.5, 4, 4, 1.5, 2}
 		};
 
-		boolean Normal = false;
+		
 
 
 
@@ -63,20 +65,20 @@ public class mainComputation_SDP {
 					sQsystemSolution sQtsolution = reorderQuantitySystem.optimalSchedule_sQt.optimalSchedule_sQt(instance, Normal);		
 					System.out.println("Optimal cost under (s,Qt) policy is: "+sQtsolution.optimalCost);
 					System.out.println("Optimal reordering schedule under (s,Qt) policy is: "+Arrays.toString(sQtsolution.optimalSchedule));
-					int[] reorderPointsQt = reorderQuantitySystem.reorderPoint.computeReorderPoint(instance, sQtsolution);
+					int[] reorderPointsQt = reorderQuantitySystem.reorderPoint_compare.computeReorderPoint(instance, sQtsolution);
 					System.out.println("Reorder point = "+Arrays.toString(reorderPointsQt));
 					long timeEndsQt = System.currentTimeMillis();
 					//System.out.println("Time consumed for (s,Qt) is "+(timeEndsQt - timeStart)/1000 + " s.");
 
 
-					/**sQ**/
+					/**sQ*
 					System.out.println();		
 					sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);		
 					System.out.println("Optimal cost under (s,Q) policy is: "+sQsolution.optimalCost);
 					System.out.println("Optimal reordering schedule under (s,Q) policy is: "+Arrays.toString(sQsolution.optimalSchedule));
-					int[] reorderPointsQ = reorderQuantitySystem.reorderPoint.computeReorderPoint(instance, sQsolution);
+					int[] reorderPointsQ = reorderQuantitySystem.reorderPoint_compare.computeReorderPoint(instance, sQsolution);
 					System.out.println("Reorder point = "+Arrays.toString(reorderPointsQ));
-
+*/
 
 				}
 			}

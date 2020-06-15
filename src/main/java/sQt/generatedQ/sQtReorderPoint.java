@@ -144,7 +144,7 @@ public class sQtReorderPoint {
 			if(optimalSchedule[t] == 0) {
 				reorderPoint[t] = instance.minInventory;
 			}else {
-				for(int i= 0- instance.minInventory - 200; i<inventory.length; i++) {  // Inventory   
+				for(int i= 0- instance.minInventory; i<inventory.length; i++) {  // Inventory   
 					if(optimalActionByInventory[i][t] == false) {
 						reorderPoint[t] = i + instance.minInventory;
 						break;
@@ -184,10 +184,10 @@ public class sQtReorderPoint {
 	
 	public static void main(String[] args) {
 
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 3;
 
 		double tail = 0.00000001;
 
@@ -197,10 +197,10 @@ public class sQtReorderPoint {
 
 		double stdParameter = 0.25;
 
-		double[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,1,5,3};
 
 		
-		double[] optimalSchedule = {8, 0, 9, 0};
+		double[] optimalSchedule = {3, 3, 5, 4};
 		
 
 		InstanceDouble instance = new InstanceDouble(

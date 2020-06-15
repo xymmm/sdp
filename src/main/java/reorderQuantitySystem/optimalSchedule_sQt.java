@@ -81,10 +81,10 @@ public class optimalSchedule_sQt {
 	
 	
 	public static void main(String args[]) {
-		double fixedOrderingCost = 10;
+		double fixedOrderingCost = 5;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 5;
+		double penaltyCost = 3;
 
 		double tail = 0.00000001;
 
@@ -94,9 +94,7 @@ public class optimalSchedule_sQt {
 
 		double stdParameter = 0.25;
 
-		//int[] demandMean = {20, 40, 60, 40};
-		//double[] demandMean = {1,2,1.5,3};
-		double[] demandMean = {2,4,6,4};
+		double[] demandMean = {2,1,5,3};
 		
 		InstanceDouble instance = new InstanceDouble(
 				fixedOrderingCost,
@@ -111,7 +109,7 @@ public class optimalSchedule_sQt {
 				stdParameter
 				);
 
-		sQsystemSolution sQtsolution = optimalSchedule_sQt(instance,false);
+		sQsystemSolution sQtsolution = optimalSchedule_sQt(instance, false);
 		
 		System.out.println(sQtsolution.optimalCost);
 		System.out.println(Arrays.toString(sQtsolution.optimalSchedule));
