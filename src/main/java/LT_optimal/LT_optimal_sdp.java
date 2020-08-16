@@ -41,7 +41,7 @@ public class LT_optimal_sdp {
 		double[][][] LTaction = new double[stages][2][inventory.length];
 		double[][][] REaction = new double[stages][2][inventory.length];
 		/* build cost matrices */
-		//arraylist to store cost
+		//dynamically create dimensions of Trans*Q for cost
 		double[][][] optimalCost = new double[stages][2][inventory.length];
 		
 		
