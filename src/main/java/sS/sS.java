@@ -30,7 +30,7 @@ public class sS {
 		for(int t=0; t<demandMean.length;t++) {
 			demandProbability[t] = Demand.tabulateProbability(demandMean[t], tail);
 		}
-		return demandProbability;
+		return demandProbability; 
 	}
 	
 	public static double[][] computeNormalDemandProbability(double[] demandMean, double stdParameter, int maxDemand, double tail){
