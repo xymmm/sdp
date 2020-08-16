@@ -200,7 +200,7 @@ public class sQtReorderPoint {
 		double[] demandMean = {2,1,5,3};
 
 		
-		double[] optimalSchedule = {3, 3, 5, 4};
+		double[] optimalSchedule = {3, 4, 9, 5};
 		
 
 		InstanceDouble instance = new InstanceDouble(

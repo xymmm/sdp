@@ -18,11 +18,11 @@ public class computationAnalysis_1 {
 		double holdingCost = 1;
 		double initialStock = 0;
 		
-		double[] unitCostA = {0};//{0,1};
+		double[] unitCostA = {0,1};
 		double[][] KPgroup = {
-				{5, 3}
-				//{10, 5},
-				//{10, 7}
+				{5, 3},
+				{10, 5},
+				{10, 7}
 		};
 		
 		int partitions = 10;
@@ -39,16 +39,16 @@ public class computationAnalysis_1 {
 		int maxQuantity = 9;
 		
 		double demandMean [][] = {
-				//{1, 2, 4, 5, 6, 3},
+				{1, 2, 4, 5, 6, 3},
 				{4, 5, 6, 3 ,2, 1},
-				//{2.5, 1, 3.5, 4.5, 1.5, 3},
-				//{3.5, 1, 2, 4.5, 1, 3},
-				//{3, 3, 3, 3, 3, 3},
-				//{1.77, 1.31, 4.30, 3.81, 1.49, 4.54},
-				//{4, 7, 3.5, 2, 3, 1},
-				//{1, 2.5, 3.5, 4, 3, 2},
-				//{2.5, 1, 3.5, 4.5, 1.5, 5.5},
-				//{2, 1.5, 4, 4, 1.5, 2}
+				{2.5, 1, 3.5, 4.5, 1.5, 3},
+				{3.5, 1, 2, 4.5, 1, 3},
+				{3, 3, 3, 3, 3, 3},
+				{1.77, 1.31, 4.30, 3.81, 1.49, 4.54},
+				{4, 7, 3.5, 2, 3, 1},
+				{1, 2.5, 3.5, 4, 3, 2},
+				{2.5, 1, 3.5, 4.5, 1.5, 5.5},
+				{2, 1.5, 4, 4, 1.5, 2}
 		};
 		
 		double[][][][] results = new double[demandMean.length][unitCostA.length][KPgroup.length][5];
@@ -81,15 +81,15 @@ public class computationAnalysis_1 {
 					resultsTime[d][u][g][1] = (System.currentTimeMillis() - timesQtsdp)/1000.0;
 					/**sQ**/
 					//long timesQsdp = System.currentTimeMillis();
-					sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);
-					System.out.println("Optimal reordering schedule under (s,Q) policy is: "+Arrays.toString(sQsolution.optimalSchedule));
-					int[] reorderPointsQ = reorderQuantitySystem.reorderPoint_compare.computeReorderPoint(instance, sQsolution);
-					System.out.println("Reorder point = "+Arrays.toString(reorderPointsQ));
+					//-sQsystemSolution sQsolution = reorderQuantitySystem.optimalSchedule_sQ.optimalSchedule_sQ(instance, Normal);
+					//-System.out.println("Optimal reordering schedule under (s,Q) policy is: "+Arrays.toString(sQsolution.optimalSchedule));
+					//-int[] reorderPointsQ = reorderQuantitySystem.reorderPoint_compare.computeReorderPoint(instance, sQsolution);
+					//-System.out.println("Reorder point = "+Arrays.toString(reorderPointsQ));
 					//results[d][u][g][2] = sQsolution.optimalCost;
 					//resultsTime[d][u][g][2] = (System.currentTimeMillis() - timesQsdp)/1000.0;
 					
 					//MINLP-----------------------------
-					/*
+					
 					//**********************sQt for Poisson Demand*************************
 					long timeStartsQt = System.currentTimeMillis();
 					double[] sQtschedule = sQTminlp_oneRun.sQTminlpSchedule(demandMean[d], fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, rangedQ);
@@ -104,6 +104,7 @@ public class computationAnalysis_1 {
 					results[d][u][g][3] = PoissonInstance_sQt.statCost.average();
 					resultsTime[d][u][g][3] = (System.currentTimeMillis() - timeStartsQt)/1000.0;
 					
+					/*
 					//**********************sQ for Poisson Demand*************************
 					long timeStartsQ = System.currentTimeMillis();
 					double[] sQschedule = sQminlp_oneRun.sQPoissonMinlpSchedule(demandMean[d], fixedCost, unitCost, holdingCost, penaltyCost, initialStock, partitions, rangedQ);

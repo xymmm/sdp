@@ -137,8 +137,8 @@ public class simulationPoissonMINLP {
 			//double[] schedule = {2.98, 3.53, 8.72, 5.00};
 			//double[] reorderPoints = {1, -2, 4, 0};
 			
-			double[] schedule = {3, 3, 5, 4};
-			double[] reorderPoints = {2, 1, 5, 1};
+			double[] schedule = {3, 4, 9, 5};
+			double[] reorderPoints = {1, -2, 4, 0};
 
 			simPoissonInstance PoissonInstance = new simPoissonInstance(
 					demandMean, 
@@ -153,7 +153,7 @@ public class simulationPoissonMINLP {
 			
 			Chrono timer = new Chrono();
 			
-			int count = 10000;
+			int count = 100000;
 			simulationPoissonMINLPmultipleRuns(PoissonInstance, count);
 			
 			PoissonInstance.statCost.setConfidenceIntervalStudent();
