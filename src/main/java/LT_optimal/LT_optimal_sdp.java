@@ -38,16 +38,21 @@ public class LT_optimal_sdp {
 		demandProbabilities = sS.computeDemandProbability(instance.demandMean, instance.maxDemand, instance.tail);
 		
 		/* build action matrices */
-		double[][][] LTaction = new double[stages][2][inventory.length];
-		double[][][] REaction = new double[stages][2][inventory.length];
+		double[][] LTaction = new double[stages][inventory.length];
+		double[][] Q1 = new double[stages][inventory.length];
+		double[][] Q2 = new double[stages][inventory.length];
 		/* build cost matrices */
 		//dynamically create dimensions of Trans*Q for cost
-		double[][][] optimalCost = new double[stages][2][inventory.length];
+		double[][][] totalCost = null;		//[][maxQ+1][maxQ+1], first dimension is dependent on the domin of Trans, determined in every iteration
+		double[][] optimalCost = new double[stages][inventory.length];		//optimal cost of the system, not for each location
+																			//optimal cost is not equivalent to the sum of two minimim costs
+		double[][] optimalCost1 = new double[stages][inventory.length];		//found when system's optimal cost determined
+		double[][] optimalCost2 = new double[stages][inventory.length];		//ditto
 		
 		
 		
 		
-		return new LTsolution(inventory, LTaction, REaction, optimalCost);
+		return new LTsolution(inventory, LTaction, Q1, Q2, optimalCost);
 	}
 	
 	
