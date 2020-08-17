@@ -22,7 +22,7 @@ public class LTactionSolution {
 		for(int l=0; l<totalCost.length; l++) {
 			for(int q1=0; q1<totalCost[0].length; q1++) {
 				for(int q2=0; q2<totalCost[0][0].length; q2++) {
-					if(totalCost[l][q1][q2]<minCost) {
+					if(totalCost[l][q1][q2] < minCost) {
 						minCost = totalCost[l][q1][q2];
 						LTindex = l; Q1index = q1; Q2index = q2;
 					}
