@@ -10,7 +10,7 @@ public class LT2locations {
 	   public double R;
 	   public double r;
 	   public double[] demandMean;
-	   public double[] initialInventory;	   
+	   public int[] initialInventory;	   
 	   
 	   /** SDP boundary conditions **/
 	   public double tail;
@@ -31,7 +31,8 @@ public class LT2locations {
 	         double tail,
 	         int minInventory,
 	         int maxInventory,
-	         int maxQuantity) {
+	         int maxQuantity,
+	         int[] initialInventory) {
 	      this.K = K;
 	      this.z = z;
 	      this.h = h;

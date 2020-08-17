@@ -44,10 +44,11 @@ public class LT_optimal_sdp {
 		//dynamically create dimensions of Trans*Q for cost
 		double[][][][][] totalCost1 = null;		//[i][i][1 to 2][maxQ+1][maxQ+1], 3rd dimension is dependent on the domin of Trans, determined in every iteration
 		double[][][][][] totalCost2 = null;		//[i][i][2 to 1][maxQ+1][maxQ+1], 3rd dimension is dependent on the domin of Trans, determined in every iteration
+		double[][][][][] totalCost3 = new double [inventory.length][inventory.length][1][instance.maxQuantity+1][instance.maxQuantity+1];
 		double[][][] optimalCost = new double[stages][inventory.length][inventory.length];		//optimal cost of the system, not for each location
 																								//optimal cost is not equivalent to the sum of two minimim costs
-		double[][] optimalCost1 = new double[stages][inventory.length];							//found when system's optimal cost determined
-		double[][] optimalCost2 = new double[stages][inventory.length];							//ditto
+		//double[][] optimalCost1 = new double[stages][inventory.length];							//found when system's optimal cost determined
+		//double[][] optimalCost2 = new double[stages][inventory.length];							//ditto
 		
 				
 		/*************************** SDP **************************************************************/
@@ -59,7 +60,7 @@ public class LT_optimal_sdp {
 					if(inventory[i1]>=0) {
 						for(int l = 0; l<=inventory[i1]; l++) {
 							double transCost = computeLTcost(l, instance.R, instance.r);
-							
+							totalCost1 = new double[inventory.length][inventory.length][inventory[i1]+1][instance.maxQuantity+1][instance.maxQuantity+1];
 							//reorder
 							for(int q1=0; q1<Q1.length; q1++) {		//not yet consider 0 initial order
 								for(int q2=0; q2<Q2.length; q2++) { //not yet consider 0 initial order
@@ -95,7 +96,8 @@ public class LT_optimal_sdp {
 					}//end for transship from 1 to 2
 					
 					/******* positive inventory at location 2 that can afford transship from 2 to 1 ***/					
-					if(inventory[i2]>=0) {
+					else if(inventory[i2]>=0) {
+						totalCost2 = new double[inventory.length][inventory.length][inventory[i2]+1][instance.maxQuantity+1][instance.maxQuantity+1];
 						for(int l = 0; l<=inventory[i2]; l++) {
 							double transCost = computeLTcost(l, instance.R, instance.r);							
 							//reorder
@@ -115,7 +117,7 @@ public class LT_optimal_sdp {
 												//totalCost1 [i][i][1 to 2][maxQ+1][maxQ+1]
 												int i1UpdateIndex = inventory[i1]+l+q1-d1 - instance.minInventory + 1;
 												int i2UpdateIndex = inventory[i2]-l+q2-d2 - instance.minInventory + 1;
-												totalCost1 [i1][i2][l][q1][q2] += demandProbabilities[t][d1]*
+												totalCost2 [i1][i2][l][q1][q2] += demandProbabilities[t][d1]*
 																				  demandProbabilities[t][d2]*
 																				  (transCost + orderCost + immediateCost + (
 																						  			(t==0)? 0 : optimalCost[t+1][i1UpdateIndex][i2UpdateIndex])
@@ -132,23 +134,58 @@ public class LT_optimal_sdp {
 						}//iterating quantity of transshipment
 					}//end for transship from 2 to 1
 					
+					/******************* both inventory levels are negative, not possible to transship *****/
+					else {
+						double transCost = 0;	//no transshipping action
+						for(int q1=0; q1<Q1.length; q1++) {		//not yet consider 0 initial order
+							for(int q2=0; q2<Q2.length; q2++) { //not yet consider 0 initial order
+								double scenarioProb1 = 0; double scenarioProb2 = 0;
+								for(int d1=0; d1<demandProbabilities[t].length; d1++) {
+									for(int d2 = 0; d2 < demandProbabilities[t].length; d2++) {
+									if(
+											(inventory[i1]+q1-d1 <= instance.maxInventory) && (inventory[i1]+q1-d1 >= instance.minInventory) &&
+											(inventory[i2]+q2-d2 <= instance.maxInventory) && (inventory[i2]+q2-d2 >= instance.minInventory)
+										){
+											
+											double orderCost = computeOrderingCost(q1, instance.K, instance.z) + computeOrderingCost(q2, instance.K, instance.z);
+											double immediateCost = computeClosingCost(inventory[i1]+q1-d1, instance.h, instance.b)  
+																	+ computeClosingCost(inventory[i2]+q2-d2, instance.h, instance.b);
+											//totalCost1 [i][i][1 to 2][maxQ+1][maxQ+1]
+											int i1UpdateIndex = inventory[i1]+q1-d1 - instance.minInventory + 1;
+											int i2UpdateIndex = inventory[i2]+q2-d2 - instance.minInventory + 1;
+											totalCost3 [i1][i2][0][q1][q2] += demandProbabilities[t][d1]*
+																			  demandProbabilities[t][d2]*
+																			  (transCost + orderCost + immediateCost + (
+																					  			(t==0)? 0 : optimalCost[t+1][i1UpdateIndex][i2UpdateIndex])
+																			  );
+											scenarioProb1 += demandProbabilities[t][d1]; scenarioProb2 += demandProbabilities[t][d2];
+										}//inventory exceeded, else nothing to do
+
+									}//d1
+								}//d2
+								totalCost3 [i1][i2][0][q1][q2] = totalCost3[i1][i2][0][q1][q2]/(scenarioProb1 * scenarioProb2);
+							}//q1
+						}//q2
+
+					}
+					
 					/*********************** determine the optimal cost and actions ************************/
 					LTactionSolution action12 = LTactionSolution.actionsIndex(totalCost1[i1][i2]);
 					LTactionSolution action21 = LTactionSolution.actionsIndex(totalCost2[i1][i2]);
-					optimalCost[t][i1][i2] = Math.min(action12.minCost, action21.minCost);
+					LTactionSolution action0  = LTactionSolution.actionsIndex(totalCost3[i1][i2]);
+ 					optimalCost[t][i1][i2] = Math.min(Math.min(action12.minCost, action21.minCost), action0.minCost);
 					if(optimalCost[t][i1][i2] == action12.minCost) {
 						LT[t][i1][i2] = action12.LT; Q1[t][i1][i2] = action12.Q1; Q2[t][i1][i2] = action12.Q2;
-					}else {
+					}else if(optimalCost[t][i1][i2] == action21.minCost) {
 						LT[t][i1][i2] = action21.LT; Q1[t][i1][i2] = action21.Q1; Q2[t][i1][i2] = action21.Q2;
+					}else {
+						LT[t][i1][i2] = action0.LT;  Q1[t][i1][i2] = action0.Q1;  Q2[t][i1][i2] = action0.Q2;
 					}
 					
 					//-----------------------------					
 				}//i2
 			}//i1
 		}//for t
-		
-		
-		
 		
 		return new LTsolution(inventory, LT, Q1, Q2, optimalCost);
 	}
@@ -161,20 +198,22 @@ public class LT_optimal_sdp {
 		   double b = 10;
 		   double R = 200;
 		   double r = 5;
-		   double[] demandMean = {20, 40, 60, 40};
-		   double[] initialInventory = {100, 20};	   
+		   double[] demandMean = {4};
+		   int[] initialInventory = {6, 2};	   
 		   
 		   double tail = 0.00000001;
 		   
-		   int maxDemand = 500;
-		   int minInventory = -500;
-		   int maxInventory = 500;
-		   int maxQuantity = 200;
+		   int maxDemand = 50;
+		   int minInventory = -50;
+		   int maxInventory = 50;
+		   int maxQuantity = 50;
 		   
-		   double[] Q = {10, 10};
+		   LT2locations instance = new LT2locations(K, z, h, b, R, r, demandMean, tail, minInventory, maxInventory, maxQuantity, initialInventory);
+		   LTsolution solution = solveLT2locations(instance);
 		   
-		   //double[] cost = computeLTcost(initialInventory, 50.0, demandMean[0], Q, h, b, K, z, R, r);
-		   //System.out.println(Arrays.toString(cost));
+		   //present cost
+		   System.out.println(Arrays.deepToString(solution.optimalCost[0]));
+		   
 	}
 	
 }
