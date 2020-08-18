@@ -100,8 +100,8 @@ public class LT_optimal_sdp {
 						action12 = LTactionSolution.actionsIndex(totalCost1[i1][i2]);
 						System.out.println(action12.minCost);
 					}//end for transship from 1 to 2
-/*
-					/******* positive inventory at location 2 that can afford transship from 2 to 1 ***					
+					
+					/******* positive inventory at location 2 that can afford transship from 2 to 1 ***/				
 					if(inventory[i2]>0) {
 						System.out.println("LT action 2 to 1");
 						totalCost2 = new double[inventory.length][inventory.length][inventory[i2]+1][instance.maxQuantity+1][instance.maxQuantity+1];
@@ -142,7 +142,7 @@ public class LT_optimal_sdp {
 						System.out.println(action21.minCost);
 					}//end for transship from 2 to 1
 
-					/******************* both inventory levels are negative, not possible to transship *****
+					/******************* both inventory levels are negative, not possible to transship *****/
 					if( (inventory[i1] <= 0) && (inventory[i2] <= 0) ) {
 						System.out.println("no LT action");
 						double transCost = 0;	//no transshipping action
@@ -178,7 +178,7 @@ public class LT_optimal_sdp {
 						action0  = LTactionSolution.actionsIndex(totalCost3[i1][i2]);
 						System.out.println(action0.minCost);
 					}//end no transshipment
-*/
+
 					/*********************** determine the optimal cost and actions ************************/					
 					optimalCost[t][i1][i2] = Math.min(Math.min(action12.minCost, action21.minCost), action0.minCost);
 					if(optimalCost[t][i1][i2] == action12.minCost) {
