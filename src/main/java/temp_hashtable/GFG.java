@@ -25,7 +25,7 @@ public class GFG {
 		for(int i=0; i<LT.size(); i++) {
 			//Set<Entry<int[],Double>> statePresent = LT.entrySet();
 			Set<int[]> stateContained = LT.keySet();
-			System.out.println(Arrays.toString(stateContained.toArray()));
+			System.out.println(Arrays.deepToString(stateContained.toArray()));
 			//System.out.println("state = "+LT.keySet()+", value = " + LT.values());
 		}
 		
