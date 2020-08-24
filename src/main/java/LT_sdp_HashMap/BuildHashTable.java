@@ -4,11 +4,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
-public class LT_BuildHashTable {
+public class BuildHashTable {
 
 	public HashMap<int[], Double> LT;
 	
-	public LT_BuildHashTable(HashMap LT) {
+	public BuildHashTable(HashMap LT) {
 		this.LT = LT;
 	}
 	
