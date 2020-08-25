@@ -71,8 +71,8 @@ public class Action {
 		}
 	}
 	
-	//add state-action pairs to HashMap
-	public static void addKeys(List<int[]> keyList, StateSpace stateSpace, State state, int maxQuantity) {
+	
+	public static void generateActions(List<int[]> ActionList, StateSpace stateSpace, State state, int maxQuantity) {
 		//1. for a state, generate transshipments
 		int[] transshipment = generateTransshipment(state);
 		for(int t=0; t<transshipment.length ;t++) {
@@ -80,8 +80,8 @@ public class Action {
 			int[] quantityB = generateReorder(stateSpace, state, transshipment[t], 2, maxQuantity);
 			for(int a=0; a<quantityA.length; a++) {
 				for(int b=0; b<quantityB.length; b++) {
-					int[] key = {state.i1, state.i2, transshipment[t], quantityA[a], quantityB[b]};
-					keyList.add(key);
+					int[] key = {transshipment[t], quantityA[a], quantityB[b]};
+					ActionList.add(key);
 				}
 			}
 		}

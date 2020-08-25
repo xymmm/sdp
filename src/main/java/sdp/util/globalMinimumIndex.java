@@ -6,7 +6,7 @@ public class globalMinimumIndex {
 		double min = arr[0];
 		int index = 0;
 		for(int i=1; i<arr.length; i++) {
-			if((arr[i]<arr[i-1])&&(arr[i]<min)) {
+			if(arr[i]<min) {
 				min = arr[i];
 				index = i;
 			}
