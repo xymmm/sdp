@@ -1,12 +1,6 @@
 package LT_sdp_HashMap;
 
 public class TransitionProbability {
-
-	//TODO: to compute Poisson Distribution
-	//tail
-	//refer to probability distribution in sS
-	
-	//sdp.util.Demand.tabulateProbability(double meanDemand, double tail)
 	
 	public static double computeTransitProb(State state1, State state2, Action action, int meanDemand, double tail) {
 		double[] tabulateProbs = sdp.util.Demand.tabulateProbability(meanDemand, tail);
