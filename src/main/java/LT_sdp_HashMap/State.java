@@ -14,7 +14,7 @@ public class State {
 	
 	/** return *a* state for given inventory levels i1 and i2 As int[]**/	//maybe not used
 	public static int[] createState(StateSpace stateSpace, State state) {
-		return stateSpace.generateStateSpace().get((state.i1-stateSpace.minInventory)*stateSpace.getStateSpaceSize() + state.i2-1);
+		return stateSpace.generateStateSpace(stateSpace).get((state.i1-stateSpace.minInventory)*stateSpace.getStateSpaceSize() + state.i2-1);
 	}
 	
 	public static void printState(State state) {

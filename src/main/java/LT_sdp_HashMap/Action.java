@@ -47,17 +47,27 @@ public class Action {
 	/** to generate feasible reorder actions: if current inventory +/- transshipment + Q<maxInventory, then feasible**/
 	public static int[] generateReorder(StateSpace stateSpace, State state, int transshipment, int location, int maxQuantity) {//location = 1 or 2
 		if(location == 1) {
-			int[] Quantity = new int[stateSpace.maxInventory - (state.i1 - transshipment) ];
-			for(int q=0; q<Quantity.length;q++) {
-				if(q<maxQuantity) {Quantity[q] = q;}
+			if(stateSpace.maxInventory - (state.i1 - transshipment) > 0) {
+				int[] Quantity = new int[stateSpace.maxInventory - (state.i1 - transshipment) +1];
+				for(int q=0; q<Quantity.length;q++) {
+					if(q<=maxQuantity) {Quantity[q] = q;}
+				}	
+				return Quantity;
+			}else {
+				int[] Quantity = {0};
+				return Quantity;
 			}
-			return Quantity;
 		}else {
-			int[] Quantity = new int[stateSpace.maxInventory - (state.i2 + transshipment) ];
-			for(int q=0; q<Quantity.length;q++) {
-				if(q<maxQuantity) {Quantity[q] = q;}
+			if(stateSpace.maxInventory - (state.i2 + transshipment) > 0) {
+				int[] Quantity = new int[stateSpace.maxInventory - (state.i2 + transshipment) +1];
+				for(int q=0; q<Quantity.length;q++) {
+					if(q<=maxQuantity) {Quantity[q] = q;}
+				}
+				return Quantity;
+			}else {
+				int[] Quantity = {0};
+				return Quantity;
 			}
-			return Quantity;
 		}
 	}
 	
@@ -77,7 +87,7 @@ public class Action {
 		}
 	}
 	
-	/**test**/
+	/**test*
 	public static void main(String args[]) {
 		int maxQuantity = 10;
 		StateSpace stateSpace = new StateSpace(-10, 10);
@@ -89,6 +99,6 @@ public class Action {
 		for(int i=0; i<keyList.size();i++) {
 			System.out.println("feasible keys:"+Arrays.toString(keyList.get(i)));
 		}
-	}
+	}*/
 	
 }

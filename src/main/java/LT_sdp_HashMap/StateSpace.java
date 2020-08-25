@@ -18,10 +18,10 @@ public class StateSpace {
 		return maxInventory - minInventory +1;
 	}
 	
-	public List<int[]> generateStateSpace(){
+	public static List<int[]> generateStateSpace(StateSpace stateSpace){
 		List<int[]> allStates = new ArrayList<int[]>();
-		for(int i= minInventory; i<=maxInventory; i++) {
-			for(int j= minInventory; j<=maxInventory; j++) {
+		for(int i= stateSpace.minInventory; i<=stateSpace.maxInventory; i++) {
+			for(int j= stateSpace.minInventory; j<=stateSpace.maxInventory; j++) {
 				int[] state = {i, j};
 				allStates.add(state);
 			}
