@@ -1,13 +1,15 @@
 package LT_sdp_HashMap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class Action {
 	
 	public int transshipment;
 	public int quantityA;
 	public int quantityB;
-	public int maxQuantity;
 	
 	public Action(int transshipment, int quantityA, int quantityB) {
 		this.transshipment = transshipment;
@@ -42,11 +44,51 @@ public class Action {
 		}
 	}
 	
-	/**test*
-	public static void main(String args[]) {
-		State state = new State (2,1);
-		System.out.println(Arrays.toString(generateTransshipment(state)));
-	}*/
+	/** to generate feasible reorder actions: if current inventory +/- transshipment + Q<maxInventory, then feasible**/
+	public static int[] generateReorder(StateSpace stateSpace, State state, int transshipment, int location, int maxQuantity) {//location = 1 or 2
+		if(location == 1) {
+			int[] Quantity = new int[stateSpace.maxInventory - (state.i1 - transshipment) ];
+			for(int q=0; q<Quantity.length;q++) {
+				if(q<maxQuantity) {Quantity[q] = q;}
+			}
+			return Quantity;
+		}else {
+			int[] Quantity = new int[stateSpace.maxInventory - (state.i2 + transshipment) ];
+			for(int q=0; q<Quantity.length;q++) {
+				if(q<maxQuantity) {Quantity[q] = q;}
+			}
+			return Quantity;
+		}
+	}
 	
 	//add state-action pairs to HashMap
+	public static void addKeys(List<int[]> keyList, StateSpace stateSpace, State state, int maxQuantity) {
+		//1. for a state, generate transshipments
+		int[] transshipment = generateTransshipment(state);
+		for(int t=0; t<transshipment.length ;t++) {
+			int[] quantityA = generateReorder(stateSpace, state, transshipment[t], 1, maxQuantity);
+			int[] quantityB = generateReorder(stateSpace, state, transshipment[t], 2, maxQuantity);
+			for(int a=0; a<quantityA.length; a++) {
+				for(int b=0; b<quantityB.length; b++) {
+					int[] key = {state.i1, state.i2, transshipment[t], quantityA[a], quantityB[b]};
+					keyList.add(key);
+				}
+			}
+		}
+	}
+	
+	/**test**/
+	public static void main(String args[]) {
+		int maxQuantity = 10;
+		StateSpace stateSpace = new StateSpace(-10, 10);
+		State state = new State (2,1);
+		System.out.println("feasible transshipment quantity = "+Arrays.toString(generateTransshipment(state)));
+		//System.out.println(Arrays.toString(generateReorder(stateSpace, state, 1, 1)));
+		List<int[]> keyList = new ArrayList<int[]>();
+		addKeys(keyList, stateSpace, state, maxQuantity);
+		for(int i=0; i<keyList.size();i++) {
+			System.out.println("feasible keys:"+Arrays.toString(keyList.get(i)));
+		}
+	}
+	
 }

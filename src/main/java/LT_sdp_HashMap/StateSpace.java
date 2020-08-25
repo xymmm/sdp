@@ -9,7 +9,7 @@ public class StateSpace {
 	public int maxInventory;
 	public int minInventory;
 	
-	public StateSpace(int maxInventory, int minInventory) {
+	public StateSpace(int minInventory, int maxInventory) {
 		this.maxInventory = maxInventory;
 		this.minInventory = minInventory;
 	}
