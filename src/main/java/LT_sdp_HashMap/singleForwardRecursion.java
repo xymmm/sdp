@@ -8,7 +8,7 @@ public class singleForwardRecursion {
 
 	public static void main(String[] args) {
 		/** input **/
-		int[] demandMean = {1, 2, 3, 2};
+		int[] demandMean = {1, 1, 3, 1};
 		StateSpace stateSpace = new StateSpace(-6,6);
 		int maxQuantity = 5;
 		ImmediateCost costPara = new ImmediateCost(15,0,10,0,1,5);
@@ -42,36 +42,37 @@ public class singleForwardRecursion {
 					for(int c=0; c<cost.length;c++) {
 						Action action = new Action(feasibleActions.get(c)[0], feasibleActions.get(c)[1], feasibleActions.get(c)[2]);				
 						cost[c] = ImmediateCost.computeTransshipmentCost(action, costPara) 
-									+ ImmediateCost.computeReorderCost(action, costPara);
+								+ ImmediateCost.computeReorderCost(action, costPara);
 						//expected closing cost
 						double tempCost = 0;
 						double scenarioProb = 0;
-						
+
 						//for(int level1 = initialState.i1; level1 >= stateSpace.minInventory; level1--) {
-							//for(int level2 = initialState.i2; level2 >= stateSpace.minInventory; level2--) {
+						//for(int level2 = initialState.i2; level2 >= stateSpace.minInventory; level2--) {
 						for(int d1=0; d1<=maxDemand[currentStageIndex]; d1++) {
 							for(int d2 = 0; d2<=maxDemand[currentStageIndex]; d2++) {
 								if(
-									(initialState.i1-action.transshipment + action.quantityA-d1 <= stateSpace.maxInventory)
-								  &&(initialState.i1-action.transshipment + action.quantityA-d1 >= stateSpace.minInventory)
-								  &&(initialState.i2+action.transshipment + action.quantityB-d2 <= stateSpace.maxInventory)
-								  &&(initialState.i2+action.transshipment + action.quantityB-d2 >= stateSpace.minInventory)
+										(initialState.i1-action.transshipment + action.quantityA-d1 <= stateSpace.maxInventory)
+										&&(initialState.i1-action.transshipment + action.quantityA-d1 >= stateSpace.minInventory)
+										&&(initialState.i2+action.transshipment + action.quantityB-d2 <= stateSpace.maxInventory)
+										&&(initialState.i2+action.transshipment + action.quantityB-d2 >= stateSpace.minInventory)
 										) {
-								State newState = new State(initialState.i1-action.transshipment + action.quantityA-d1, 
+									State newState = new State(initialState.i1-action.transshipment + action.quantityA-d1, 
 																initialState.i2+action.transshipment + action.quantityB-d2);
-								double transitionProb = TransitionProbability.computeTransitProb
-										(stateSpace, initialState, newState, action, demandMean[currentStageIndex], tail);
-								int stateIndex = stateSpace.getStateIndex(stateSpace, newState);
-								tempCost += transitionProb * (
-												ImmediateCost.computeClosingCost (newState, costPara) + 
-												((currentStageIndex == 0)? (0): optimalETC[stateIndex][currentStageIndex-1])
-												) ;
-								scenarioProb += transitionProb;
-							}
+									double transitionProb = TransitionProbability.computeTransitProb
+											(stateSpace, initialState, newState, action, demandMean[currentStageIndex], tail);
+									//int stateIndex = stateSpace.getStateIndex(stateSpace, newState);
+									int stateIndex = stateSpace.getStateIndex(stateSpace, initialState);
+									cost[c] += transitionProb * (
+											ImmediateCost.computeClosingCost (newState, costPara) + 
+											((currentStageIndex == 0)? (0): optimalETC[stateIndex][currentStageIndex-1])
+											) ;
+									scenarioProb += transitionProb;
+								}
 							}
 						}
 						//update total cost = immediate cost + E[]
-						cost[c] += tempCost/scenarioProb;//this is the expected cost for an action				
+						cost[c] = cost[c]/scenarioProb;//this is the expected cost for an action				
 					}
 				}
 				//present
@@ -88,7 +89,7 @@ public class singleForwardRecursion {
 						optimalQB[l][currentStageIndex] = feasibleActions.get(c)[2];
 					}
 				}
-				
+
 				//System.out.println("otpimal ETC: "+ optimalETC[l][currentStageIndex]);
 				/*List<Integer> optimalIndex = new ArrayList<>();
 				for(int i=0; i<cost.length; i++) {
