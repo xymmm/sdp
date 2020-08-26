@@ -19,7 +19,9 @@ public class singleForwardRecursion {
 
 		List<int[]> allStates = StateSpace.generateStateSpace(stateSpace);
 
-		List<int[]> optimalActions = new ArrayList<int[]>();
+		int[][] optimalTransshipment = new int[allStates.size()][demandMean.length];
+		int[][] optimalQA = new int[allStates.size()][demandMean.length];
+		int[][] optimalQB = new int[allStates.size()][demandMean.length];
 		double[][] optimalETC = new double[allStates.size()][demandMean.length];
 
 
@@ -64,6 +66,14 @@ public class singleForwardRecursion {
 
 				//find optimal
 				optimalETC[l][currentStageIndex] = sdp.util.globleMinimum.getGlobalMinimum(cost);	
+				for(int c=0; c<cost.length; c++) {
+					if(optimalETC[l][currentStageIndex] == cost[c]) {
+						optimalTransshipment[l][currentStageIndex] = feasibleActions.get(c)[0];
+						optimalQA[l][currentStageIndex] = feasibleActions.get(c)[1];
+						optimalQB[l][currentStageIndex] = feasibleActions.get(c)[2];
+					}
+				}
+				
 				//System.out.println("otpimal ETC: "+ optimalETC[l][currentStageIndex]);
 				/*List<Integer> optimalIndex = new ArrayList<>();
 				for(int i=0; i<cost.length; i++) {
@@ -81,7 +91,10 @@ public class singleForwardRecursion {
 			//print optimal overall
 
 			System.out.println("state:"+allStates.get(l)[0]+"\t"+allStates.get(l)[1]+"\t"
-					+Arrays.toString(optimalETC[l]));
+					+ Arrays.toString(optimalETC[l])+"\t"
+					+ Arrays.toString(optimalTransshipment[l]) + "\t"
+					+ Arrays.toString(optimalQA[l])+"\t"
+					+ Arrays.toString(optimalQB[l]));
 
 		}
 
