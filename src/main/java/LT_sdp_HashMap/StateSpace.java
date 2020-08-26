@@ -28,13 +28,19 @@ public class StateSpace {
 		};
 		return allStates;
 	}
+	
+	public static int getStateIndex(StateSpace stateSpace, State state) {
+		return (state.i1 - stateSpace.minInventory)*stateSpace.getStateSpaceSize() + state.i2 - stateSpace.minInventory;
+	}
 
 	/**test state space*
 	public static void main(String args[]) {
-		StateSpace statespace = new StateSpace(5,-3);
-		List<int[]> allStates = statespace.generateStateSpace();
+		StateSpace statespace = new StateSpace(-3,5);
+		List<int[]> allStates = generateStateSpace(statespace);
 		System.out.println(Arrays.deepToString(allStates.toArray()));
 		int[] a = allStates.get(35);
 		System.out.println(Arrays.toString(a));
+		State state = new State(-3,-3);
+		System.out.println(getStateIndex(statespace, state));
 	}*/
 }

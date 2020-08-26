@@ -35,18 +35,19 @@ public class singleForwardRecursion {
 
 					for(int c=0; c<cost.length;c++) {
 						Action action = new Action(feasibleActions.get(c)[0], feasibleActions.get(c)[1], feasibleActions.get(c)[2]);				
-						cost[c] = (currentStageIndex == 0)? (0): optimalETC[l][currentStageIndex-1] + 
-								ImmediateCost.computeTransshipmentCost(action, costPara) 
-						+ ImmediateCost.computeReorderCost(action, costPara);
+						cost[c] = ImmediateCost.computeTransshipmentCost(action, costPara) 
+									+ ImmediateCost.computeReorderCost(action, costPara);
 						//expected closing cost
 						double tempCost = 0;
 						double scenarioProb = 0;
 						for(int level1 = initialState.i1; level1 >= stateSpace.minInventory; level1--) {
 							for(int level2 = initialState.i2; level2 >= stateSpace.minInventory; level2--) {
 								State newState = new State(level1, level2);
+								tempCost = ImmediateCost.computeClosingCost (newState, costPara);
 								double transitionProb = TransitionProbability.computeTransitProb
 										(stateSpace, initialState, newState, action, demandMean[currentStageIndex], tail);
-								tempCost += transitionProb * ImmediateCost.computeClosingCost (newState, costPara);
+								int stateIndex = stateSpace.getStateIndex(stateSpace, newState);
+								tempCost += transitionProb * ((currentStageIndex == 0)? (0): optimalETC[stateIndex][currentStageIndex-1]) ;
 								scenarioProb += transitionProb;
 							}
 						}
