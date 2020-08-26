@@ -33,9 +33,13 @@ public class TransitionProbability {
 			/*}else {
 				return Double.POSITIVE_INFINITY;
 			}*/
-
 		}
 
-
+	}
+	
+	
+	public static int getMaxDemand(double tail, int mean) {
+		PoissonDistribution dist = new PoissonDistribution(mean);
+		return dist.inverseCumulativeProbability(1-tail);
 	}
 }
