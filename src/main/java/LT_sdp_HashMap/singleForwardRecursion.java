@@ -6,7 +6,7 @@ import java.util.List;
 
 public class singleForwardRecursion {
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		/** input **/
 		int[] demandMean = {1, 2, 3, 2};
 		StateSpace stateSpace = new StateSpace(-6,6);
@@ -43,11 +43,13 @@ public class singleForwardRecursion {
 						for(int level1 = initialState.i1; level1 >= stateSpace.minInventory; level1--) {
 							for(int level2 = initialState.i2; level2 >= stateSpace.minInventory; level2--) {
 								State newState = new State(level1, level2);
-								tempCost = ImmediateCost.computeClosingCost (newState, costPara);
 								double transitionProb = TransitionProbability.computeTransitProb
 										(stateSpace, initialState, newState, action, demandMean[currentStageIndex], tail);
 								int stateIndex = stateSpace.getStateIndex(stateSpace, newState);
-								tempCost += transitionProb * ((currentStageIndex == 0)? (0): optimalETC[stateIndex][currentStageIndex-1]) ;
+								tempCost += transitionProb * (
+												ImmediateCost.computeClosingCost (newState, costPara) + 
+												((currentStageIndex == 0)? (0): optimalETC[stateIndex][currentStageIndex-1])
+												) ;
 								scenarioProb += transitionProb;
 							}
 						}
