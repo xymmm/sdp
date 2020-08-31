@@ -17,7 +17,12 @@ public class TransitionProbability {
 		return prob1*prob2;
 	}
 	
+	// double computeTransitProbByStates(State initialState, State finalState)
+	// initial state is the state after you have received all orders and you have transshipped
+	// just subtract initial and final inventory and then pmf
 	
+	// double computeTransitProb(int[] demand)
+	// what is the probability that demand will be demand[0] in location 1 and demand[1] in location 2; just multiply poisson pmf
 	
 	public static double computeTransitProbByStates(LTinstance instance, State state1, State state2, int[] action, int stageIndex) {
 		PoissonDistribution dist1 = new PoissonDistribution(instance.demandMean1[stageIndex]);
