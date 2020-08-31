@@ -2,7 +2,9 @@ package LT_sdp_HashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ForwardRecursion {
 
@@ -30,12 +32,12 @@ public class ForwardRecursion {
 		feasibleActions = State.generateFeasibleActions(initialState, instance);
 		double[] cost = new double[feasibleActions.size()];	//number of actions for current state
 
-		for(int t=0; t<Stage;t++) {			
-			
+		for(int t=0; t<Stage;t++) {						
 			for(int a=0; a<feasibleActions.size(); a++) {
-				int[] action = feasibleActions.get(a);				
-				cost[a] = BuildHashTable.computeCurrentStageETC(initialState, action, instance, t);
+				int[] action = feasibleActions.get(a);			
+				Set<State> futureStates = new HashSet<State>();
 				
+				cost[a] = BuildHashTable.computeCurrentStageETC(initialState, action, instance, t, futureStates).currentStageETC;				
 				//expected future cost
 			
 			}

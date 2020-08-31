@@ -1,6 +1,7 @@
 package LT_sdp_HashMap;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class BuildHashTable {
 
@@ -17,8 +18,13 @@ public class BuildHashTable {
 		LT.put(key, ETC);
 	}
 	
-	/** compute ETC for a state with all possible demand**/
-	public static double computeCurrentStageETC(State initialState, int[] action, LTinstance instance, int stageIndex) {
+	
+	
+	/** compute (cost of an action + expected immediate cost: u(x) + sum(c(x)) + E[H+B]) for a state with all possible demand 
+	 *  the input set 'futureStates' will be generated before knowning feasible actions, 
+	 *  	elements (possible future states) will be added for a state throughout iteration.
+	 *  **/
+	public static costStatePair computeCurrentStageETC(State initialState, int[] action, LTinstance instance, int stageIndex, Set<State> futureStates) {
 		
 		//transshipping and ordering cost
 		double actionCost = CostComputation.computeTransshipmentCost(action, instance) + CostComputation.computeReorderCost(action, instance);
@@ -39,13 +45,30 @@ public class BuildHashTable {
 					)
 			demandProb = TransitionProbability.computeTransitProbByDemand(instance, initialState, action, d1, d2, stageIndex);
 			scenarioProb += demandProb;
+			
+			//add new pair of inventory levels to the set as a possible future state
 			State newState = new State(initialState.i1 - d1, initialState.i2 - d2);
+			futureStates.add(newState);
+			
 			closingCost += demandProb*CostComputation.computeClosingCost(newState, instance);
 			}
 		}
 		closingCost = closingCost/scenarioProb;
 		
-		return actionCost + closingCost;
+		return new costStatePair(actionCost + closingCost, futureStates);
+	}
+	
+	
+	/** compute future cost: E[C_{t+1}(i, i')] for all new possible states i' that can transit from i under a given action**/
+	public static double computeFutureETC(State initialState, int[] action, LTinstance instance, 
+											int stageIndex, Set<State> futureStates, HashMap<int[], Double> LT) {
+		double futureCost = 0;	
+		double scenarioProb = 0;
+		for(int s=0; s<futureStates.size(); s++) {
+			State newState = futureStates.get
+			double stateProb = TransitionProbability.computeTransitProbByStates(instance, initialState, futureStates.get(s), action, stageIndex);
+		}
+		return futureCost;
 	}
 	
 	/** print states when they are stored as int array*
