@@ -9,13 +9,16 @@ public class ForwardRecursion {
 	public static void main(String[] args) {
 		/** input **/
 		int[] demandMean = {2, 4, 6, 4};
-		StateSpace stateSpace = new StateSpace(-10,10);
+		int maxInventory = 10;
+		int minInventory = -10;
 		int maxQuantity = 10;
-		ImmediateCost costPara = new ImmediateCost(10,0,15,0,1,7);
-		//HashMap<int[], Double> LT = new HashMap<int[], Double>();
+		double tail = 0.0000000001;
+		double K = 10; double z = 0;
+		double R = 15; double v = 0;
+		double h = 1;  double b = 7;
+		LTinstance instance = new LTinstance(demandMean, demandMean, maxInventory, minInventory, maxQuantity, K, z, R, v, h, b, tail);
 		
 		State initialState = new State(0,0);
-		double tail = 0.000001;
 			
 		int Stage = demandMean.length;
 		
@@ -24,26 +27,17 @@ public class ForwardRecursion {
 		
 		
 		List<int[]> feasibleActions = new ArrayList<int[]>();
-		Action.generateActions(feasibleActions, stateSpace, initialState, maxQuantity);
+		feasibleActions = State.generateFeasibleActions(initialState, instance);
 		double[] cost = new double[feasibleActions.size()];	//number of actions for current state
 
-		for(int i=0; i<feasibleActions.size(); i++) {			
+		for(int t=0; t<Stage;t++) {			
 			
-			for(int c=0; c<cost.length;c++) {
-				Action action = new Action(feasibleActions.get(c)[0], feasibleActions.get(c)[1], feasibleActions.get(c)[2]);				
-				cost[c] = ImmediateCost.computeTransshipmentCost(action, costPara) 
-							+ ImmediateCost.computeReorderCost(action, costPara);
-				//expected closing cost
-				double tempCost = 0;
-				for(int level1 = initialState.i1; level1 >= stateSpace.minInventory; level1--) {
-					for(int level2 = initialState.i2; level2 >= stateSpace.minInventory; level2--) {
-						State newState = new State(level1, level2);
-						double transitionProb = TransitionProbability.computeTransitProb(stateSpace, initialState, newState, action, demandMean[0], tail);
-						tempCost += transitionProb * ImmediateCost.computeClosingCost (newState, costPara);
-					}
-				}
-				//update total cost = immediate cost + E[]
-				cost[c] += tempCost;//this is the expected cost for an action				
+			for(int a=0; a<feasibleActions.size(); a++) {
+				int[] action = feasibleActions.get(a);				
+				cost[a] = BuildHashTable.computeCurrentStageETC(initialState, action, instance, t);
+				
+				//expected future cost
+			
 			}
 		}
 		//present

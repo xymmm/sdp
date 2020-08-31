@@ -1,43 +1,57 @@
 package LT_sdp_HashMap;
 
-import java.util.Arrays;
-
 import org.apache.commons.math3.distribution.PoissonDistribution;
 
 public class TransitionProbability {
 
-	public static double computeTransitProb(StateSpace stateSpace, State state1, State state2, Action action, int demandMean, double tail) {
-		PoissonDistribution dist = new PoissonDistribution(demandMean);
-		int maxDemand = dist.inverseCumulativeProbability(1-tail);
+	public static double computeTransitProbByDemand(LTinstance instance, State initialState, int[] action, int demand1, int demand2, int stageIndex) {
+		PoissonDistribution dist1 = new PoissonDistribution(instance.demandMean1[stageIndex]);
+		int maxDemand1 = dist1.inverseCumulativeProbability(1-instance.tail);
+		
+		PoissonDistribution dist2 = new PoissonDistribution(instance.demandMean1[stageIndex]);
+		int maxDemand2 = dist1.inverseCumulativeProbability(1-instance.tail);
+		
+		double prob1 = dist1.probability(initialState.i1 - action[0] + action[1] - demand1)/dist1.cumulativeProbability(maxDemand1);
+		double prob2 = dist2.probability(initialState.i2 + action[0] + action[2] - demand2)/dist2.cumulativeProbability(maxDemand2);	
+		
+		return prob1*prob2;
+	}
+	
+	
+	
+	public static double computeTransitProbByStates(LTinstance instance, State state1, State state2, int[] action, int stageIndex) {
+		PoissonDistribution dist1 = new PoissonDistribution(instance.demandMean1[stageIndex]);
+		int maxDemand1 = dist1.inverseCumulativeProbability(1-instance.tail);
+		PoissonDistribution dist2 = new PoissonDistribution(instance.demandMean2[stageIndex]);
+		int maxDemand2 = dist1.inverseCumulativeProbability(1-instance.tail);
 
 		// compare with the max demand does not change the result, because infeasible actions, 
 		// including infeasible transshipment and order quantities, are already excluded from the set.
 		if((state1.i1 <= 0 )&&( state1.i2 <= 0)) {
-			/*if(
-					(state1.i1 + action.quantityA - state2.i1 <= maxDemand) && (state1.i1 + action.quantityA - state2.i1 >= 0)&&
-					(state1.i2 + action.quantityB - state2.i2 <= maxDemand) && (state1.i2 + action.quantityB - state2.i2 >= 0)
-					){*/
-				return (dist.probability(state1.i1 + action.quantityA - state2.i1)/dist.cumulativeProbability(maxDemand))
-						*(dist.probability(state1.i2 + action.quantityB - state2.i2)/dist.cumulativeProbability(maxDemand));
-			/*}else {
-				return Double.POSITIVE_INFINITY;
-			}*/			
-
+			if(
+					(state1.i1 + action[1] - state2.i1 <= maxDemand1) && (state1.i1 + action[1] - state2.i1 >= 0)&&
+					(state1.i2 + action[2] - state2.i2 <= maxDemand2) && (state1.i2 + action[2] - state2.i2 >= 0)
+					){
+				return (dist1.probability(state1.i1 + action[1]- state2.i1)/dist1.cumulativeProbability(maxDemand1))
+						*(dist2.probability(state1.i2 + action[2] - state2.i2)/dist2.cumulativeProbability(maxDemand2));
+			}else {
+				return 0;
+			}		
 		}else {
-			/*if(
-					(state1.i1 - action.transshipment + action.quantityA - state2.i1 <= maxDemand)&&(state1.i1 - action.transshipment + action.quantityA - state2.i1 >= 0)&&
-					(state1.i2 + action.transshipment + action.quantityB - state2.i2 <= maxDemand)&&(state1.i2 + action.transshipment + action.quantityB - state2.i2 >= 0)
-					) {*/
-				return (dist.probability(state1.i1 - action.transshipment + action.quantityA - state2.i1 )/dist.cumulativeProbability(maxDemand))
-						*(dist.probability(state1.i2 + action.transshipment + action.quantityB - state2.i2)/dist.cumulativeProbability(maxDemand));
-			/*}else {
-				return Double.POSITIVE_INFINITY;
-			}*/
+			if(
+					(state1.i1 - action[0] + action[1] - state2.i1 <= maxDemand1)&&(state1.i1 - action[0] + action[1] - state2.i1 >= 0)&&
+					(state1.i2 + action[0] + action[1] - state2.i2 <= maxDemand2)&&(state1.i2 + action[0] + action[2] - state2.i2 >= 0)
+					) {
+				return (dist1.probability(state1.i1 - action[0] + action[1] - state2.i1 )/dist1.cumulativeProbability(maxDemand1))
+						*(dist2.probability(state1.i2 + action[0] + action[2] - state2.i2)/dist2.cumulativeProbability(maxDemand2));
+			}else {
+				return 0;
+			}
 		}
 
 	}
 	
-	
+
 	public static int getMaxDemand(double tail, int mean) {
 		PoissonDistribution dist = new PoissonDistribution(mean);
 		return dist.inverseCumulativeProbability(1-tail);

@@ -29,9 +29,11 @@ public class StateSpace {
 		return allStates;
 	}
 	
+	/*
 	public static int getStateIndex(StateSpace stateSpace, State state) {
 		return (state.i1 - stateSpace.minInventory)*stateSpace.getStateSpaceSize() + state.i2 - stateSpace.minInventory;
 	}
+	*/
 
 	/**test state space*
 	public static void main(String args[]) {

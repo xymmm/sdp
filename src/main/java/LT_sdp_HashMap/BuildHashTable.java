@@ -1,15 +1,51 @@
 package LT_sdp_HashMap;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Set;
 
 public class BuildHashTable {
 
 	public HashMap<int[], Double> LT;
 	
-	public BuildHashTable(HashMap LT) {
+	public BuildHashTable(HashMap<int[], Double> LT) {
 		this.LT = LT;
+	}
+	
+	
+	/** add key-value pair**/
+	public static void addToMap(HashMap<int[], Double> LT, State initialState, int[] action, double ETC) {
+		int[] key = {initialState.i1, initialState.i2, action[0], action[1], action[2]};
+		LT.put(key, ETC);
+	}
+	
+	/** compute ETC for a state with all possible demand**/
+	public static double computeCurrentStageETC(State initialState, int[] action, LTinstance instance, int stageIndex) {
+		
+		//transshipping and ordering cost
+		double actionCost = CostComputation.computeTransshipmentCost(action, instance) + CostComputation.computeReorderCost(action, instance);
+		
+		//closing cost
+		double closingCost = 0;
+		double scenarioProb = 0;
+		double demandProb = 0;
+		int maxDemand1 = TransitionProbability.getMaxDemand(instance.tail, instance.demandMean1[stageIndex]);
+		int maxDemand2 = TransitionProbability.getMaxDemand(instance.tail, instance.demandMean2[stageIndex]);
+		for(int d1=0; d1<=maxDemand1; d1++) {
+			for(int d2 = 0; d2 <= maxDemand2; d2++) {
+			if(
+					(initialState.i1-action[0] + action[1]-d1 <= instance.maxInventory)
+					&&(initialState.i1-action[0] + action[1]-d1 >= instance.minInventory)
+					&&(initialState.i2+action[0] + action[2]-d2 <= instance.maxInventory)
+					&&(initialState.i2+action[0] + action[2]-d2 >= instance.minInventory)
+					)
+			demandProb = TransitionProbability.computeTransitProbByDemand(instance, initialState, action, d1, d2, stageIndex);
+			scenarioProb += demandProb;
+			State newState = new State(initialState.i1 - d1, initialState.i2 - d2);
+			closingCost += demandProb*CostComputation.computeClosingCost(newState, instance);
+			}
+		}
+		closingCost = closingCost/scenarioProb;
+		
+		return actionCost + closingCost;
 	}
 	
 	/** print states when they are stored as int array*

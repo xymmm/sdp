@@ -4,11 +4,15 @@ import java.util.List;
 
 public class LToptimalSolution {
 	
-	public double optimalCost;
-	public List<int[]> optimalActions;
+	public double[][] optimalCost;
+	public int[] optimalTransshipment;
+	public int[] optimalQA;
+	public int[] optimalQB;
 	
-	public LToptimalSolution(double optimalCost, List<int[]> optimalActions) {
+	public LToptimalSolution(double[][] optimalCost, int[] optimalTransshipment, int[] optimalQA, int[] optimalQB) {
 		this.optimalCost = optimalCost;
-		this.optimalActions = optimalActions;
+		this.optimalTransshipment = optimalTransshipment;
+		this.optimalQA = optimalQA;
+		this.optimalQB = optimalQB;
 	}
 }

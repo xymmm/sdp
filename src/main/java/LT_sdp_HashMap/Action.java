@@ -1,4 +1,4 @@
-package LT_sdp_HashMap;
+/*package LT_sdp_HashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,44 +7,7 @@ import java.util.List;
 
 public class Action {
 	
-	public int transshipment;
-	public int quantityA;
-	public int quantityB;
-	
-	public Action(int transshipment, int quantityA, int quantityB) {
-		this.transshipment = transshipment;
-		this.quantityA = quantityA;
-		this.quantityB = quantityB;
-	}
-	
-	
-	/** for a given state of two inventory levels, generate all feasible actions**/
-	public static int[] generateTransshipment(State state){
-		//int[] feasibleTransshipment = null;
-		if((state.i1 <=0)&&(state.i2 <= 0)) {//case 4
-			return new int[] {0};
-		}else if((state.i1 <=0)&&(state.i2 > 0)) {//case 3
-			int[] feasibleTransshipment = new int[state.i2+1];
-			for(int i=0; i<feasibleTransshipment.length;i++) {
-				feasibleTransshipment[i] = -state.i2 + i;
-			}
-			return feasibleTransshipment;
-		}else if((state.i1 > 0)&&(state.i2 <= 0)) {//case 2
-			int[] feasibleTransshipment = new int[state.i1+1];
-			for(int i=0; i<feasibleTransshipment.length; i++) {
-				feasibleTransshipment[i] = i;
-			}
-			return feasibleTransshipment;
-		}else {
-			int[] feasibleTransshipment = new int[state.i1 + state.i2 +1];
-			for(int i=0; i<feasibleTransshipment.length; i++) {
-				feasibleTransshipment[i] = -state.i2 + i;
-			}
-			return feasibleTransshipment;
-		}
-	}
-	
-	/** to generate feasible reorder actions: if current inventory +/- transshipment + Q<maxInventory, then feasible**/
+	* to generate feasible reorder actions: if current inventory +/- transshipment + Q<maxInventory, then feasible**
 	public static int[] generateReorder(StateSpace stateSpace, State state, int transshipment, int location, int maxQuantity) {//location = 1 or 2
 		if(location == 1) {
 			if(stateSpace.maxInventory - (state.i1 - transshipment) > 0) {
@@ -71,7 +34,7 @@ public class Action {
 		}
 	}
 	
-	
+/*	
 	public static void generateActions(List<int[]> ActionList, StateSpace stateSpace, State state, int maxQuantity) {
 		//1. for a state, generate transshipments
 		int[] transshipment = generateTransshipment(state);
@@ -99,6 +62,6 @@ public class Action {
 		for(int i=0; i<keyList.size();i++) {
 			System.out.println("feasible keys:"+Arrays.toString(keyList.get(i)));
 		}
-	}*/
+	}
 	
-}
+}*/
