@@ -13,6 +13,24 @@ public class State {
 		this.i2 = i2;
 	}
 	
+	public String toString() {
+	   return this.i1 + " " + this.i2;
+	}
+	
+	public static State parse(String state) {
+	   /*
+	    * Takes a string of type "125 65"
+	    * Splits where it finds a space, {"125","65"}
+	    * Parses each of the elements into an integer
+	    */
+	   String[] str = state.split(" ");
+	   int[] levels = new int[2];
+	   for(int i = 0; i< str.length; i++) {
+	      levels[i] = Integer.parseInt(str[i]);
+	   }
+	   return new State(levels[0],levels[1]);
+	}
+	
 	/** generate feasible actions for a given state **/
 	public static ArrayList<int[]> generateFeasibleActions(State state, LTinstance instance){
 		ArrayList<int[]> actions = new ArrayList<int[]>();
@@ -61,11 +79,6 @@ public class State {
 			}
 			return actions;
 		}
-	}
-
-	
-	public static void printState(State state) {
-		System.out.println("state = <"+state.i1+", "+state.i2+">.");
 	}
 	
 	/**test**/
