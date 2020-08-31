@@ -5,11 +5,23 @@ import java.util.Set;
 
 public class BuildHashTable {
 
-	public HashMap<int[], Double> LT;
+	public HashMap<int[], Integer[]> actions;
+	public HashMap<int[], Double> costs;
 	
 	public BuildHashTable(HashMap<int[], Double> LT) {
-		this.LT = LT;
+		this.actions = new HashMap<int[], Integer[]>();
+		this.costs = new HashMap<int[], Double>();
 	}
+	
+	/**  **
+	
+	public static double getOptimalCost(State s){
+	   return this.cost.get(bla bla)
+	}
+	public static double getOptimalAction(State s);
+	public static void store(State, Action a, double c);
+	
+	/**/
 	
 	
 	/** add key-value pair**/
