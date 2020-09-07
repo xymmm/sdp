@@ -1,4 +1,4 @@
-package LT_sdp_HashMap;
+package lateralTransshipment;
 
 public class LTinstance {
 	

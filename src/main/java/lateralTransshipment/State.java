@@ -1,4 +1,4 @@
-package LT_sdp_HashMap;
+package lateralTransshipment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,6 +79,17 @@ public class State {
 			}
 			return actions;
 		}
+		
+		/**  **
+		
+		public static double getOptimalCost(State s){
+		   return this.cost.get(bla bla)
+		}
+		public static double getOptimalAction(State s);
+		public static void store(State, Action a, double c);
+		
+		**/
+		
 	}
 	
 	/**test**/
