@@ -5,16 +5,33 @@ import java.util.Arrays;
 
 public class State {
 
-	public int i1;
-	public int i2;
+	public int period;
+	public int initialInventoryA;
+	public int initialInventoryB;
 	
 	public State(int i1, int i2) {
-		this.i1 = i1;
-		this.i2 = i2;
+		this.period = period;
+		this.initialInventoryA = initialInventoryA;
+		this.initialInventoryB = initialInventoryB;
 	}
 	
 	public String toString() {
-	   return this.i1 + " " + this.i2;
+	   return this.period + " " + this.initialInventoryA + " " + this.initialInventoryB;
+	}
+	
+	public int hashCode() {
+		String hash = "";
+		hash = (hash + period) + "_" + this.initialInventoryA + " " + this.initialInventoryB;
+		return hash.hashCode();
+	}
+	
+	public boolean equals(Object o) {
+		if(o instanceof State)
+			return ((State) o).period == this.period &&
+				   ((State) o).initialInventoryA == this.initialInventoryA &&
+				   ((State) o).initialInventoryB == this.initialInventoryB;
+		else
+			return false;
 	}
 	
 	public static State parse(String state) {
@@ -36,31 +53,31 @@ public class State {
 		ArrayList<int[]> actions = new ArrayList<int[]>();
 		State newState = null;
 		
-		if((state.i1 <=0)&&(state.i2 <= 0)) {//case 4: no transshipment
+		if((state.initialInventoryA <=0)&&(state.initialInventoryB <= 0)) {//case 4: no transshipment
 			System.out.println("case 4");
-			for(int i=0; i <= instance.maxInventory - state.i1; i++) {
-				for(int j=0; j <= instance.maxInventory - state.i2; j++) {
+			for(int i=0; i <= instance.maxInventory - state.initialInventoryA; i++) {
+				for(int j=0; j <= instance.maxInventory - state.initialInventoryB; j++) {
 					if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {0, i, j});
 				}
 			}
 			return actions;
-		}else if((state.i1 <=0)&&(state.i2 > 0)) {//case 3: transship from 2 to 1, transshipment <= 0
+		}else if((state.initialInventoryA <=0)&&(state.initialInventoryB > 0)) {//case 3: transship from 2 to 1, transshipment <= 0
 			System.out.println("case 3");
-			for(int t=0; t<=state.i2; t++) {
-				newState = new State(state.i1 + t, state.i2 - t);	//update inventory level after transshipment
-				for(int i=0; i <= instance.maxInventory - state.i1; i++) {
-					for(int j=0; j <= instance.maxInventory - state.i2; j++) {
+			for(int t=0; t<=state.initialInventoryB; t++) {
+				newState = new State(state.initialInventoryA + t, state.initialInventoryB - t);	//update inventory level after transshipment
+				for(int i=0; i <= instance.maxInventory - state.initialInventoryA; i++) {
+					for(int j=0; j <= instance.maxInventory - state.initialInventoryB; j++) {
 						if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {-t, i, j});
 					}
 				}
 			}
 			return actions;
-		}else if((state.i1 > 0)&&(state.i2 <= 0)) {//case 2: transship from 1 to 2, transship >= 0
+		}else if((state.initialInventoryA > 0)&&(state.initialInventoryB <= 0)) {//case 2: transship from 1 to 2, transship >= 0
 			System.out.println("case 2");
-			for(int t=0; t<=state.i1; t++) {
-				newState = new State(state.i1 - t, state.i2 + t);	//update inventory level after transshipment
-				for(int i=0; i <= instance.maxInventory - state.i1; i++) {
-					for(int j=0; j <= instance.maxInventory - state.i2; j++) {
+			for(int t=0; t<=state.initialInventoryA; t++) {
+				newState = new State(state.initialInventoryA - t, state.initialInventoryB + t);	//update inventory level after transshipment
+				for(int i=0; i <= instance.maxInventory - state.initialInventoryA; i++) {
+					for(int j=0; j <= instance.maxInventory - state.initialInventoryB; j++) {
 						if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {t, i, j});
 					}
 				}
@@ -69,10 +86,10 @@ public class State {
 		}else {										//case 1: transhsip undirected
 			//int[] feasibleTransshipment = new int[state.i1 + state.i2 +1];
 			System.out.println("case 1");
-			for(int t=-state.i2; t<= state.i1; t++) {				
-				newState = new State((state.i1)-t, (state.i2)+t);
-				for(int i=0; i <= instance.maxInventory - newState.i1; i++) {
-					for(int j=0; j <= instance.maxInventory - newState.i2; j++) {
+			for(int t=-state.initialInventoryB; t<= state.initialInventoryA; t++) {				
+				newState = new State((state.initialInventoryA)-t, (state.initialInventoryB)+t);
+				for(int i=0; i <= instance.maxInventory - newState.initialInventoryA; i++) {
+					for(int j=0; j <= instance.maxInventory - newState.initialInventoryB; j++) {
 						if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {t, i, j});
 					}
 				}
