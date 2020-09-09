@@ -4,8 +4,8 @@ public class CostComputation {
 
 	
 	public static double computeClosingCost (State state, LTinstance instance) {
-		return ((state.i1 >= 0) ? (instance.h*state.i1) : (-instance.b * state.i1)) 
-				+ ((state.i2 >= 0) ? (instance.h*state.i2) : (-instance.b * state.i2));
+		return ((state.initialInventoryA >= 0) ? (instance.h*state.initialInventoryA) : (-instance.b * state.initialInventoryA)) 
+				+ ((state.initialInventoryB >= 0) ? (instance.h*state.initialInventoryB) : (-instance.b * state.initialInventoryB));
 	}
 	
 	public static double computeTransshipmentCost(int[] action, LTinstance instance) {

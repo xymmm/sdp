@@ -11,8 +11,8 @@ public class TransitionProbability {
 		PoissonDistribution dist2 = new PoissonDistribution(instance.demandMean1[stageIndex]);
 		int maxDemand2 = dist1.inverseCumulativeProbability(1-instance.tail);
 		
-		double prob1 = dist1.probability(initialState.i1 - action[0] + action[1] - demand1)/dist1.cumulativeProbability(maxDemand1);
-		double prob2 = dist2.probability(initialState.i2 + action[0] + action[2] - demand2)/dist2.cumulativeProbability(maxDemand2);	
+		double prob1 = dist1.probability(initialState.initialInventoryA - action[0] + action[1] - demand1)/dist1.cumulativeProbability(maxDemand1);
+		double prob2 = dist2.probability(initialState.initialInventoryB + action[0] + action[2] - demand2)/dist2.cumulativeProbability(maxDemand2);	
 		
 		return prob1*prob2;
 	}
@@ -32,23 +32,23 @@ public class TransitionProbability {
 
 		// compare with the max demand does not change the result, because infeasible actions, 
 		// including infeasible transshipment and order quantities, are already excluded from the set.
-		if((state1.i1 <= 0 )&&( state1.i2 <= 0)) {
+		if((state1.initialInventoryA <= 0 )&&( state1.initialInventoryB<= 0)) {
 			if(
-					(state1.i1 + action[1] - state2.i1 <= maxDemand1) && (state1.i1 + action[1] - state2.i1 >= 0)&&
-					(state1.i2 + action[2] - state2.i2 <= maxDemand2) && (state1.i2 + action[2] - state2.i2 >= 0)
+					(state1.initialInventoryA + action[1] - state2.initialInventoryA <= maxDemand1) && (state1.initialInventoryA + action[1] - state2.initialInventoryA >= 0)&&
+					(state1.initialInventoryB + action[2] - state2.initialInventoryB <= maxDemand2) && (state1.initialInventoryB + action[2] - state2.initialInventoryB >= 0)
 					){
-				return (dist1.probability(state1.i1 + action[1]- state2.i1)/dist1.cumulativeProbability(maxDemand1))
-						*(dist2.probability(state1.i2 + action[2] - state2.i2)/dist2.cumulativeProbability(maxDemand2));
+				return (dist1.probability(state1.initialInventoryA + action[1]- state2.initialInventoryA)/dist1.cumulativeProbability(maxDemand1))
+						*(dist2.probability(state1.initialInventoryB + action[2] - state2.initialInventoryB)/dist2.cumulativeProbability(maxDemand2));
 			}else {
 				return 0;
 			}		
 		}else {
 			if(
-					(state1.i1 - action[0] + action[1] - state2.i1 <= maxDemand1)&&(state1.i1 - action[0] + action[1] - state2.i1 >= 0)&&
-					(state1.i2 + action[0] + action[1] - state2.i2 <= maxDemand2)&&(state1.i2 + action[0] + action[2] - state2.i2 >= 0)
+					(state1.initialInventoryA - action[0] + action[1] - state2.initialInventoryA <= maxDemand1)&&(state1.initialInventoryA - action[0] + action[1] - state2.initialInventoryA >= 0)&&
+					(state1.initialInventoryB + action[0] + action[1] - state2.initialInventoryB <= maxDemand2)&&(state1.initialInventoryB + action[0] + action[2] - state2.initialInventoryB >= 0)
 					) {
-				return (dist1.probability(state1.i1 - action[0] + action[1] - state2.i1 )/dist1.cumulativeProbability(maxDemand1))
-						*(dist2.probability(state1.i2 + action[0] + action[2] - state2.i2)/dist2.cumulativeProbability(maxDemand2));
+				return (dist1.probability(state1.initialInventoryA - action[0] + action[1] - state2.initialInventoryA )/dist1.cumulativeProbability(maxDemand1))
+						*(dist2.probability(state1.initialInventoryB + action[0] + action[2] - state2.initialInventoryB)/dist2.cumulativeProbability(maxDemand2));
 			}else {
 				return 0;
 			}
