@@ -123,13 +123,13 @@ public class LT2locations {
 	/******************************************* recursion **************************************************************/
 	Map<State, int[]> cacheActions = new HashMap<>();
 	Map<State, Double> cacheValueFunction = new HashMap<>();
-	double f(int periodIndex, State state){
+	double f(State state){
 		return cacheValueFunction.computeIfAbsent(state, s -> {
 			double val= Arrays.stream(s.getFeasibleActions())
 								.map(action -> actionValueFunction.apply(s, action)  //action cost (ordering and transshipping)
-						+ Arrays.stream(pmf1[periodIndex])
+						+ Arrays.stream(pmf1[s.period-1])
 								.mapToDouble(p -> p[1]*immediateValueFunction.apply(s)) 
-						+ Arrays.stream(pmf2[periodIndex])
+						+ Arrays.stream(pmf2[s.period-1])
 								.mapToDouble(p -> p[1]*immediateValueFunction.apply(s))
 						+ (s.period < this.planningHorizon ?
 											p[1]*f(stateTransition.apply(s, action, p[0])) : 0)
@@ -139,9 +139,9 @@ public class LT2locations {
 			int[] bestAction = Arrays.stream(s.getFeasibleActions())
 									.filter(
 											action -> actionValueFunction.apply(s, action)
-														+ Arrays.stream(pmf1[periodIndex])
+														+ Arrays.stream(pmf1[s.period-1])
 															.mapToDouble(p -> p[1]*immediateValueFunction.apply(s)) 
-														+ Arrays.stream(pmf2[periodIndex])
+														+ Arrays.stream(pmf2[s.period-1])
 															.mapToDouble(p -> p[1]*immediateValueFunction.apply(s))
 														+ (s.period < this.planningHorizon ? p[1]*f(stateTransition.apply(s, action, p[0])) : 0)
 											/*action -> Arrays.stream(pmf)
@@ -256,7 +256,7 @@ public class LT2locations {
 		/**
 		 * Run forward recursion and determine the expected total cost of an optimal policy
 		 */
-		System.out.println("f_1("+initialInventoryA+", "+initialInventoryB+")="+inventory.f(0, initialState));
+		System.out.println("f_1("+initialInventoryA+", "+initialInventoryB+")="+inventory.f(initialState));
 		/**
 		 * Recover optimal action for period 1 when initial inventory at the beginning of period 1 is 1.
 		 */
