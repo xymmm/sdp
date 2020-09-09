@@ -38,7 +38,7 @@ public class LT2locations {
 		this.planningHorizon = planningHorizon;
 		this.pmf1 = pmf1;
 		this.pmf2 = pmf2;
-	}								//input lot-sizing instance with planning horizon and demand probabilities (with demand units)
+	}								
 
 	/****************************** create class for States ***********************************************************/
 
@@ -61,9 +61,9 @@ public class LT2locations {
 		@Override
 		public int hashCode(){
 			String hash = "";
-			hash = (hash + period) + "_" + this.initialInventoryA + " " + this.initialInventoryB;
+			hash = (hash + period) + "_" + this.initialInventoryA + "_" + this.initialInventoryB;
 			return hash.hashCode();
-		}//done 
+		}
 
 		@Override
 		public boolean equals(Object o){
@@ -73,43 +73,46 @@ public class LT2locations {
 				((State) o).initialInventoryB == this.initialInventoryB;
 			else
 				return false;
-		}				//find state
+		}
 
 		@Override
 		public String toString(){
-			return this.period + " " + this.initialInventoryA + " " + this.initialInventoryB;
+			return this.period + "_" + this.initialInventoryA + "_" + this.initialInventoryB;
 		}
 
 		/* state(1, 125, 65) to (int) period = 1, (int) state.A = 125, (int) state.B = 65 */
 		public State parse(String state) {
-			String[] str = state.split(" ");
+			String[] str = state.split("_");
 			int[] levels = new int[2];					//store inventory levels of 2 locations
 			int period = Integer.parseInt(str[0]);		//store current stage, actual number (not index)
 			for(int i = 1; i< str.length; i++) {
 				levels[i] = Integer.parseInt(str[i]);
 			}
-			return new State(period, levels[0],levels[1]);
+			return new State(period, levels[0], levels[1]);
 		}
 	}//end class State
 
 
-	/*************************** generate actions and compute cost ********************************************************/
+	/*************************** generate actions and compute costs ********************************************************/
 
-	Function<State, int[]> actionGenerator;	//for a given state, generate a feasible action
-
+	Function<State, int[]> actionGenerator;	//for a given state, generate a feasible action as an integer array: State -> int[]        
 	
 	@FunctionalInterface
 	interface StateTransitionFunction <S, A, R1, R2> { //state, action, demand for location 1, demand for location 2
-		public S apply (S s, A a, R1 r, R2 p);
+		public S apply (S s, A a, R1 r1, R2 r2);
 	}
 	public StateTransitionFunction<State, Integer[], Double, Double> stateTransition;
 
+	Function<State, Double> immediateValueFunction;
+	
+	/*
 	@FunctionalInterface
 	//only immediate cost - holding or penalty cost
 	interface ImmediateValueFunction <S> { //state, value
 		public S apply (S s);
 	}
 	public ImmediateValueFunction<State> immediateValueFunction;
+	*/
 
 	@FunctionalInterface
 	interface ActionValueFuction<S, A>{
@@ -117,30 +120,40 @@ public class LT2locations {
 	}
 	public ActionValueFuction<State, int[]> actionValueFunction;
 
-	Map<State, Double> cacheActions = new HashMap<>();
+	/******************************************* recursion **************************************************************/
+	Map<State, int[]> cacheActions = new HashMap<>();
 	Map<State, Double> cacheValueFunction = new HashMap<>();
-	double f(int periodIndex, State state, LTinstance instance){
+	double f(int periodIndex, State state){
 		return cacheValueFunction.computeIfAbsent(state, s -> {
 			double val= Arrays.stream(s.getFeasibleActions())
-						.map(action -> p[1]*actionValueFunction.apply(s, action) + //action cost (ordering and transshipping)
-								Arrays.stream(pmf1[periodIndex])
-										.mapToDouble(p -> p[1]*immediateValueFunction.apply(s))+ 
-									   Arrays.stream(pmf2[periodIndex])
-										.mapToDouble(p -> p[1]*immediateValueFunction.apply(s))+
-									(s.period < this.planningHorizon ?
+								.map(action -> actionValueFunction.apply(s, action)  //action cost (ordering and transshipping)
+						+ Arrays.stream(pmf1[periodIndex])
+								.mapToDouble(p -> p[1]*immediateValueFunction.apply(s)) 
+						+ Arrays.stream(pmf2[periodIndex])
+								.mapToDouble(p -> p[1]*immediateValueFunction.apply(s))
+						+ (s.period < this.planningHorizon ?
 											p[1]*f(stateTransition.apply(s, action, p[0])) : 0)
 							.sum())
 								.min()
 									.getAsDouble();
-			double bestOrderQty = Arrays.stream(s.getFeasibleActions())
-					.filter(orderQty -> Arrays.stream(pmf)
-							.mapToDouble(p -> p[1]*immediateValueFunction.apply(s, orderQty, p[0])+
+			int[] bestAction = Arrays.stream(s.getFeasibleActions())
+									.filter(
+											action -> actionValueFunction.apply(s, action)
+														+ Arrays.stream(pmf1[periodIndex])
+															.mapToDouble(p -> p[1]*immediateValueFunction.apply(s)) 
+														+ Arrays.stream(pmf2[periodIndex])
+															.mapToDouble(p -> p[1]*immediateValueFunction.apply(s))
+														+ (s.period < this.planningHorizon ? p[1]*f(stateTransition.apply(s, action, p[0])) : 0)
+											/*action -> Arrays.stream(pmf)
+											.mapToDouble(p -> p[1]*immediateValueFunction.apply(s, orderQty, p[0])+
 									(s.period < this.planningHorizon ?
 											p[1]*f(stateTransition.apply(s, orderQty, p[0])):0))
-							.sum() == val)
+							.sum() == val
+							*/
+											)
 					.findAny()
 					.getAsDouble();
-			cacheActions.putIfAbsent(s, bestOrderQty);
+			cacheActions.putIfAbsent(s, bestAction);
 			return val;
 		});
 	}
@@ -243,7 +256,7 @@ public class LT2locations {
 		/**
 		 * Run forward recursion and determine the expected total cost of an optimal policy
 		 */
-		System.out.println("f_1("+initialInventoryA+", "+initialInventoryB+")="+inventory.f(0, initialState, instance));
+		System.out.println("f_1("+initialInventoryA+", "+initialInventoryB+")="+inventory.f(0, initialState));
 		/**
 		 * Recover optimal action for period 1 when initial inventory at the beginning of period 1 is 1.
 		 */
