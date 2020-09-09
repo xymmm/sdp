@@ -9,28 +9,23 @@ import java.util.stream.DoubleStream;
 public class LT2locations {
 
 	/**
-	 * Consider a 3-period inventory control problem. At the beginning of each period the firm should decide how many units of a 
-	 * product should be produced. 
+	 * Non-stationary stochastic lot sizing problem with lateral transshipment for 2-location system.
 	 * 
-	 * If production takes place for x units, where x {@literal >} 0, we incur a production cost c(x). 
-	 * This cost comprises both a fix and a variable component: c(x) = 0, if x = 0; c(x) = 3+2x, otherwise. (ordering cost)
+	 * Inventory at 2 locations can be replenished from the regular supplier (warehouse) but also proactive transshipment between locations.
 	 * 
-	 * Production in each period cannot exceed 4 units. (maxquantity of Q)
+	 * Events order: for any period,
+	 * 		check inventory levels (i1, i2) -> transship between 2 locations -> order replenishment -> meet demand.
 	 * 
-	 * Demand in each period takes two possible values: 1 or 2 units with equal 
-	 * probability (0.5). Demand is observed in each period only after production has occurred. 
+	 * For a state (t, i1, i2), actions include: 
+	 * 		quantity of transshipment, quantity of replenishment orders at location 1 and 2 (presented in an integer array).
 	 * 
-	 * After meeting current period's demand holding cost of $1 per unit is incurred for any item that is carried over from one period to the next. 
+	 * Action cost occurs when transshipping and reordering take places: charged a fixed cost for any action, and a linear unit ordering cost for ordered quantity.
+	 * Immediate cost occurs at the end of each time period: holding cost for outstanding inventory, or penalty cost for backorders.
 	 * 
-	 * Because of limited capacity the inventory at the end of each period cannot exceed 3 units. All demand should be met on time 
-	 * (no backorders). If at the end of the planning horizon (i.e. period 3) the firm still has units in stock, these can be 
-	 * salvaged at $2 per unit. The initial inventory is 1 unit.
-	 * 
-	 * @author Roberto Rossi
-	 *
-	 *
-	 * backorders, retrieve optimal actions on transshipment and regular orders
-	 */
+	 * For programming, inventory is set within certain interval [minInventory, maxInventory],
+	 * To iterate feasible actions, order quantity is also set to with a upper limitation: maxQuantity.
+	 * 		One needs to make sure that the optimal action does not reaches this upper bound (maxQuantity).
+	 **/
 
 
 	int planningHorizon;
