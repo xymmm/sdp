@@ -224,10 +224,15 @@ public class LT2locations {
 		/**
 		 * Immediate value function for a given state
 		 */
-		inventory.immediateValueFunction = (state) -> {
-			double immediateCost = ((state.initialInventoryA >= 0) ? (h*state.initialInventoryA) : (-b * state.initialInventoryA)) 
-					+ ((state.initialInventoryB >= 0) ? (h*state.initialInventoryB) : (-b * state.initialInventoryB));
-			//return cost;
+		inventory.immediateValueFunction = (state, action, demand) -> {
+			double cost = (action[0] > 0 ? R + v*action[0] : 0) + (action[1]>0 ? K + z*action[1] : 0) + (action[2]>0 ? K+z*action[2] : 0);
+			cost += ((state.initialInventoryA - action [0] + action[1] - demand[0] >=0) ? 
+						h*(state.initialInventoryA - action [0] + action[1] - demand[0]) : (-b)*(state.initialInventoryA - action [0] + action[1] - demand[0]))
+					+ ((state.initialInventoryB + action [0] + action[2] - demand[1] >=0) ? 
+							h*(state.initialInventoryB + action [0] + action[2] - demand[1]) : (-b)*(state.initialInventoryB + action [0] + action[2] - demand[1]));
+			//cost -= (state.period == planningHorizon ? salvageValue : 0)*(state.initialInventory+action-demand);
+
+			return cost;
 		};
 
 
