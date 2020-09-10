@@ -1,10 +1,16 @@
 package lateralTransshipment;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import org.apache.commons.math3.distribution.PoissonDistribution;
 
 public class LT2locations {
 
@@ -29,7 +35,7 @@ public class LT2locations {
 
 
 	int planningHorizon;
-	double[][][] pmf;		//t, demand (vector), prob
+	double[][][] pmf;		//pmf[t]: [	[prob, demand1, demand2],[],...[]	]
 
 	public LT2locations(int planningHorizon,
 			double[][][] pmf) {
@@ -51,16 +57,16 @@ public class LT2locations {
 
 		}
 
-		public int[][] getFeasibleActions(){//apply lateral transshipment actions
+		public int[][] getFeasibleActions(){//all actions
 			return actionGenerator.apply(this);
-		}//function awaits
+		}
 
 		@Override
 		public int hashCode(){
 			String hash = this.toString();
 			return hash.hashCode();
 		}
-		
+
 		@Override
 		public String toString(){
 			return this.period + "_" + this.initialInventoryA + "_" + this.initialInventoryB;
@@ -94,19 +100,19 @@ public class LT2locations {
 	/*************************** generate actions and compute costs ********************************************************/
 
 	Function<State, int[][]> actionGenerator;	//for a given state, generate a feasible action as an integer array: State -> int[][3]        
-	
+
 	@FunctionalInterface
 	interface StateTransitionFunction <S, A, R> { //state, action, demand for location 1, demand for location 2
 		public S apply (S s, A a, R r);
 	}
 	public StateTransitionFunction<State, Integer[], Double[]> stateTransition;	
-	
+
 	@FunctionalInterface
 	interface ImmediateValueFunction <S, A, R> { //state, value
 		public S apply (S s, A a, R r);
 	}
 	public ImmediateValueFunction<State, Integer[], Double[]> immediateValueFunction;
-	
+
 
 
 	/******************************************* recursion **************************************************************/
@@ -115,39 +121,61 @@ public class LT2locations {
 	double f(State state){
 		return cacheValueFunction.computeIfAbsent(state, s -> {
 			double val= Arrays.stream(s.getFeasibleActions())
-					.map(orderQty -> Arrays.stream(pmf)
-							.mapToDouble(p -> p[1]*immediateValueFunction.apply(s, orderQty, p[0])+
+					.map(action -> Arrays.stream(pmf)
+							.mapToDouble(p -> p[1]*immediateValueFunction.apply(s, action, p[0])+
 									(s.period < this.planningHorizon ?
-											p[1]*f(stateTransition.apply(s, orderQty, p[0])) : 0))
+											p[1]*f(stateTransition.apply(s, action, p[0])) : 0))
 							.sum())
 					.min()
 					.getAsDouble();
-			double bestOrderQty = Arrays.stream(s.getFeasibleActions())
+			double bestAction = Arrays.stream(s.getFeasibleActions())
 					.filter(orderQty -> Arrays.stream(pmf)
-							.mapToDouble(p -> p[1]*immediateValueFunction.apply(s, orderQty, p[0])+
+							.mapToDouble(p -> p[1]*immediateValueFunction.apply(s, action, p[0])+
 									(s.period < this.planningHorizon ?
-											p[1]*f(stateTransition.apply(s, orderQty, p[0])):0))
+											p[1]*f(stateTransition.apply(s, action, p[0])):0))
 							.sum() == val)
 					.findAny()
 					.getAsDouble();
-			cacheActions.putIfAbsent(s, bestOrderQty);
+			cacheActions.putIfAbsent(s, bestAction);
 			return val;
 		});
 	}
+
+	/************************************ generate demand pairs and probabilities (pmf) ***********************************************************/
+	public static double[][][] generatePMF(int[] demandMean1, int[] demandMean2, double tail){
+		double[][][] pmf = null;
+		double[][] demandPairs = null;
+		double[][] demandPairsProb = null;
+		
+		for(int t=0; t<demandMean1.length; t++) {			
+			PoissonDistribution dist1 = new PoissonDistribution(demandMean1[t]);
+			PoissonDistribution dist2 = new PoissonDistribution(demandMean2[t]);
+			
+			//demand pairs as a double array
+			Stream<Integer> stream1 = IntStream.range(0, dist1.inverseCumulativeProbability(1-tail)).boxed();
+			Stream<Integer> stream2 = IntStream.range(0, dist2.inverseCumulativeProbability(1-tail)).boxed();
+			ArrayList<Integer[]> pairs = new ArrayList<>();
+			//pairs = stream1.map(level1 -> stream2.map(level2 -> Stream.of(level1, level2)))
+			// .collect(Collectors.toList());
+			
+			//prob
+			for(int i=0; i<demandPairs[t].length;i++) {
+				demandPairsProb[t][i] = (dist1.probability((int)demandPairs[t][0]) * dist2.probability((int)demandPairs[t][1])) 
+					/ (dist1.cumulativeProbability(dist1.inverseCumulativeProbability(1-tail)) * dist2.cumulativeProbability(dist2.inverseCumulativeProbability(1-tail)));
+				
+				//merge
+				pmf[t][i][0] = demandPairs[t][0]; pmf[t][i][1] = demandPairs[t][1]; pmf[t][i][2] = demandPairsProb[t][i];
+			}
+		}
+		
+	}
+	
+
 
 	/***********************************************************************************************/
 
 
 	public static void main(String [] args){
-
-		/*int planningHorizon = 3;         //Planning horizon length
-		double fixedProductionCost = 3;  //Fixed production cost
-		double perUnitProductionCost = 2;//Per unit production cost
-		int warehouseCapacity = 3;      //Production capacity
-		double holdingCost = 1;          //Holding cost
-		double salvageValue = 2;         //Salvage value
-		int maxOrderQty = 4;             //Max order quantity
-		 */
 
 		int[] demandMean1 = {2,4};
 		int[] demandMean2 = {6, 4};
@@ -168,20 +196,9 @@ public class LT2locations {
 		 * Probability mass function: Demand in each period takes two possible values: 1 or 2 units 
 		 * with equal probability (0.5).
 		 */
-		double[][][] pmf1 = null; 
-		double[][][] pmf2 = null;
-		int[] maxDemand1 = new int[instance.demandMean1.length];
-		int[] maxDemand2 = new int[instance.demandMean1.length];
-		int[] minDemand1 = new int[instance.demandMean1.length];
-		int[] minDemand2 = new int[instance.demandMean1.length];
-		for(int t=0; t<instance.demandMean1.length; t++) {
-			maxDemand1[t] = (int) Arrays.stream(pmf1[t]).mapToDouble(v -> v[0]).max().getAsDouble();
-			maxDemand2[t] = (int) Arrays.stream(pmf2[t]).mapToDouble(v -> v[0]).max().getAsDouble();
-			minDemand1[t] = (int) Arrays.stream(pmf1[t]).mapToDouble(v -> v[0]).min().getAsDouble();
-			minDemand2[t] = (int) Arrays.stream(pmf2[t]).mapToDouble(v -> v[0]).min().getAsDouble();
-		}
+		double[][][] pmf = generatePMF(demandMean1, demandMean2, tail);
 
-		LT2locations inventory = new LT2locations(planningHorizon, pmf1, pmf2);
+		LT2locations inventory = new LT2locations(planningHorizon, pmf);
 
 		/**
 		 * This function returns the set of actions associated with a given state
@@ -198,10 +215,10 @@ public class LT2locations {
 		 * State transition function; given a state, an action and a random outcome, the function
 		 * returns the future state
 		 */
-		inventory.stateTransition = (state, action, randomOutcome1, randomOutcome2) -> 
+		inventory.stateTransition = (state, action, randomOutcome) -> 
 		inventory.new State(state.period + 1, 
-				(int) (state.initialInventoryA + action[0] + action[1] - randomOutcome1),
-				(int) (state.initialInventoryB - action[0] + action[2] - randomOutcome2)
+				(int) (state.initialInventoryA + action[0] + action[1] - randomOutcome[0]),
+				(int) (state.initialInventoryB - action[0] + action[2] - randomOutcome[1])
 				);
 
 		/**
@@ -212,15 +229,9 @@ public class LT2locations {
 					+ ((state.initialInventoryB >= 0) ? (h*state.initialInventoryB) : (-b * state.initialInventoryB));
 			//return cost;
 		};
-		
-		inventory.actionValueFunction = (state, action) ->{
-			double actionCost = ((action[0] > 0) ? (instance.R + instance.v * Math.abs(action[0])) : 0)
-									+ ((action[1]>0) ? (instance.K + instance.z*action[1]) : 0)
-										+ ((action[2]>0) ? (instance.K + instance.z*action[2]) : 0);
-		};
 
-			
-	
+
+
 
 		/**
 		 * Initial problem conditions
