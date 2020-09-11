@@ -45,7 +45,7 @@ public class LT2locations {
 
 	/****************************** create class for States ***********************************************************/
 
-	class State{
+	 class State{
 		public int period;
 		public int initialInventoryA;
 		public int initialInventoryB;
@@ -94,6 +94,57 @@ public class LT2locations {
 			}
 			return new State(period, levels[0], levels[1]);
 		}
+		
+		/** generate feasible actions for a given state **/
+		public ArrayList<int[]> generateFeasibleActions(State state, LTinstance instance){
+			ArrayList<int[]> actions = new ArrayList<int[]>();
+			State newState = null;
+			
+			if((state.initialInventoryA <=0)&&(state.initialInventoryB <= 0)) {//case 4: no transshipment
+				System.out.println("case 4");
+				for(int i=0; i <= instance.maxInventory - state.initialInventoryA; i++) {
+					for(int j=0; j <= instance.maxInventory - state.initialInventoryB; j++) {
+						if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {0, i, j});
+					}
+				}
+				return actions;
+			}else if((state.initialInventoryA <=0)&&(state.initialInventoryB > 0)) {//case 3: transship from 2 to 1, transshipment <= 0
+				System.out.println("case 3");
+				for(int t=0; t<=state.initialInventoryB; t++) {
+					newState = new State(state.period, state.initialInventoryA + t, state.initialInventoryB - t);	//update inventory level after transshipment
+					for(int i=0; i <= instance.maxInventory - state.initialInventoryA; i++) {
+						for(int j=0; j <= instance.maxInventory - state.initialInventoryB; j++) {
+							if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {-t, i, j});
+						}
+					}
+				}
+				return actions;
+			}else if((state.initialInventoryA > 0)&&(state.initialInventoryB <= 0)) {//case 2: transship from 1 to 2, transship >= 0
+				System.out.println("case 2");
+				for(int t=0; t<=state.initialInventoryA; t++) {
+					newState = new State(state.period, state.initialInventoryA - t, state.initialInventoryB + t);	//update inventory level after transshipment
+					for(int i=0; i <= instance.maxInventory - state.initialInventoryA; i++) {
+						for(int j=0; j <= instance.maxInventory - state.initialInventoryB; j++) {
+							if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {t, i, j});
+						}
+					}
+				}
+				return actions;
+			}else {										//case 1: transhsip undirected
+				//int[] feasibleTransshipment = new int[state.i1 + state.i2 +1];
+				System.out.println("case 1");
+				for(int t=-state.initialInventoryB; t<= state.initialInventoryA; t++) {				
+					newState = new State(state.period, (state.initialInventoryA)-t, (state.initialInventoryB)+t);
+					for(int i=0; i <= instance.maxInventory - newState.initialInventoryA; i++) {
+						for(int j=0; j <= instance.maxInventory - newState.initialInventoryB; j++) {
+							if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {t, i, j});
+						}
+					}
+				}
+				return actions;
+			}
+		}
+
 	}//end class State
 
 
@@ -198,17 +249,19 @@ public class LT2locations {
 		 */
 		double[][][] pmf = generatePMF(demandMean1, demandMean2, tail);
 
-		LT2locations inventory = new LT2locations(planningHorizon, pmf);
+		LT2locations inventory = new LT2locations(demandMean1.length, pmf);
 
 		/**
 		 * This function returns the set of actions associated with a given state
 		 */
 		inventory.actionGenerator = state ->{
-			int minQ = Math.max(maxDemand - state.initialInventory, 0);
+			ArrayList<int[]> actionList = State.generateFeasibleActions(state, instance);
+			return (int[][]) actionList.toArray();
+			/*int minQ = Math.max(maxDemand - state.initialInventory, 0);
 			return DoubleStream.iterate(minQ, orderQty -> orderQty + 1)
 					.limit(Math.min(maxOrderQty, instance.maxInventory +  
 							minDemand - state.initialInventory - minQ) + 1)
-					.toArray();
+					.toArray();*/
 		};//generateFeasibleActions
 
 		/**
