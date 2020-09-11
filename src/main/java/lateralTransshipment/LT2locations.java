@@ -3,6 +3,7 @@ package lateralTransshipment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -193,9 +194,27 @@ public class LT2locations {
 	}
 
 	/************************************ generate demand pairs and probabilities (pmf) ***********************************************************/
+	public IntStream tabulateDemand(int maxDemand) {
+		return IntStream.range(0, maxDemand);
+	}
+	
+	public int[] createPair(int int1, int int2) {
+		return new int[] {int1, int2};
+	}
+	
+	public int[] pairDemand(IntStream stream1, IntStream stream2) {
+		IntStream pairs;
+		return 
+			    stream1
+			        .flatMap(str1 -> stream2.map(str2 -> createPair(str1, str2) ))
+			        //.collect(Collectors.toCollection(() -> new ArrayList<>(pairs)))
+			        .collect(Collectors.toList());
+			        //.toArrays;
+	}
+	
 	public static double[][][] generatePMF(int[] demandMean1, int[] demandMean2, double tail){
 		double[][][] pmf = null;
-		double[][] demandPairs = null;
+		ArrayList<int[]> demandPairs = new ArrayList<int[]>();
 		double[][] demandPairsProb = null;
 		
 		for(int t=0; t<demandMean1.length; t++) {			
@@ -203,11 +222,14 @@ public class LT2locations {
 			PoissonDistribution dist2 = new PoissonDistribution(demandMean2[t]);
 			
 			//demand pairs as a double array
-			Stream<Integer> stream1 = IntStream.range(0, dist1.inverseCumulativeProbability(1-tail)).boxed();
-			Stream<Integer> stream2 = IntStream.range(0, dist2.inverseCumulativeProbability(1-tail)).boxed();
-			ArrayList<Integer[]> pairs = new ArrayList<>();
-			//pairs = stream1.map(level1 -> stream2.map(level2 -> Stream.of(level1, level2)))
-			// .collect(Collectors.toList());
+			/*Stream<Integer> stream1 = IntStream.range(0, dist1.inverseCumulativeProbability(1-tail)).boxed();
+			Stream<Integer> stream2 = IntStream.range(0, dist2.inverseCumulativeProbability(1-tail)).boxed();			
+			List<Stream<Stream<Integer>>> pairs = new ArrayList<>();
+			  pairs = stream1.map(level1 -> stream2.map(level2 -> Stream.of(level1, level2)))
+			 .collect(Collectors.toList());*/
+			
+			
+			
 			
 			//prob
 			for(int i=0; i<demandPairs[t].length;i++) {
@@ -221,8 +243,6 @@ public class LT2locations {
 		
 	}
 	
-
-
 	/***********************************************************************************************/
 
 
