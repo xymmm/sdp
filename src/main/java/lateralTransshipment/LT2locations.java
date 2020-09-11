@@ -83,8 +83,6 @@ public class LT2locations {
 				return false;
 		}
 
-
-
 		/* state(1, 125, 65) to (int) period = 1, (int) state.A = 125, (int) state.B = 65 */
 		public State parse(String state) {
 			String[] str = state.split("_");
@@ -194,7 +192,7 @@ public class LT2locations {
 	}
 
 	/************************************ generate demand pairs and probabilities (pmf) ***********************************************************/
-	public IntStream tabulateDemand(int maxDemand) {
+	/*public IntStream tabulateDemand(int maxDemand) {
 		return IntStream.range(0, maxDemand);
 	}
 	
@@ -203,18 +201,17 @@ public class LT2locations {
 	}
 	
 	public int[] pairDemand(IntStream stream1, IntStream stream2) {
-		IntStream pairs;
-		return 
-			    stream1
+		ArrayList<Integer[]> pairs;
+		stream1
 			        .flatMap(str1 -> stream2.map(str2 -> createPair(str1, str2) ))
 			        //.collect(Collectors.toCollection(() -> new ArrayList<>(pairs)))
 			        .collect(Collectors.toList());
 			        //.toArrays;
-	}
+	}*/
 	
 	public static double[][][] generatePMF(int[] demandMean1, int[] demandMean2, double tail){
 		double[][][] pmf = null;
-		ArrayList<int[]> demandPairs = new ArrayList<int[]>();
+		int[][] demandPairs = null;
 		double[][] demandPairsProb = null;
 		
 		for(int t=0; t<demandMean1.length; t++) {			
@@ -222,12 +219,14 @@ public class LT2locations {
 			PoissonDistribution dist2 = new PoissonDistribution(demandMean2[t]);
 			
 			//demand pairs as a double array
-			/*Stream<Integer> stream1 = IntStream.range(0, dist1.inverseCumulativeProbability(1-tail)).boxed();
+			Stream<Integer> stream1 = IntStream.range(0, dist1.inverseCumulativeProbability(1-tail)).boxed();
 			Stream<Integer> stream2 = IntStream.range(0, dist2.inverseCumulativeProbability(1-tail)).boxed();			
+			
 			List<Stream<Stream<Integer>>> pairs = new ArrayList<>();
 			  pairs = stream1.map(level1 -> stream2.map(level2 -> Stream.of(level1, level2)))
-			 .collect(Collectors.toList());*/
+			 .collect(Collectors.toList());
 			
+			  //pairs to demandPairs
 			
 			
 			
