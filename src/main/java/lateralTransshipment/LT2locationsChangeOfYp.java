@@ -224,30 +224,6 @@ public class LT2locationsChangeOfYp {
 		return pmf;
 	}
 
-	public static double[][][] generatePMFbyLoop(int[] demandMean1, int[] demandMean2, double tail){
-		double[][][] pmf = null;
-
-		for(int t=0; t<demandMean1.length; t++) {
-			
-			PoissonDistribution dist1 = new PoissonDistribution(demandMean1[t]);
-			PoissonDistribution dist2 = new PoissonDistribution(demandMean2[t]);
-			int maxDemand1 = dist1.inverseCumulativeProbability(1-tail);
-			int maxDemand2 = dist2.inverseCumulativeProbability(1-tail);
-						
-			for(int c=0; c<maxDemand1 * maxDemand2; c++) {
-				for(int i=0; i<=maxDemand1; i++) {
-					for(int j=0; j<=maxDemand2; j++) {
-						pmf[t][c][0] = dist1.probability(i) * dist2.probability(j) 
-										/ (dist1.cumulativeProbability(maxDemand1) * dist2.cumulativeProbability(maxDemand2));
-						pmf[t][c][1] = i;
-						pmf[t][c][2] = j;
-					}
-				}
-			}
-		}
-
-		return pmf;
-	}
 
 	/***********************************************************************************************/
 
