@@ -3,17 +3,14 @@ package lateralTransshipment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.apache.commons.math3.distribution.PoissonDistribution;
 
-public class LT2locationsChangeOfYp {
+public class LT2locationsChanges {
 
 	/**
 	 * Non-stationary stochastic lot sizing problem with lateral transshipment for 2-location system.
@@ -38,7 +35,7 @@ public class LT2locationsChangeOfYp {
 	int planningHorizon;
 	double[][][] pmf;		//pmf[t]: [	[prob, demand1, demand2],[],...[]	]
 
-	public LT2locationsChangeOfYp(int planningHorizon,
+	public LT2locationsChanges(int planningHorizon,
 			double[][][] pmf) {
 		this.planningHorizon = planningHorizon;
 		this.pmf = pmf;
@@ -100,7 +97,7 @@ public class LT2locationsChangeOfYp {
 			State newState = null;
 
 			if((state.initialInventoryA <=0)&&(state.initialInventoryB <= 0)) {//case 4: no transshipment
-				System.out.println("case 4");
+				//System.out.println("case 4");
 				for(int i=0; i <= instance.maxInventory - state.initialInventoryA; i++) {
 					for(int j=0; j <= instance.maxInventory - state.initialInventoryB; j++) {
 						if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {0, i, j});
@@ -108,7 +105,7 @@ public class LT2locationsChangeOfYp {
 				}
 				return actions;
 			}else if((state.initialInventoryA <=0)&&(state.initialInventoryB > 0)) {//case 3: transship from 2 to 1, transshipment <= 0
-				System.out.println("case 3");
+				//System.out.println("case 3");
 				for(int t=0; t<=state.initialInventoryB; t++) {
 					newState = new State(state.period, state.initialInventoryA + t, state.initialInventoryB - t);	//update inventory level after transshipment
 					for(int i=0; i <= instance.maxInventory - state.initialInventoryA; i++) {
@@ -119,7 +116,7 @@ public class LT2locationsChangeOfYp {
 				}
 				return actions;
 			}else if((state.initialInventoryA > 0)&&(state.initialInventoryB <= 0)) {//case 2: transship from 1 to 2, transship >= 0
-				System.out.println("case 2");
+				//System.out.println("case 2");
 				for(int t=0; t<=state.initialInventoryA; t++) {
 					newState = new State(state.period, state.initialInventoryA - t, state.initialInventoryB + t);	//update inventory level after transshipment
 					for(int i=0; i <= instance.maxInventory - state.initialInventoryA; i++) {
@@ -131,7 +128,7 @@ public class LT2locationsChangeOfYp {
 				return actions;
 			}else {										//case 1: transhsip undirected
 				//int[] feasibleTransshipment = new int[state.i1 + state.i2 +1];
-				System.out.println("case 1");
+				//System.out.println("case 1");
 				for(int t=-state.initialInventoryB; t<= state.initialInventoryA; t++) {				
 					newState = new State(state.period, (state.initialInventoryA)-t, (state.initialInventoryB)+t);
 					for(int i=0; i <= instance.maxInventory - newState.initialInventoryA; i++) {
@@ -169,67 +166,113 @@ public class LT2locationsChangeOfYp {
 	Map<State, int[]> cacheActions = new HashMap<>();
 	Map<State, Double> cacheValueFunction = new HashMap<>();
 	double f(State state){
-		return cacheValueFunction.computeIfAbsent(state, s -> {
-			double val= Arrays.stream(s.getFeasibleActions())
-					.map(action -> Arrays.stream(pmf)
-							.mapToDouble(p -> p[1][0]*immediateValueFunction.apply(s, action, p[0])+
-									(s.period < this.planningHorizon ?
-											p[1][1]*f(stateTransition.apply(s, action, p[0])) : 0))
-							.sum())
-					.min(Double::compare)
-					.get();
-			int[] bestAction = Arrays.stream(s.getFeasibleActions())
-					.filter(action -> Arrays.stream(pmf)
-							.mapToDouble(p -> p[1][0]*immediateValueFunction.apply(s, action, p[0])+
-									(s.period < this.planningHorizon ?
-											p[1][0]*f(stateTransition.apply(s, action, p[0])):0))
-							.sum() == val)
-					.findAny()
-					.get();
-			cacheActions.putIfAbsent(s, bestAction);
-			return val;
+		
+//			double val= Arrays.stream(s.getFeasibleActions())
+//					.map(action -> Arrays.stream(pmf)
+//							.mapToDouble(p -> p[1][0]*immediateValueFunction.apply(s, action, p[0])+
+//									(s.period < this.planningHorizon ?
+//											p[1][1]*f(stateTransition.apply(s, action, p[0])) : 0))
+//							.sum())
+//					.min(Double::compare)
+//					.get();
+//			int[] bestAction = Arrays.stream(s.getFeasibleActions())
+//					.filter(action -> Arrays.stream(pmf)
+//							.mapToDouble(p -> p[1][0]*immediateValueFunction.apply(s, action, p[0])+
+//									(s.period < this.planningHorizon ?
+//											p[1][0]*f(stateTransition.apply(s, action, p[0])):0))
+//							.sum() == val)
+//					.findAny()
+//					.get();
+//			cacheActions.putIfAbsent(s, bestAction);
+		
+//		System.out.println(state);
+		
+		//this month actions
+		int[][] actions = state.getFeasibleActions();
+		if(actions==null || actions.length==0){
+			return 0d;
+		}
+		//get cost stream
+		double[] costs =  
+				Arrays.stream(actions).mapToDouble(action -> {
+					//current stage cost
+					//System.out.println(state);
+					
+					//cur month demand: [][pro demandA demandB]
+					double[][] curMonthDemands = pmf[state.period - 1];
+										
+					double curMonthCost = Arrays.stream(curMonthDemands).mapToDouble(demand -> {
+						double cost = immediateValueFunction.apply(state, action, demand);
+						
+						//next month cost
+						if(state.period < this.planningHorizon){
+							State futureState = stateTransition.apply(state, action, new double[]{demand[1],demand[2]});
+							double futureCost = f(futureState);
+							cost = cost + demand[0]*futureCost;
+						}
+						
+						return cost;
+					}).sum();
+					
+				
+					return curMonthCost ;
+				}).toArray();
+		//get min cost
+		double minCost = Arrays.stream(costs).min().getAsDouble();
+		cacheValueFunction.put(state,minCost);
+		
+		//get first index of min cost (probably Multiple,only select first index )
+		AtomicInteger firstMinCostIdx = new AtomicInteger(0);
+		Arrays.stream(costs).forEach(cost -> {
+			if(cost==minCost){
+				return;
+			}
+			firstMinCostIdx.getAndIncrement();
 		});
+		
+		int minCostIdx = firstMinCostIdx.get();
+//		if(minCostIdx>=actions.length){
+			//is error,if true,actions[minCostIdx] probably out of range Exception,cost==minCost?
+//		}
+		cacheActions.putIfAbsent(state, actions[minCostIdx]);
+
+		return minCost;
 	}
 
 	/************************************ generate demand pairs and probabilities (pmf) ***********************************************************/
 	public static double[][][] generatePMF(int[] demandMean1, int[] demandMean2, double tail){
-		double[][][] pmf = null;
-		int[][] demandPairs = null;
-		double[][] demandPairsProb = null;
+		double[][][] pmf = new double[demandMean1.length][][];
+		
+		IntStream.range(0,demandMean1.length).forEach(t->{
 
-		for(int t=0; t<demandMean1.length; t++) {			
+			//maximum demand
 			PoissonDistribution dist1 = new PoissonDistribution(demandMean1[t]);
+			int maxDemand1 = dist1.inverseCumulativeProbability(1-tail);
+			
 			PoissonDistribution dist2 = new PoissonDistribution(demandMean2[t]);
-
-			//demand pairs as a double array
-			Stream<Integer> stream1 = IntStream.range(0, dist1.inverseCumulativeProbability(1-tail)).boxed();
-			Stream<Integer> stream2 = IntStream.range(0, dist2.inverseCumulativeProbability(1-tail)).boxed();			
-
-			List<Stream<Stream<Integer>>> pairs = new ArrayList<>();
-			pairs = stream1.map(level1 -> stream2.map(level2 -> Stream.of(level1, level2)))
-					.collect(Collectors.toList());
-
-			//pairs to demandPairs		
-
-			//prob
-			for(int i=0; i<demandPairs[t].length;i++) {
-				demandPairsProb[t][i] = (dist1.probability((int)demandPairs[t][0]) * dist2.probability((int)demandPairs[t][1])) 
-						/ (dist1.cumulativeProbability(dist1.inverseCumulativeProbability(1-tail)) * dist2.cumulativeProbability(dist2.inverseCumulativeProbability(1-tail)));
-
-				//merge
-				pmf[t][i][0] = demandPairs[t][0]; pmf[t][i][1] = demandPairs[t][1]; pmf[t][i][2] = demandPairsProb[t][i];
-			}
-
-		}
+			int maxDemand2 = dist2.inverseCumulativeProbability(1-tail);
+			
+			double[][] curPmf = new double[maxDemand1*maxDemand2][3];
+			
+			IntStream.range(0,maxDemand1).forEach(demand1 -> {
+				IntStream.range(0,maxDemand2).forEach(demand2 -> {
+					double p = dist1.probability(demand1)*dist2.probability(demand2)/
+							(dist1.cumulativeProbability(maxDemand1)*dist2.cumulativeProbability(maxDemand2));
+					curPmf[demand1*maxDemand2+demand2] =new double[]{p,demand1,demand2};
+				});
+			});
+			pmf[t] = curPmf;
+		});		
 		return pmf;
 	}
 
 
 	/***********************************************************************************************/
 
-
 	public static void main(String [] args){
 
+		long timeStart = System.currentTimeMillis();
+		
 		int[] demandMean1 = {2,4};
 		int[] demandMean2 = {6, 4};
 		int maxInventory  = 10;
@@ -245,53 +288,35 @@ public class LT2locationsChangeOfYp {
 
 		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
 
-		/**
-		 * Probability mass function: Demand in each period takes two possible values: 1 or 2 units 
-		 * with equal probability (0.5).
-		 */
 		double[][][] pmf = generatePMF(demandMean1, demandMean2, tail);
 
-		LT2locationsChangeOfYp inventory = new LT2locationsChangeOfYp(demandMean1.length, pmf);
+		LT2locationsChanges inventory = new LT2locationsChanges(demandMean1.length, pmf);
 
-		/**
-		 * This function returns the set of actions associated with a given state
-		 */
+		//generateFeasibleActions
 		inventory.actionGenerator = state ->{
 			ArrayList<int[]> actionList = state.generateFeasibleActions(state, instance);
-			return (int[][]) actionList.toArray();
-			/*int minQ = Math.max(maxDemand - state.initialInventory, 0);
-			return DoubleStream.iterate(minQ, orderQty -> orderQty + 1)
-					.limit(Math.min(maxOrderQty, instance.maxInventory +  
-							minDemand - state.initialInventory - minQ) + 1)
-					.toArray();*/
-		};//generateFeasibleActions
+			int[][] action = actionList.toArray(new int[0][0]);
+			return action;
+		};
 
-		/**
-		 * State transition function; given a state, an action and a random outcome, the function
-		 * returns the future state
-		 */
 		inventory.stateTransition = (state, action, randomOutcome) -> 
 		inventory.new State(state.period + 1, 
 				(int) (state.initialInventoryA + action[0] + action[1] - randomOutcome[0]),
 				(int) (state.initialInventoryB - action[0] + action[2] - randomOutcome[1])
 				);
 
-		/**
-		 * Immediate value function for a given state
-		 */
 		inventory.immediateValueFunction = (state, action, demand) -> {
+			double prob = demand[0];
+			
 			double cost = (action[0] > 0 ? R + v*action[0] : 0) + (action[1]>0 ? K + z*action[1] : 0) + (action[2]>0 ? K+z*action[2] : 0);
-			cost += ((state.initialInventoryA - action [0] + action[1] - demand[0] >=0) ? 
-					h*(state.initialInventoryA - action [0] + action[1] - demand[0]) : (-b)*(state.initialInventoryA - action [0] + action[1] - demand[0]))
-					+ ((state.initialInventoryB + action [0] + action[2] - demand[1] >=0) ? 
-							h*(state.initialInventoryB + action [0] + action[2] - demand[1]) : (-b)*(state.initialInventoryB + action [0] + action[2] - demand[1]));
-			//cost -= (state.period == planningHorizon ? salvageValue : 0)*(state.initialInventory+action-demand);
-
+			cost += ((state.initialInventoryA - action [0] + action[1] - demand[1] >=0) ? 
+					h*(state.initialInventoryA - action [0] + action[1] - demand[1]) : (-b)*(state.initialInventoryA - action [0] + action[1] - demand[1]))
+					+ ((state.initialInventoryB + action [0] + action[2] - demand[2] >=0) ? 
+							h*(state.initialInventoryB + action [0] + action[2] - demand[2]) : (-b)*(state.initialInventoryB + action [0] + action[2] - demand[2]));
+			
+			cost = prob * cost;
 			return cost;
 		};
-
-
-
 
 		/**
 		 * Initial problem conditions
@@ -305,10 +330,17 @@ public class LT2locationsChangeOfYp {
 		 * Run forward recursion and determine the expected total cost of an optimal policy
 		 */
 		System.out.println("f_1("+initialInventoryA+", "+initialInventoryB+")="+inventory.f(initialState));
+		
+		System.out.println("b_1("+initialInventoryA+", "+initialInventoryB+")="+inventory.cacheValueFunction.get(initialState));
+		
 		/**
 		 * Recover optimal action for period 1 when initial inventory at the beginning of period 1 is 1.
 		 */
-		System.out.println("b_1("+initialInventoryA+", "+initialInventoryB+")="+inventory.cacheActions.get(inventory.new State(initialPeriod,  initialInventoryA, initialInventoryB)));
+		System.out.println("b_1("+initialInventoryA+", "+initialInventoryB+")="
+															+Arrays.toString(inventory.cacheActions.get(initialState)));
+		
+		long timeEnd = System.currentTimeMillis();
+		System.out.println("time consumed = "+(timeEnd - timeStart)/1000);
 	}
 
 }
