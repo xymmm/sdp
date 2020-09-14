@@ -197,9 +197,9 @@ public class LT2locationsChanges {
 					//System.out.println(state);
 					
 					//cur month demand: [][pro demandA demandB]
-					double[][] curMonthDemands = pmf[state.period - 1];
+					double[][] curDemand = pmf[state.period - 1];
 										
-					double currentCost = Arrays.stream(curMonthDemands).mapToDouble(demand -> {
+					double currentCost = Arrays.stream(curDemand).mapToDouble(demand -> {
 						double cost = immediateValueFunction.apply(state, action, demand);
 						
 						//next month cost
