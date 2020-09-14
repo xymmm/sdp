@@ -189,9 +189,9 @@ public class LT2locationsChanges {
 		
 		//this month actions
 		int[][] actions = state.getFeasibleActions();
-		if(actions==null || actions.length==0){
-			return 0d;
-		}
+//		if(actions==null || actions.length==0){
+//			return 0d;
+//		}
 		//get cost stream
 		double[] costs =  
 				Arrays.stream(actions).mapToDouble(action -> {
@@ -273,7 +273,7 @@ public class LT2locationsChanges {
 
 		long timeStart = System.currentTimeMillis();
 		
-		int[] demandMean1 = {2,4};
+		int[] demandMean1 = {2, 4};
 		int[] demandMean2 = {6, 4};
 		int maxInventory  = 10;
 		int minInventory  = -10;
@@ -326,21 +326,15 @@ public class LT2locationsChanges {
 		int initialInventoryB = 1;
 		State initialState = inventory.new State(initialPeriod, initialInventoryA, initialInventoryB);
 
-		/**
-		 * Run forward recursion and determine the expected total cost of an optimal policy
-		 */
+		//optimal cost
 		System.out.println("f_1("+initialInventoryA+", "+initialInventoryB+")="+inventory.f(initialState));
-		
-		System.out.println("b_1("+initialInventoryA+", "+initialInventoryB+")="+inventory.cacheValueFunction.get(initialState));
-		
-		/**
-		 * Recover optimal action for period 1 when initial inventory at the beginning of period 1 is 1.
-		 */
+				
+		//optimal action for period 1
 		System.out.println("b_1("+initialInventoryA+", "+initialInventoryB+")="
 															+Arrays.toString(inventory.cacheActions.get(initialState)));
 		
 		long timeEnd = System.currentTimeMillis();
-		System.out.println("time consumed = "+(timeEnd - timeStart)/1000);
+		System.out.println("time consumed = "+(timeEnd - timeStart)/1000+"s");
 	}
 
 }
