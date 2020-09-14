@@ -189,9 +189,7 @@ public class LT2locationsChanges {
 		
 		//this month actions
 		int[][] actions = state.getFeasibleActions();
-//		if(actions==null || actions.length==0){
-//			return 0d;
-//		}
+
 		//get cost stream
 		double[] costs =  
 				Arrays.stream(actions).mapToDouble(action -> {
@@ -201,7 +199,7 @@ public class LT2locationsChanges {
 					//cur month demand: [][pro demandA demandB]
 					double[][] curMonthDemands = pmf[state.period - 1];
 										
-					double curMonthCost = Arrays.stream(curMonthDemands).mapToDouble(demand -> {
+					double currentCost = Arrays.stream(curMonthDemands).mapToDouble(demand -> {
 						double cost = immediateValueFunction.apply(state, action, demand);
 						
 						//next month cost
@@ -215,11 +213,11 @@ public class LT2locationsChanges {
 					}).sum();
 					
 				
-					return curMonthCost ;
+					return currentCost ;
 				}).toArray();
 		//get min cost
 		double minCost = Arrays.stream(costs).min().getAsDouble();
-		cacheValueFunction.put(state,minCost);
+		cacheValueFunction.put(state, minCost);
 		
 		//get first index of min cost (probably Multiple,only select first index )
 		AtomicInteger firstMinCostIdx = new AtomicInteger(0);
@@ -322,8 +320,8 @@ public class LT2locationsChanges {
 		 * Initial problem conditions
 		 */
 		int initialPeriod = 1;
-		int initialInventoryA = 1;
-		int initialInventoryB = 1;
+		int initialInventoryA = 0;
+		int initialInventoryB = 0;
 		State initialState = inventory.new State(initialPeriod, initialInventoryA, initialInventoryB);
 
 		//optimal cost
@@ -332,6 +330,8 @@ public class LT2locationsChanges {
 		//optimal action for period 1
 		System.out.println("b_1("+initialInventoryA+", "+initialInventoryB+")="
 															+Arrays.toString(inventory.cacheActions.get(initialState)));
+		
+		
 		
 		long timeEnd = System.currentTimeMillis();
 		System.out.println("time consumed = "+(timeEnd - timeStart)/1000+"s");
