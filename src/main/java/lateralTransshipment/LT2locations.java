@@ -10,6 +10,13 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.math3.distribution.PoissonDistribution;
 
+import minlp_Poisson.simPoissonInstance;
+import umontreal.ssj.probdist.PoissonDist;
+import umontreal.ssj.randvar.PoissonGen;
+import umontreal.ssj.randvar.RandomVariateGenInt;
+import umontreal.ssj.rng.MRG32k3a;
+import umontreal.ssj.stat.Tally;
+
 public class LT2locations {
 
 	/**
@@ -239,12 +246,56 @@ public class LT2locations {
 		});		
 		return pmf;
 	}
+	
+	/***************************** simulation ******************************************************/
+
+	static MRG32k3a randomStream = new MRG32k3a();	
+	static {
+		long seed[] = {1234,1234,1234,1234,1234,1234};
+		randomStream.setSeed(seed);
+	}	
+	static int generatePoissonDemand(double demandMean) {
+		RandomVariateGenInt genDemand;		  
+		genDemand = new PoissonGen(randomStream, new PoissonDist(demandMean)); 
+		int demand = genDemand.nextInt();
+		return -demand;
+	}
+	
+	double LTsim(State initialState, LTinstance instance){
+		double cost = 0;
+		int t=0;		
+		do {
+			int[] action = cacheActions.get(initialState);
+			State replenishedState = new State(t+1, initialState.initialInventoryA-action[0]+action[1], 
+										initialState.initialInventoryB + action[0] + action[2]);
+			cost+= (Math.abs(action[0]) > 0 ? instance.R + instance.v*action[0] : 0) 
+					+ (action[1]>0 ? instance.K + instance.z*action[1] : 0) 
+					+ (action[2]>0 ? instance.K + instance.z*action[2] : 0);
+			int[] demand = new int[2]; 
+			demand[0] = generatePoissonDemand(instance.demandMean1[t]); demand[1] = generatePoissonDemand(instance.demandMean2[t]);
+			State closingState = new State(t+2, replenishedState.initialInventoryA + demand[0], replenishedState.initialInventoryB + demand[1]);
+			cost+= (closingState.initialInventoryA >= 0 ? instance.h * closingState.initialInventoryA : instance.b * closingState.initialInventoryA)
+					+(closingState.initialInventoryB >= 0 ? instance.h * closingState.initialInventoryB : instance.b * closingState.initialInventoryB);
+			initialState = closingState;
+		}while(t<instance.demandMean1.length);
+		return cost;
+	}
+	
+	public static Tally statCost = new Tally("stats on cost");
+	
+	void MultipleSim(State initialState, LTinstance instance, int count){
+		for(int i=0; i<count; i++) {
+			statCost.add(LTsim(initialState, instance));
+		}
+	}
 
 
-	/***********************************************************************************************/
+
+
+	/***************************** main ************************************************************/
 
 	public static void main(String [] args){
-
+		/** time record - start**/
 		long timeStart = System.currentTimeMillis();
 		
 		int[] demandMean1 = {2, 4};
@@ -273,16 +324,17 @@ public class LT2locations {
 			return action;
 		};
 
+		//state transition
 		inventory.stateTransition = (state, action, randomOutcome) -> 
 		inventory.new State(state.period + 1, 
 				(int) (state.initialInventoryA + action[0] + action[1] - randomOutcome[0]),
 				(int) (state.initialInventoryB - action[0] + action[2] - randomOutcome[1])
 				);
-
+		
+		//immediate cost * prob
 		inventory.immediateValueFunction = (state, action, demand) -> {
-			double prob = demand[0];
-			
-			double cost = (action[0] > 0 ? R + v*action[0] : 0) + (action[1]>0 ? K + z*action[1] : 0) + (action[2]>0 ? K+z*action[2] : 0);
+			double prob = demand[0];			
+			double cost = (Math.abs(action[0]) > 0 ? R + v*action[0] : 0) + (action[1]>0 ? K + z*action[1] : 0) + (action[2]>0 ? K+z*action[2] : 0);
 			cost += ((state.initialInventoryA - action [0] + action[1] - demand[1] >=0) ? 
 					h*(state.initialInventoryA - action [0] + action[1] - demand[1]) : (-b)*(state.initialInventoryA - action [0] + action[1] - demand[1]))
 					+ ((state.initialInventoryB + action [0] + action[2] - demand[2] >=0) ? 
@@ -299,14 +351,26 @@ public class LT2locations {
 		State initialState = inventory.new State(initialPeriod, initialInventoryA, initialInventoryB);
 
 		//optimal cost
-		System.out.println("f_1("+initialInventoryA+", "+initialInventoryB+")="+inventory.f(initialState));
+		System.out.println("f("+initialInventoryA+", "+initialInventoryB+")="+inventory.f(initialState));
 				
 		//optimal action for period 1
-		System.out.println("b_1("+initialInventoryA+", "+initialInventoryB+")="
+		System.out.println("optAction("+initialInventoryA+", "+initialInventoryB+")="
 															+Arrays.toString(inventory.cacheActions.get(initialState)));
-		
+
+		/** time record - end**/
 		long timeEnd = System.currentTimeMillis();
-		System.out.println("time consumed = "+(timeEnd - timeStart)/1000+"s");
+		System.out.println("time consumed on Forward DP: "+(timeEnd - timeStart)/1000+"s");
+		
+		/****************************************************************************/
+		timeStart = System.currentTimeMillis();
+		int count = 1;
+		MultipleSim(initialState, instance, count);
+		statCost.setConfidenceIntervalStudent();
+		System.out.println(statCost.report(0.9, 3));
+		System.out.println(statCost.average());
+		timeEnd = System.currentTimeMillis();
+		System.out.println("time consumed on simulation (forward DP): "+(timeEnd - timeStart)/1000+"s");
+
 	}
 
 }
