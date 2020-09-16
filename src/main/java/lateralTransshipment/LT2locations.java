@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.math3.distribution.PoissonDistribution;
 
-public class LT2locationsChanges {
+public class LT2locations {
 
 	/**
 	 * Non-stationary stochastic lot sizing problem with lateral transshipment for 2-location system.
@@ -35,7 +35,7 @@ public class LT2locationsChanges {
 	int planningHorizon;
 	double[][][] pmf;		//pmf[t]: [	[prob, demand1, demand2],[],...[]	]
 
-	public LT2locationsChanges(int planningHorizon,
+	public LT2locations(int planningHorizon,
 			double[][][] pmf) {
 		this.planningHorizon = planningHorizon;
 		this.pmf = pmf;
@@ -167,34 +167,12 @@ public class LT2locationsChanges {
 	Map<State, Double> cacheValueFunction = new HashMap<>();
 	double f(State state){
 		
-//			double val= Arrays.stream(s.getFeasibleActions())
-//					.map(action -> Arrays.stream(pmf)
-//							.mapToDouble(p -> p[1][0]*immediateValueFunction.apply(s, action, p[0])+
-//									(s.period < this.planningHorizon ?
-//											p[1][1]*f(stateTransition.apply(s, action, p[0])) : 0))
-//							.sum())
-//					.min(Double::compare)
-//					.get();
-//			int[] bestAction = Arrays.stream(s.getFeasibleActions())
-//					.filter(action -> Arrays.stream(pmf)
-//							.mapToDouble(p -> p[1][0]*immediateValueFunction.apply(s, action, p[0])+
-//									(s.period < this.planningHorizon ?
-//											p[1][0]*f(stateTransition.apply(s, action, p[0])):0))
-//							.sum() == val)
-//					.findAny()
-//					.get();
-//			cacheActions.putIfAbsent(s, bestAction);
-		
-//		System.out.println(state);
-		
 		//this month actions
 		int[][] actions = state.getFeasibleActions();
 
 		//get cost stream
 		double[] costs =  
 				Arrays.stream(actions).mapToDouble(action -> {
-					//current stage cost
-					//System.out.println(state);
 					
 					//cur month demand: [][pro demandA demandB]
 					double[][] curDemand = pmf[state.period - 1];
@@ -229,9 +207,7 @@ public class LT2locationsChanges {
 		});
 		
 		int minCostIdx = firstMinCostIdx.get();
-//		if(minCostIdx>=actions.length){
-			//is error,if true,actions[minCostIdx] probably out of range Exception,cost==minCost?
-//		}
+
 		cacheActions.putIfAbsent(state, actions[minCostIdx]);
 
 		return minCost;
@@ -288,7 +264,7 @@ public class LT2locationsChanges {
 
 		double[][][] pmf = generatePMF(demandMean1, demandMean2, tail);
 
-		LT2locationsChanges inventory = new LT2locationsChanges(demandMean1.length, pmf);
+		LT2locations inventory = new LT2locations(demandMean1.length, pmf);
 
 		//generateFeasibleActions
 		inventory.actionGenerator = state ->{
@@ -316,9 +292,7 @@ public class LT2locationsChanges {
 			return cost;
 		};
 
-		/**
-		 * Initial problem conditions
-		 */
+		//Initial problem conditions
 		int initialPeriod = 1;
 		int initialInventoryA = 0;
 		int initialInventoryB = 0;
@@ -330,8 +304,6 @@ public class LT2locationsChanges {
 		//optimal action for period 1
 		System.out.println("b_1("+initialInventoryA+", "+initialInventoryB+")="
 															+Arrays.toString(inventory.cacheActions.get(initialState)));
-		
-		
 		
 		long timeEnd = System.currentTimeMillis();
 		System.out.println("time consumed = "+(timeEnd - timeStart)/1000+"s");
