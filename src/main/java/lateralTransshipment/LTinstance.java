@@ -29,7 +29,7 @@ public class LTinstance {
 			 double b,
 			 double tail) {
 		 this.demandMean1 = demandMean1;
-		 this.demandMean1 = demandMean2;
+		 this.demandMean2 = demandMean2;
 		 this.maxInventory = maxInventory;
 		 this.minInventory = minInventory;
 		 this.maxQuantity = maxQuantity;
