@@ -380,7 +380,7 @@ public class LT2locations {
 		timeStart = System.currentTimeMillis();
 		int count = 1;
 		boolean print = true;
-		LTsim(initialState, instance, count, print);
+		inventory.LTsim(initialState, instance, count, print);
 		timeEnd = System.currentTimeMillis();
 		System.out.println("time consumed on simulation (forward DP): "+(timeEnd - timeStart)/1000+"s");
 
