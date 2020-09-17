@@ -183,13 +183,13 @@ public class LT2locations {
 		double[] costs =  
 				Arrays.stream(actions).mapToDouble(action -> {
 
-					//cur month demand: [][pro demandA demandB]
+					//current demand: [][pro demandA demandB]
 					double[][] curDemand = pmf[state.period - 1];
 
 					double currentCost = Arrays.stream(curDemand).mapToDouble(demand -> {
 						double cost = immediateValueFunction.apply(state, action, demand);
 
-						//next month cost
+						//future cost
 						if(state.period < this.planningHorizon){
 							State futureState = stateTransition.apply(state, action, new double[]{demand[1],demand[2]});
 							double futureCost = f(futureState);
@@ -198,7 +198,6 @@ public class LT2locations {
 
 						return cost;
 					}).sum();
-
 
 					return currentCost ;
 				}).toArray();
