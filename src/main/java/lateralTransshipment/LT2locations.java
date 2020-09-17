@@ -357,7 +357,7 @@ public class LT2locations {
 		//immediate cost * prob
 		inventory.immediateValueFunction = (state, action, demand) -> {
 			double prob = demand[0];			
-			double cost = (Math.abs(action[0]) > 0 ? R + v*action[0] : 0) + (action[1]>0 ? K + z*action[1] : 0) + (action[2]>0 ? K+z*action[2] : 0);
+			double cost = (Math.abs(action[0]) > 0 ? R + v*Math.abs(action[0]) : 0) + (action[1]>0 ? K + z*action[1] : 0) + (action[2]>0 ? K+z*action[2] : 0);
 			cost += ((state.initialInventoryA - action [0] + action[1] - demand[1] >=0) ? 
 					h*(state.initialInventoryA - action [0] + action[1] - demand[1]) : (-b)*(state.initialInventoryA - action [0] + action[1] - demand[1]))
 					+ ((state.initialInventoryB + action [0] + action[2] - demand[2] >=0) ? 
@@ -374,15 +374,15 @@ public class LT2locations {
 		State initialState = inventory.new State(initialPeriod, initialInventoryA, initialInventoryB);
 
 		//optimal cost
-		System.out.println("f("+initialInventoryA+", "+initialInventoryB+")="+inventory.f(initialState));
+		System.out.println("f("+initialInventoryA+","+initialInventoryB+") = "+inventory.f(initialState));
 
 		//optimal action for period 1
-		System.out.println("optAction("+initialInventoryA+", "+initialInventoryB+")="
+		System.out.println("optAction("+initialInventoryA+","+initialInventoryB+") = "
 				+Arrays.toString(inventory.cacheActions.get(initialState)));
 
 		/** time record - end**/
 		long timeEnd = System.currentTimeMillis();
-		System.out.println("time consumed on Forward DP: "+(timeEnd - timeStart)/1000+"s");
+		System.out.println("time consumed on Forward DP: "+(timeEnd - timeStart)/1000+"s.");
 
 		/****************************************************************************/
 /*		timeStart = System.currentTimeMillis();
