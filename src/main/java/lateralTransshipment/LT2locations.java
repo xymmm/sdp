@@ -59,7 +59,6 @@ public class LT2locations {
 			this.period = period;
 			this.initialInventoryA = initialInventoryA;
 			this.initialInventoryB = initialInventoryB;
-
 		}
 
 		public int[][] getFeasibleActions(){//all actions
@@ -77,15 +76,15 @@ public class LT2locations {
 			return this.period + "_" + this.initialInventoryA + "_" + this.initialInventoryB;
 		}
 
-		@Override
-		public boolean equals(Object o){
-			if(o instanceof State)
-				return ((State) o).period == this.period &&
-				((State) o).initialInventoryA == this.initialInventoryA &&
-				((State) o).initialInventoryB == this.initialInventoryB;
-			else
-				return false;
-		}
+//		@Override
+//		public boolean equals(Object o){
+//			if(o instanceof State)
+//				return ((State) o).period == this.period &&
+//				((State) o).initialInventoryA == this.initialInventoryA &&
+//				((State) o).initialInventoryB == this.initialInventoryB;
+//			else
+//				return false;
+//		}
 
 		/* state(1, 125, 65) to (int) period = 1, (int) state.A = 125, (int) state.B = 65 */
 		public State parse(String state) {
@@ -318,18 +317,18 @@ public class LT2locations {
 		/** time record - start**/
 		long timeStart = System.currentTimeMillis();
 
-		int[] demandMean1 = {2, 4};
-		int[] demandMean2 = {6, 4};
-		int maxInventory  = 10;
-		int minInventory  = -10;
-		int maxQuantity   = 10;
+		int[] demandMean1 = {1, 2};
+		int[] demandMean2 = {3, 2};
+		int maxInventory  = 20;
+		int minInventory  = -20;
+		int maxQuantity   = 20;
 		double K = 10;
 		double z = 0;
 		double R = 5;
 		double v = 0;
 		double h = 1;
 		double b = 3; 
-		double tail = 0.000000000001;
+		double tail = 0.00000001;
 
 		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
 
@@ -340,10 +339,10 @@ public class LT2locations {
 		//generateFeasibleActions
 		inventory.actionGenerator = state ->{
 			ArrayList<int[]> actionList = state.generateFeasibleActions(state, instance);
-			int[][] action = actionList.toArray(new int[0][0]);
-			if(action==null || action.length==0){
-				System.out.println("no actions ?????");
-			}
+			int[][] action = actionList.toArray(new int[actionList.size()][3]);
+//			if(action==null || action.length==0){
+//				System.out.println(state.period+" "+state.initialInventoryA+" "+state.initialInventoryB+" "+"no actions ?????");
+//			}
 			return action;
 		};
 
@@ -385,13 +384,13 @@ public class LT2locations {
 		System.out.println("time consumed on Forward DP: "+(timeEnd - timeStart)/1000+"s.");
 
 		/****************************************************************************/
-/*		timeStart = System.currentTimeMillis();
+		timeStart = System.currentTimeMillis();
 		int count = 1;
 		boolean print = true;
 		LTsim(initialState, instance, count, print);
 		timeEnd = System.currentTimeMillis();
 		System.out.println("time consumed on simulation (forward DP): "+(timeEnd - timeStart)/1000+"s");
-*/
+
 	}
 
 }
