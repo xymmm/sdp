@@ -166,40 +166,44 @@ public class LT2locationsBackwards {
 	public static Tally statCost = new Tally("stats on cost");
 
 	public static void LTsim(int[] initialState, LTinstance instance, int count, boolean print,
-			int[][] inventoryPairs, int[][][] optimalAction){	
+								int[][] inventoryPairs, int[][][] optimalAction){	
+		
 		double[] cost = new double[count];
+		int[][] state = new int[count][2];
 		for(int i=0; i<count; i++) {
+			
 			if(print) System.out.println("---------------------------------------------------");
 
-			int[] state = initialState;
+			state[i] = initialState;
+			System.out.println("input initialState"+Arrays.toString(state[i]));
 
 			int[] demand1 = generateDemand(instance.demandMean1);
 			int[] demand2 = generateDemand(instance.demandMean2);
 
 			cost[i] = 0;
-			int t=0;		
-			do {
-				if(print) System.out.println("period "+(t+1)+", state = "+Arrays.toString(state));
+			
+			for(int t=0; t<instance.demandMean1.length; t++) {
+				if(print) System.out.println("period "+(t+1)+", state = "+Arrays.toString(state[i]));
 
-				int stateIndex = getStateIndex(inventoryPairs, state);
+				int stateIndex = getStateIndex(inventoryPairs, state[i]);
 				int[] action = optimalAction[t][stateIndex];
 				if(print) System.out.println("optimal action = "+Arrays.toString(action));
 
-				state[0] = initialState[0] - action[0] + action[1] <= instance.maxInventory ? initialState[0] - action[0] + action[1] : instance.maxInventory;
-				state[1] = initialState[1] + action[0] + action[2] <= instance.maxInventory ? initialState[1] + action[0] + action[2] : instance.maxInventory;
-				if(print) System.out.println("state after action = "+Arrays.toString(state));
+				state[i][0] = state[i][0] - action[0] + action[1] <= instance.maxInventory ? state[i][0] - action[0] + action[1] : instance.maxInventory;
+				state[i][1] = state[i][1] + action[0] + action[2] <= instance.maxInventory ? state[i][1] + action[0] + action[2] : instance.maxInventory;
+				if(print) System.out.println("state after action = "+Arrays.toString(state[i]));
 				cost[i]+= computeActionCost(instance, action);
 				if(print) System.out.println("cumulative cost = "+cost[i]);
 
-				System.out.println("demand = ["+demand1[t]+","+demand2[t]+"]");
-				state[0] = state[0] + demand1[t] >= instance.minInventory ? state[0] + demand1[t] : instance.minInventory;
-				state[1] = state[1] + demand2[t] >= instance.minInventory ? state[1] + demand2[t] : instance.minInventory;
-				if(print) System.out.println("state after demand = "+Arrays.toString(state));
-				cost[i]+= computeImmediateCost(instance, state);
+				if(print) System.out.println("demand = ["+demand1[t]+","+demand2[t]+"]");
+				state[i][0] = state[i][0] + demand1[t] >= instance.minInventory ? state[i][0] + demand1[t] : instance.minInventory;
+				state[i][1] = state[i][1] + demand2[t] >= instance.minInventory ? state[i][1] + demand2[t] : instance.minInventory;
+				if(print) System.out.println("state after demand = "+Arrays.toString(state[i]));
+				cost[i]+= computeImmediateCost(instance, state[i]);
 				if(print) System.out.println("cumulative cost = "+cost[i]);
 
-				t++;
-			}while(t<instance.demandMean1.length);
+			}
+			System.out.println("END----"+Arrays.toString(initialState));
 			statCost.add(cost[i]);
 		}
 
@@ -289,7 +293,7 @@ public class LT2locationsBackwards {
 		int idx = getStateIndex(inventoryPairs, initialState);
 		System.out.println("optimal cost of state " + Arrays.toString(initialState) + ": "+optimalCost[0][idx]);
 
-		LTsim(initialState, instance,  2, true,
+		LTsim(initialState, instance,  3, true,
 				inventoryPairs, optimalAction);
 		//		System.out.println(Arrays.toString(simulationCost));
 
