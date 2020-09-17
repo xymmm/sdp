@@ -315,8 +315,8 @@ public class LT2locations {
 		/** time record - start**/
 		long timeStart = System.currentTimeMillis();
 
-		int[] demandMean1 = {1, 1, 2};
-		int[] demandMean2 = {1, 2, 3};
+		int[] demandMean1 = {1,  2};
+		int[] demandMean2 = {2, 3};
 		int maxInventory  = 5;
 		int minInventory  = -5;
 		int maxQuantity   = 6;
