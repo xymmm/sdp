@@ -1,20 +1,15 @@
 package lateralTransshipment;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import org.apache.commons.math3.distribution.PoissonDistribution;
 
-import minlp_Poisson.simPoissonInstance;
-import sQ.simulation.sQsimInstanceDouble;
 import umontreal.ssj.probdist.PoissonDist;
 import umontreal.ssj.randvar.PoissonGen;
 import umontreal.ssj.randvar.RandomVariateGenInt;
@@ -25,6 +20,8 @@ public class LT2locations {
 
 	/**
 	 * Non-stationary stochastic lot sizing problem with lateral transshipment for 2-location system.
+	 * 
+	 * Forward recursion
 	 * 
 	 * Inventory at 2 locations can be replenished from the regular supplier (warehouse) but also proactive transshipment between locations.
 	 * 
@@ -176,12 +173,13 @@ public class LT2locations {
 	Map<State, int[]> cacheActions = new HashMap<>();
 	Map<State, Double> cacheValueFunction = new HashMap<>();
 	double f(State state){
-
+		if(state.period == 2)System.out.print("state = ("+state.period + ","+ state.initialInventoryA + "," + state.initialInventoryB + "):");
+		
 		//this month actions
 		int[][] actions = state.getFeasibleActions();
-		if(actions==null || actions.length==0){
-			return 0d;
-		}
+//		if(actions==null || actions.length==0){
+//			return 0d;
+//		}
 
 		//get cost stream
 		double[] costs =  
@@ -208,6 +206,7 @@ public class LT2locations {
 		//get min cost
 		double minCost = Arrays.stream(costs).min().getAsDouble();
 		cacheValueFunction.put(state, minCost);
+		if(state.period == 2) System.out.println(cacheValueFunction.get(state));
 
 		//get first index of min cost (probably Multiple,only select first index )
 		int minCostIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(costs);
@@ -312,11 +311,6 @@ public class LT2locations {
 	}
 
 
-
-
-
-
-
 	public static void main(String [] args) throws IOException{
 		/** time record - start**/
 		long timeStart = System.currentTimeMillis();
@@ -325,14 +319,14 @@ public class LT2locations {
 		int[] demandMean2 = {1, 2, 3};
 		int maxInventory  = 5;
 		int minInventory  = -5;
-		int maxQuantity   = 10;
+		int maxQuantity   = 6;
 		double K = 10;
 		double z = 0;
 		double R = 5;
 		double v = 0;
 		double h = 1;
 		double b = 3; 
-		double tail = 0.00000001;
+		double tail = 0.0001;
 
 		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
 
