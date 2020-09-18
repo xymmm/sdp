@@ -216,12 +216,32 @@ public class LT2locationsBackwards {
 		//System.out.println(statCost.average());
 	}
 
+	
+	public static void printLTsolution(LTsolution solution) {
+		System.out.println("------------------optimal cost------------------");
+		for(int i=0; i<solution.inventoryPairs.length; i++) {
+			System.out.print(solution.inventoryPairs[i][0]+","+solution.inventoryPairs[i][1]+ "\t");
+			for(int t=0; t<solution.optimalCost.length; t++) {
+				System.out.print(solution.optimalCost[t][i] + "\t");
+			}
+			System.out.println();
+		}
+
+		System.out.println("------------------optimal action------------------");
+		for(int i=0; i<solution.inventoryPairs.length; i++) {
+			System.out.print(solution.inventoryPairs[i][0]+","+solution.inventoryPairs[i][1]+ "\t");
+			for(int t=0; t<solution.optimalCost.length; t++) {
+				System.out.print(Arrays.toString(solution.optimalAction[t][i]) + "\t");
+			}
+			System.out.println();
+		}
+	}
 
 
 
 
 /************************************************************************************************************************************/
-public static void computeLTinstance(LTinstance instance, boolean initialOrder) {
+public static LTsolution computeLTinstance(LTinstance instance, boolean initialOrder) {
 	int Stages = instance.demandMean1.length;		
 	int[][] inventoryPairs = generateInventoryPairs(instance);
 
@@ -274,25 +294,7 @@ public static void computeLTinstance(LTinstance instance, boolean initialOrder) 
 		}
 	}
 
-
-	System.out.println("------------------optimal cost------------------");
-	for(int i=0; i<inventoryPairs.length; i++) {
-		System.out.print(inventoryPairs[i][0]+","+inventoryPairs[i][1]+ "\t");
-		for(int t=0; t<Stages; t++) {
-			System.out.print(optimalCost[t][i] + "\t");
-		}
-		System.out.println();
-	}
-
-	System.out.println("------------------optimal action------------------");
-	for(int i=0; i<inventoryPairs.length; i++) {
-		System.out.print(inventoryPairs[i][0]+","+inventoryPairs[i][1]+ "\t");
-		for(int t=0; t<Stages; t++) {
-			System.out.print(Arrays.toString(optimalAction[t][i]) + "\t");
-		}
-		System.out.println();
-	}
-
+/*
 	System.out.println();
 	System.out.println("------------------simulation------------------");
 	int[] initialState = {1,5};
@@ -302,8 +304,9 @@ public static void computeLTinstance(LTinstance instance, boolean initialOrder) 
 	LTsimMultipleRuns(initialState, instance, 2, true,
 			inventoryPairs, optimalAction);
 	//		System.out.println(Arrays.toString(simulationCost));
+	 * */
 
-	//		return new LTsolution(inventoryPairs, optimalAction, optimalCost);
+	return new LTsolution(inventoryPairs, optimalAction, optimalCost);
 
 }
 
@@ -327,7 +330,10 @@ public static void main(String[] args) {
 
 	boolean initialOrder = true;
 
-	computeLTinstance(instance, initialOrder);
+	LTsolution solution = computeLTinstance(instance, initialOrder);
+	
+	printLTsolution(solution);
+	
 
 
 }

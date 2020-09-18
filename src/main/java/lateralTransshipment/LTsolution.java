@@ -10,9 +10,9 @@ public class LTsolution {
 			int[][] inventoryPairs,
 			int[][][] optimalAction,
 			double[][] optimalCost) {
-		inventoryPairs = this.inventoryPairs;
-		optimalAction = this.optimalAction;
-		optimalCost = this.optimalCost;
+		this.inventoryPairs = inventoryPairs;
+		this.optimalAction = optimalAction;
+		this.optimalCost = optimalCost;
 		
 	}
 
