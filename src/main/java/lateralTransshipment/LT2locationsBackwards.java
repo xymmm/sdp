@@ -6,15 +6,6 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.math3.distribution.PoissonDistribution;
 
-import lateralTransshipment.LT2locations.State;
-import sQ.simulation.sQsimInstanceDouble;
-import sQ.simulation.sQsimPoisson;
-import sS.sSsolution;
-import umontreal.ssj.probdist.PoissonDist;
-import umontreal.ssj.randvar.PoissonGen;
-import umontreal.ssj.randvar.RandomVariateGenInt;
-import umontreal.ssj.rng.MRG32k3a;
-import umontreal.ssj.stat.Tally;
 import umontreal.ssj.util.Chrono;
 
 public class LT2locationsBackwards {
@@ -22,6 +13,31 @@ public class LT2locationsBackwards {
 
 	/**generate demand & probability matrix**/
 	//generatePMF(int[] demandMean1, int[] demandMean2, double tail)
+	public static double[][][] generatePMF(int[] demandMean1, int[] demandMean2, double tail){
+		double[][][] pmf = new double[demandMean1.length][][];
+
+		IntStream.range(0,demandMean1.length).forEach(t->{
+
+			//maximum demand
+			PoissonDistribution dist1 = new PoissonDistribution(demandMean1[t]);
+			int maxDemand1 = dist1.inverseCumulativeProbability(1-tail);
+
+			PoissonDistribution dist2 = new PoissonDistribution(demandMean2[t]);
+			int maxDemand2 = dist2.inverseCumulativeProbability(1-tail);
+
+			double[][] curPmf = new double[maxDemand1*maxDemand2][3];
+
+			IntStream.range(0,maxDemand1).forEach(demand1 -> {
+				IntStream.range(0,maxDemand2).forEach(demand2 -> {
+					double p = dist1.probability(demand1)*dist2.probability(demand2)/
+							(dist1.cumulativeProbability(maxDemand1)*dist2.cumulativeProbability(maxDemand2));
+					curPmf[demand1*maxDemand2+demand2] =new double[]{p,demand1,demand2};
+				});
+			});
+			pmf[t] = curPmf;
+		});		
+		return pmf;
+	}
 
 	//not used
 	public static double[][] generateDemandMatrix(LTinstance instance, int t){
@@ -175,7 +191,7 @@ public class LT2locationsBackwards {
 		int[][] inventoryPairs = generateInventoryPairs(instance);
 
 		//demand[t][demandPairCount][3] ->{prob*prob, demand 1, demand 2}
-		double[][][] demand = LT2locations.generatePMF(instance.demandMean1, instance.demandMean2, instance.tail);	
+		double[][][] demand = generatePMF(instance.demandMean1, instance.demandMean2, instance.tail);	
 		//		double[][][] demand = generateDemandMatrix(instance);
 
 		int[][][] optimalAction = new int [Stages][inventoryPairs.length][3];
@@ -184,10 +200,10 @@ public class LT2locationsBackwards {
 
 		for(int t=Stages-1;t>=0;t--) { 	
 			
-			System.out.println("period"+(t+1));
+//			System.out.println("period"+(t+1));
 
 			for(int i=0;i<inventoryPairs.length;i++) { 
-				System.out.println("state: "+Arrays.toString(inventoryPairs[i]));
+//				System.out.println("state: "+Arrays.toString(inventoryPairs[i]));
 				int[][] actions =  generateFeasibleActions(inventoryPairs[i], instance);
 				totalCost = new double [inventoryPairs.length][actions.length];
 
@@ -250,11 +266,11 @@ public class LT2locationsBackwards {
 
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {1, 2, 3};
-		int[] demandMean2 = {2, 3, 1};
+		int[] demandMean1 = {1, 2};
+		int[] demandMean2 = {2, 3};
 		int maxInventory  = 10;
 		int minInventory  = -10;
-		int maxQuantity   = 10;
+		int maxQuantity   = 20;
 		double K = 10;
 		double z = 0;
 		double R = 5;

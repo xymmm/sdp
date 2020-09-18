@@ -19,7 +19,7 @@ public class LTsimInstance{
 	public int[][][] optimalAction;
 	public double[][] optimalCost;
 	
-	public int[] initialState = {1,5};
+	public int[] start = {1,5};
 	
 	public Tally statCost = new Tally("stats on cost");
 	
@@ -53,7 +53,7 @@ public class LTsimInstance{
 	}
 	
 	public int[] getInitialState() {
-		return this.initialState;
+		return start;
 	}
 	
 }

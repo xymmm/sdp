@@ -28,7 +28,7 @@ public class LTsimulation {
 	
 	public static double LTsim(LTsimInstance simInstance, boolean print) {
 		if(print == true) System.out.println("-------------------------------");
-		int[] inventoryLevel = simInstance.getInitialState();
+		int[] inventoryLevel = {1,5};
 		double cost = 0;
 		
 		int t=0;
@@ -60,6 +60,7 @@ public class LTsimulation {
 					+ ((inventoryLevel[1] >=0 ) ? simInstance.h*inventoryLevel[1] : (-simInstance.b)*inventoryLevel[1]);
 			if(print == true) System.out.println("Cumulative cost is "+cost);
 			
+			//if(t==simInstance.demandMean1.length-1) inventoryLevel = simInstance.getInitialState();
 			t++;
 		}while(t<simInstance.demandMean1.length);
 		return cost;
