@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 import org.apache.commons.math3.distribution.PoissonDistribution;
 
 import lateralTransshipment.LT2locations.State;
+import sQ.simulation.sQsimInstanceDouble;
 import sS.sSsolution;
 import umontreal.ssj.probdist.PoissonDist;
 import umontreal.ssj.randvar.PoissonGen;
@@ -19,30 +20,30 @@ public class LT2locationsBackwards {
 
 	/**generate demand & probability matrix**/
 	//generatePMF(int[] demandMean1, int[] demandMean2, double tail)
-	
+
 	//not used
 	public static double[][] generateDemandMatrix(LTinstance instance, int t){
-		
 
-//		for(int t=0; t<instance.demandMean1.length; t++) {
-			PoissonDistribution dist1 = new PoissonDistribution(instance.demandMean1[t]);
-			PoissonDistribution dist2 = new PoissonDistribution(instance.demandMean2[t]);
 
-			int maxDemand1 = dist1.inverseCumulativeProbability(instance.tail);
-			int maxDemand2 = dist2.inverseCumulativeProbability(instance.tail);
+		//		for(int t=0; t<instance.demandMean1.length; t++) {
+		PoissonDistribution dist1 = new PoissonDistribution(instance.demandMean1[t]);
+		PoissonDistribution dist2 = new PoissonDistribution(instance.demandMean2[t]);
 
-			double[][] demand = new double[(maxDemand1 + 1)*(maxDemand2+1)][3];
-			
-			ArrayList<double[]> demandList = new ArrayList<double[]>();
-			for(int i=0; i<=maxDemand1; i++) {
-				for(int j=0; j<=maxDemand2; j++) {
-					double[] pairs = {dist1.probability(i)*dist2.probability(j), i,j};	demandList.add(pairs);
-				}
+		int maxDemand1 = dist1.inverseCumulativeProbability(instance.tail);
+		int maxDemand2 = dist2.inverseCumulativeProbability(instance.tail);
+
+		double[][] demand = new double[(maxDemand1 + 1)*(maxDemand2+1)][3];
+
+		ArrayList<double[]> demandList = new ArrayList<double[]>();
+		for(int i=0; i<=maxDemand1; i++) {
+			for(int j=0; j<=maxDemand2; j++) {
+				double[] pairs = {dist1.probability(i)*dist2.probability(j), i,j};	demandList.add(pairs);
 			}
-			for(int l=0; l<demandList.size();l++) {
-				demand[l] = demandList.get(l);
-			}	
-//		}
+		}
+		for(int l=0; l<demandList.size();l++) {
+			demand[l] = demandList.get(l);
+		}	
+		//		}
 
 		return demand;
 	}
@@ -165,165 +166,170 @@ public class LT2locationsBackwards {
 
 	public static Tally statCost = new Tally("stats on cost");
 
-	public static void LTsim(int[] initialState, LTinstance instance, int count, boolean print,
-								int[][] inventoryPairs, int[][][] optimalAction){	
-		
-		double[] cost = new double[count];
-		int[][] state = new int[count][2];
-		for(int i=0; i<count; i++) {
-			
-			if(print) System.out.println("---------------------------------------------------");
+	public static double LTsim(int[] initialState, LTinstance instance, boolean print,
+			int[][] inventoryPairs, int[][][] optimalAction){	
 
-			state[i] = initialState;
-			System.out.println("input initialState"+Arrays.toString(state[i]));
+		int[] state = initialState;
 
-			int[] demand1 = generateDemand(instance.demandMean1);
-			int[] demand2 = generateDemand(instance.demandMean2);
+		if(print) System.out.println("---------------------------------------------------");
 
-			cost[i] = 0;
-			
-			for(int t=0; t<instance.demandMean1.length; t++) {
-				if(print) System.out.println("period "+(t+1)+", state = "+Arrays.toString(state[i]));
+		System.out.println("input initialState"+Arrays.toString(state));
 
-				int stateIndex = getStateIndex(inventoryPairs, state[i]);
-				int[] action = optimalAction[t][stateIndex];
-				if(print) System.out.println("optimal action = "+Arrays.toString(action));
+		int[] demand1 = generateDemand(instance.demandMean1);
+		int[] demand2 = generateDemand(instance.demandMean2);
 
-				state[i][0] = state[i][0] - action[0] + action[1] <= instance.maxInventory ? state[i][0] - action[0] + action[1] : instance.maxInventory;
-				state[i][1] = state[i][1] + action[0] + action[2] <= instance.maxInventory ? state[i][1] + action[0] + action[2] : instance.maxInventory;
-				if(print) System.out.println("state after action = "+Arrays.toString(state[i]));
-				cost[i]+= computeActionCost(instance, action);
-				if(print) System.out.println("cumulative cost = "+cost[i]);
+		double cost = 0;
 
-				if(print) System.out.println("demand = ["+demand1[t]+","+demand2[t]+"]");
-				state[i][0] = state[i][0] + demand1[t] >= instance.minInventory ? state[i][0] + demand1[t] : instance.minInventory;
-				state[i][1] = state[i][1] + demand2[t] >= instance.minInventory ? state[i][1] + demand2[t] : instance.minInventory;
-				if(print) System.out.println("state after demand = "+Arrays.toString(state[i]));
-				cost[i]+= computeImmediateCost(instance, state[i]);
-				if(print) System.out.println("cumulative cost = "+cost[i]);
+		for(int t=0; t<instance.demandMean1.length; t++) {
+			if(print) System.out.println("period "+(t+1)+", state = "+Arrays.toString(state));
 
-			}
-			System.out.println("END----"+Arrays.toString(initialState));
-			statCost.add(cost[i]);
+			int stateIndex = getStateIndex(inventoryPairs, state);
+			int[] action = optimalAction[t][stateIndex];
+			if(print) System.out.println("optimal action = "+Arrays.toString(action));
+
+			state[0] = state[0] - action[0] + action[1] <= instance.maxInventory ? state[0] - action[0] + action[1] : instance.maxInventory;
+			state[1] = state[1] + action[0] + action[2] <= instance.maxInventory ? state[1] + action[0] + action[2] : instance.maxInventory;
+			if(print) System.out.println("state after action = "+Arrays.toString(state));
+			cost+= computeActionCost(instance, action);
+			if(print) System.out.println("cumulative cost = "+cost);
+
+			if(print) System.out.println("demand = ["+demand1[t]+","+demand2[t]+"]");
+			state[0] = state[0] + demand1[t] >= instance.minInventory ? state[0] + demand1[t] : instance.minInventory;
+			state[1] = state[1] + demand2[t] >= instance.minInventory ? state[1] + demand2[t] : instance.minInventory;
+			if(print) System.out.println("state after demand = "+Arrays.toString(state));
+			cost+= computeImmediateCost(instance, state);
+			if(print) System.out.println("cumulative cost = "+cost);
+
 		}
+		return cost;
 
+	}
+
+	public static void LTsimMultipleRuns(int[] initialState, LTinstance instance, int count, boolean print,
+											int[][] inventoryPairs, int[][][] optimalAction) {
+		for(int i=0; i<count; i++) {
+			statCost.add(LTsim(initialState, instance, print,
+					inventoryPairs, optimalAction));
+		}
 		statCost.setConfidenceIntervalStudent();
 		System.out.println(statCost.report(0.9, 3));
 		//System.out.println(statCost.average());
-
-		//		return cost;
 	}
 
-	/************************************************************************************************************************************/
-	public static void computeLTinstance(LTinstance instance, boolean initialOrder) {
-		int Stages = instance.demandMean1.length;		
-		int[][] inventoryPairs = generateInventoryPairs(instance);
-
-		//demand[t][demandPairCount][3] ->{prob*prob, demand 1, demand 2}
-		double[][][] demand = LT2locations.generatePMF(instance.demandMean1, instance.demandMean2, instance.tail);	
-//		double[][][] demand = generateDemandMatrix(instance);
-
-		int[][][] optimalAction = new int [Stages][inventoryPairs.length][3];
-		double[][] optimalCost = new double [Stages][inventoryPairs.length]; 
-		double[][] totalCost = null;
-
-		for(int t=Stages-1;t>=0;t--) { 	
-
-			for(int i=0;i<inventoryPairs.length;i++) { 
-
-				int[][] actions =  generateFeasibleActions(inventoryPairs[i], instance);
-				totalCost = new double [inventoryPairs.length][actions.length];
-
-				for(int a=0; a<actions.length;a++) {
-
-					double scenarioProb = 0;
-					totalCost[i][a] = computeActionCost(instance, actions[a]);
-					//					assert totalCost[i][a] >= 0;
-
-					for(int d=0;d<demand[t].length;d++) { // Demand
-						if(
-								(inventoryPairs[i][0] - actions[a][0] + actions[a][1] - demand[t][d][1] <= instance.maxInventory) 
-								&& (inventoryPairs[i][0] - actions[a][0] + actions[a][1] - demand[t][d][1] >= instance.minInventory)
-								&& (inventoryPairs[i][1] + actions[a][0] + actions[a][2] - demand[t][d][2] <= instance.maxInventory) 
-								&& (inventoryPairs[i][1] + actions[a][0] + actions[a][2] - demand[t][d][2] >= instance.minInventory)
-								) {
-							//						   assert optimalCost[i+a-d][t+1] >= 0;
-							int[] closingState = {(int) (inventoryPairs[i][0] - actions[a][0] + actions[a][1] - demand[t][d][1]),
-									(int) (inventoryPairs[i][1] + actions[a][0] + actions[a][2] - demand[t][d][2])};
-							int closingStateIndex = getStateIndex(inventoryPairs, closingState);
-							totalCost[i][a] += demand[t][d][0]*(
-									computeImmediateCost(instance, closingState)
-									+((t==Stages-1) ? 0 : optimalCost[t+1][closingStateIndex])
-									);
 
 
-							scenarioProb += demand[t][d][0];
-						}//else, we do nothing - not added in scenarios
-					}
-					totalCost[i][a] = totalCost[i][a]/scenarioProb;
+
+
+/************************************************************************************************************************************/
+public static void computeLTinstance(LTinstance instance, boolean initialOrder) {
+	int Stages = instance.demandMean1.length;		
+	int[][] inventoryPairs = generateInventoryPairs(instance);
+
+	//demand[t][demandPairCount][3] ->{prob*prob, demand 1, demand 2}
+	double[][][] demand = LT2locations.generatePMF(instance.demandMean1, instance.demandMean2, instance.tail);	
+	//		double[][][] demand = generateDemandMatrix(instance);
+
+	int[][][] optimalAction = new int [Stages][inventoryPairs.length][3];
+	double[][] optimalCost = new double [Stages][inventoryPairs.length]; 
+	double[][] totalCost = null;
+
+	for(int t=Stages-1;t>=0;t--) { 	
+
+		for(int i=0;i<inventoryPairs.length;i++) { 
+
+			int[][] actions =  generateFeasibleActions(inventoryPairs[i], instance);
+			totalCost = new double [inventoryPairs.length][actions.length];
+
+			for(int a=0; a<actions.length;a++) {
+
+				double scenarioProb = 0;
+				totalCost[i][a] = computeActionCost(instance, actions[a]);
+				//					assert totalCost[i][a] >= 0;
+
+				for(int d=0;d<demand[t].length;d++) { // Demand
+					if(
+							(inventoryPairs[i][0] - actions[a][0] + actions[a][1] - demand[t][d][1] <= instance.maxInventory) 
+							&& (inventoryPairs[i][0] - actions[a][0] + actions[a][1] - demand[t][d][1] >= instance.minInventory)
+							&& (inventoryPairs[i][1] + actions[a][0] + actions[a][2] - demand[t][d][2] <= instance.maxInventory) 
+							&& (inventoryPairs[i][1] + actions[a][0] + actions[a][2] - demand[t][d][2] >= instance.minInventory)
+							) {
+						//						   assert optimalCost[i+a-d][t+1] >= 0;
+						int[] closingState = {(int) (inventoryPairs[i][0] - actions[a][0] + actions[a][1] - demand[t][d][1]),
+								(int) (inventoryPairs[i][1] + actions[a][0] + actions[a][2] - demand[t][d][2])};
+						int closingStateIndex = getStateIndex(inventoryPairs, closingState);
+						totalCost[i][a] += demand[t][d][0]*(
+								computeImmediateCost(instance, closingState)
+								+((t==Stages-1) ? 0 : optimalCost[t+1][closingStateIndex])
+								);
+
+
+						scenarioProb += demand[t][d][0];
+					}//else, we do nothing - not added in scenarios
 				}
-				optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
-				int optimalActionIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
-				optimalAction[t][i] = actions[optimalActionIdx];
+				totalCost[i][a] = totalCost[i][a]/scenarioProb;
 			}
+			optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
+			int optimalActionIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
+			optimalAction[t][i] = actions[optimalActionIdx];
 		}
+	}
 
 
-		System.out.println("------------------optimal cost------------------");
-		for(int i=0; i<inventoryPairs.length; i++) {
-			System.out.print(inventoryPairs[i][0]+","+inventoryPairs[i][1]+ "\t");
-			for(int t=0; t<Stages; t++) {
-				System.out.print(optimalCost[t][i] + "\t");
-			}
-			System.out.println();
+	System.out.println("------------------optimal cost------------------");
+	for(int i=0; i<inventoryPairs.length; i++) {
+		System.out.print(inventoryPairs[i][0]+","+inventoryPairs[i][1]+ "\t");
+		for(int t=0; t<Stages; t++) {
+			System.out.print(optimalCost[t][i] + "\t");
 		}
-
-		System.out.println("------------------optimal action------------------");
-		for(int i=0; i<inventoryPairs.length; i++) {
-			System.out.print(inventoryPairs[i][0]+","+inventoryPairs[i][1]+ "\t");
-			for(int t=0; t<Stages; t++) {
-				System.out.print(Arrays.toString(optimalAction[t][i]) + "\t");
-			}
-			System.out.println();
-		}
-
 		System.out.println();
-		System.out.println("------------------simulation------------------");
-		int[] initialState = {1,5};
-		int idx = getStateIndex(inventoryPairs, initialState);
-		System.out.println("optimal cost of state " + Arrays.toString(initialState) + ": "+optimalCost[0][idx]);
-
-		LTsim(initialState, instance,  3, true,
-				inventoryPairs, optimalAction);
-		//		System.out.println(Arrays.toString(simulationCost));
-
-		//		return new LTsolution(inventoryPairs, optimalAction, optimalCost);
-
 	}
 
-
-
-	public static void main(String[] args) {
-		int[] demandMean1 = {1,  2};
-		int[] demandMean2 = {2, 3};
-		int maxInventory  = 5;
-		int minInventory  = -5;
-		int maxQuantity   = 6;
-		double K = 10;
-		double z = 0;
-		double R = 5;
-		double v = 0;
-		double h = 1;
-		double b = 3; 
-		double tail = 0.0001;
-
-		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
-
-		boolean initialOrder = true;
-
-		computeLTinstance(instance, initialOrder);
-
-
+	System.out.println("------------------optimal action------------------");
+	for(int i=0; i<inventoryPairs.length; i++) {
+		System.out.print(inventoryPairs[i][0]+","+inventoryPairs[i][1]+ "\t");
+		for(int t=0; t<Stages; t++) {
+			System.out.print(Arrays.toString(optimalAction[t][i]) + "\t");
+		}
+		System.out.println();
 	}
+
+	System.out.println();
+	System.out.println("------------------simulation------------------");
+	int[] initialState = {1,5};
+	int idx = getStateIndex(inventoryPairs, initialState);
+	System.out.println("optimal cost of state " + Arrays.toString(initialState) + ": "+optimalCost[0][idx]);
+
+	LTsimMultipleRuns(initialState, instance, 2, true,
+			inventoryPairs, optimalAction);
+	//		System.out.println(Arrays.toString(simulationCost));
+
+	//		return new LTsolution(inventoryPairs, optimalAction, optimalCost);
+
+}
+
+
+
+public static void main(String[] args) {
+	int[] demandMean1 = {1,  2};
+	int[] demandMean2 = {2, 3};
+	int maxInventory  = 5;
+	int minInventory  = -5;
+	int maxQuantity   = 6;
+	double K = 10;
+	double z = 0;
+	double R = 5;
+	double v = 0;
+	double h = 1;
+	double b = 3; 
+	double tail = 0.0001;
+
+	LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
+
+	boolean initialOrder = true;
+
+	computeLTinstance(instance, initialOrder);
+
+
+}
 
 }
