@@ -1,0 +1,17 @@
+						int[] closingState = {
+								(int) (inventoryPairs[i][0] - actions[a][0] + actions[a][1] - demand[t][d][1]  instance.minInventory 
+										 instance.minInventory 
+												(inventoryPairs[i][0] - actions[a][0] + actions[a][1] - demand[t][d][1]  instance.maxInventory 
+														 instance.maxInventory 
+																 inventoryPairs[i][0] - actions[a][0] + actions[a][1] - demand[t][d][1])),
+								
+								(int) (inventoryPairs[i][0] + actions[a][0] + actions[a][2] - demand[t][d][2]  instance.minInventory 
+										 instance.minInventory 
+												(inventoryPairs[i][0] + actions[a][0] + actions[a][2] - demand[t][d][2]  instance.maxInventory 
+														 instance.maxInventory 
+																 inventoryPairs[i][0] + actions[a][0] + actions[a][2] - demand[t][d][2]))};
+						int closingStateIndex = getStateIndex(inventoryPairs, closingState);
+						totalCost[i][a] += demand[t][d][0](
+								computeImmediateCost(instance, closingState)
+								+((t==Stages-1)  0  optimalCost[t+1][closingStateIndex])
+								);
