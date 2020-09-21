@@ -319,7 +319,7 @@ public class LT2locationsBackwards {
 			long timePeriodStart = System.currentTimeMillis();
 
 			for(int i=0;i<inventoryPairs.length;i++) { 
-//				System.out.println(Arrays.toString(inventoryPairs[i]));
+				System.out.println(Arrays.toString(inventoryPairs[i]));
 				int[][] actions = null;
 				if(t==0 && noInitialTransship == true && noInitialOrder == true) {//work as normal
 					actions = new int[][]{{0, 0, 0}};
@@ -375,31 +375,33 @@ public class LT2locationsBackwards {
 
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {2, 4, 6, 4};
-		int[] demandMean2 = {3, 2, 1, 4};
-		int maxInventory  = 20;
-		int minInventory  = -20;
-		int maxQuantity   = 20;
-		double K = 10;
+		int[] demandMean1 = {10, 6, 4, 8};
+		int[] demandMean2 = {4, 10, 12, 8};
+		int maxInventory  = 30;
+		int minInventory  = -30;
+		int maxQuantity   = 30;
+		double K = 5;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
-		double R = 5;
+		double R = 7;
 		double v = 0;
 		double h = 1;
 		double b = 3; 
 		double tail = 0.0001;
-		boolean noInitialTransship = false;
-		boolean noInitialOrder = false;
-
-		long timeStart = System.currentTimeMillis();
+//		boolean noInitialTransship = false;
+//		boolean noInitialOrder = true;
+		boolean[] noInitialTransship = {true};//{false, true, true, false};
+		boolean[] noInitialOrder 	 = {true};//{false, true, false, true};
 		
 		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
-		LTsolution solution = computeLTinstance(instance, noInitialTransship, noInitialOrder);
-
-		printLTsolution(solution);
-		writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");
-		
-		long timeEnd = System.currentTimeMillis();
-		System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
+		for(int i=0; i<4; i++) {
+			long timeStart = System.currentTimeMillis();
+			LTsolution solution = computeLTinstance(instance, noInitialTransship[i], noInitialOrder[i]);
+			long timeEnd = System.currentTimeMillis();
+			System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
+//			printLTsolution(solution);
+			writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
+			System.out.println();
+		}
 		
 
 
