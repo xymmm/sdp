@@ -124,9 +124,11 @@ public class LT2locationsBackwards {
 			//			System.out.println("case 3");
 			for(int t=0; t<=state[1]; t++) {
 				newState = new int[] {state[0] + t, state[1] - t};	//update inventory level after transshipment
-				for(int i=0; i <= instance.maxInventory - state[0]; i++) {
-					for(int j=0; j <= instance.maxInventory - state[1]; j++) {
-						if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {-t, i, j});
+				if(newState[0]<=instance.maxInventory && newState[0] >=instance.minInventory) {//transship does not hit boundary
+					for(int i=0; i <= instance.maxInventory - state[0]; i++) {
+						for(int j=0; j <= instance.maxInventory - state[1]; j++) {
+							if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {-t, i, j});
+						}
 					}
 				}
 			}
@@ -137,25 +139,40 @@ public class LT2locationsBackwards {
 			//			System.out.println("case 2");
 			for(int t=0; t<=state[0]; t++) {
 				newState = new int[] {state[0] - t, state[1] + t};	//update inventory level after transshipment
-				for(int i=0; i <= instance.maxInventory - state[0]; i++) {
-					for(int j=0; j <= instance.maxInventory - state[1]; j++) {
-						if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {t, i, j});
+				if(newState[1] <= instance.maxInventory && newState[1] >= instance.minInventory) {//transship does not hit boundary
+					for(int i=0; i <= instance.maxInventory - state[0]; i++) {
+						for(int j=0; j <= instance.maxInventory - state[1]; j++) {
+							if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {t, i, j});
+						}
 					}
 				}
 			}
 			int[][] action = new int[actions.size()][3];
 			for(int i=0; i<actions.size(); i++) {action[i] = actions.get(i);}
 			return action;
-		}else {										//case 1: transhsip undirected
-			//int[] feasibleTransshipment = new int[state.i1 + state.i2 +1];
+		}else {//case 1: transhsip undirected
 			//			System.out.println("case 1");
-			for(int t=-state[1]; t<= state[0]; t++) {				
-				newState = new int[] { state[0]-t, state[1]+t};
-				for(int i=0; i <= instance.maxInventory - newState[0]; i++) {
-					for(int j=0; j <= instance.maxInventory - newState[1]; j++) {
-						if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {t, i, j});
+			for(int t=-state[1]; t<= state[0]; t++) {
+				if(t<=0) {//transship from 1 to 2
+					newState = new int[] { state[0]-t, state[1]+t};
+					if(newState[1] <=instance.maxInventory && newState[1] >= instance.minInventory) {
+						for(int i=0; i <= instance.maxInventory - newState[0]; i++) {
+							for(int j=0; j <= instance.maxInventory - newState[1]; j++) {
+								if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {t, i, j});
+							}
+						}
+					}
+				}else {//transship from 2 to 1
+					newState = new int[] { state[0]-t, state[1]+t};
+					if(newState[0] <= instance.maxInventory && newState[0] >= instance.minInventory) {
+						for(int i=0; i <= instance.maxInventory - newState[0]; i++) {
+							for(int j=0; j <= instance.maxInventory - newState[1]; j++) {
+								if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {t, i, j});
+							}
+						}
 					}
 				}
+
 			}
 			int[][] action = new int[actions.size()][3];
 			for(int i=0; i<actions.size(); i++) {action[i] = actions.get(i);}
@@ -163,7 +180,70 @@ public class LT2locationsBackwards {
 		}
 	}
 
+	public static int[][] generateNoOrderActions(int[] state, LTinstance instance){
+		ArrayList<int[]> actions = new ArrayList<int[]>();
+		int[] newState = null;
+
+		if((state[0] <=0)&&(state[1] <= 0)) {//case 4: no transshipment
+			return new int[][] {{0, 0, 0}};
+		}else if((state[0] <=0)&&(state[1] > 0)) {//case 3: transship from 2 to 1, transshipment <= 0
+			//			System.out.println("case 3");
+			for(int t=0; t<=state[1]; t++) {
+				newState = new int[] {state[0] + t, state[1] - t};	//update inventory level after transshipment
+				if(newState[0] <=instance.maxInventory && newState[1] >= instance.minInventory) {
+					actions.add(new int[] {-t, 0, 0});
+				}
+			}
+			int[][] action = new int[actions.size()][3];
+			for(int i=0; i<actions.size(); i++) {action[i] = actions.get(i);}
+			return action;
+		}else if((state[0] > 0)&&(state[1] <= 0)) {//case 2: transship from 1 to 2, transship >= 0
+			//			System.out.println("case 2");
+			for(int t=0; t<=state[0]; t++) {
+				newState = new int[] {state[0] - t, state[1] + t};	//update inventory level after transshipment
+				if(newState[1] <= instance.maxInventory && newState[1] >= instance.minInventory) {
+					actions.add(new int[] {t, 0, 0});
+				}
+			}
+			int[][] action = new int[actions.size()][3];
+			for(int i=0; i<actions.size(); i++) {action[i] = actions.get(i);}
+			return action;
+		}else {//case 1: transhsip undirected
+			//			System.out.println("case 1");
+			for(int t=-state[1]; t<= state[0]; t++) {
+				if(t<=0) {//transship from 1 to 2
+					newState = new int[] { state[0]-t, state[1]+t};
+					if(newState[1] <=instance.maxInventory && newState[1] >= instance.minInventory) {
+						actions.add(new int[] {t, 0, 0});
+					}
+				}else {//transship from 2 to 1
+					newState = new int[] { state[0]-t, state[1]+t};
+					if(newState[0] <= instance.maxInventory && newState[0] >= instance.minInventory) {
+						actions.add(new int[] {t, 0, 0});
+					}
+				}
+
+			}
+			int[][] action = new int[actions.size()][3];
+			for(int i=0; i<actions.size(); i++) {action[i] = actions.get(i);}
+			return action;
+		}
+	}
+
+	public static int[][] generateNoTransshipActions(int[] state, LTinstance instance){
+		ArrayList<int[]> actions = new ArrayList<int[]>();
+		for(int i=0; i <= instance.maxInventory - state[0]; i++) {
+			for(int j=0; j <= instance.maxInventory - state[1]; j++) {
+				if((i<=instance.maxQuantity)&&(j<=instance.maxQuantity)) actions.add(new int[] {0, i, j});
+			}
+		}
+		int[][] action = new int[actions.size()][3];
+		for(int i=0; i<actions.size(); i++) {action[i] = actions.get(i);}
+		return action;
+	}
+
 	/** print solution**/
+	
 	public static void printLTsolution(LTsolution solution) {
 		System.out.println("------------------optimal cost------------------");
 		for(int i=0; i<solution.inventoryPairs.length; i++) {
@@ -186,7 +266,7 @@ public class LT2locationsBackwards {
 
 
 	/************************************************************************************************************************************/
-	public static LTsolution computeLTinstance(LTinstance instance, boolean initialOrder) {
+	public static LTsolution computeLTinstance(LTinstance instance, boolean noInitialTransship, boolean noInitialOrder) {
 		int Stages = instance.demandMean1.length;		
 		int[][] inventoryPairs = generateInventoryPairs(instance);
 
@@ -199,12 +279,22 @@ public class LT2locationsBackwards {
 		double[][] totalCost = null;
 
 		for(int t=Stages-1;t>=0;t--) { 	
-			
-//			System.out.println("period"+(t+1));
+
+			System.out.println("period "+(t+1));
 
 			for(int i=0;i<inventoryPairs.length;i++) { 
 //				System.out.println("state: "+Arrays.toString(inventoryPairs[i]));
-				int[][] actions =  generateFeasibleActions(inventoryPairs[i], instance);
+				int[][] actions = null;
+				if(t==0 && noInitialTransship == true && noInitialOrder == true) {//work as normal
+					actions = new int[][]{{0, 0, 0}};
+				}else if(t==0 && noInitialTransship == true && noInitialOrder == false) {//only no transship in the first period
+					actions = generateNoTransshipActions(inventoryPairs[i], instance);
+				}else if(t==0 && noInitialTransship == false && noInitialOrder == true) {//only no order in the first period
+					actions = generateNoOrderActions(inventoryPairs[i], instance);
+				}else {
+					actions =  generateFeasibleActions(inventoryPairs[i], instance);
+				}
+
 				totalCost = new double [inventoryPairs.length][actions.length];
 
 				for(int a=0; a<actions.length;a++) {
@@ -232,7 +322,7 @@ public class LT2locationsBackwards {
 
 							scenarioProb += demand[t][d][0];
 						}//else, we do nothing - not added in scenarios
-	
+
 					}
 					totalCost[i][a] = totalCost[i][a]/scenarioProb;
 				}
@@ -259,36 +349,41 @@ public class LT2locationsBackwards {
 		double h = 1;
 		double b = 3; 
 		double tail = 0.0001;
+		boolean noInitialTransship = false;
+		boolean noInitialOrder = false;
 
+		long timeStart = System.currentTimeMillis();
+		
 		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
-
-		boolean initialOrder = true;
-
-		LTsolution solution = computeLTinstance(instance, initialOrder);
+		LTsolution solution = computeLTinstance(instance, noInitialTransship, noInitialOrder);
 
 		printLTsolution(solution);
+		
+		long timeEnd = System.currentTimeMillis();
+		System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
+		
 
 
-
+		/*
 		Chrono timer = new Chrono();
 
 		LTsimInstance simInstance = new LTsimInstance(demandMean1, demandMean2, maxInventory, minInventory, K, z, R, v, h, b,
 				solution.inventoryPairs, solution.optimalAction, solution.optimalCost); 
 		int count = 100000;
 		boolean print = false;
-		
+
 		lateralTransshipment.LTsimulation.LTsimMultipleRuns(simInstance, count, print);
-				
+
 		System.out.println("-------------------------------------------");
 		int initialStateIndex = getStateIndex(solution.inventoryPairs, simInstance.getInitialState());
 		System.out.println("Simulation: optimal cost of state"+Arrays.toString(simInstance.getInitialState()) +"= "+solution.optimalCost[0][initialStateIndex]);
 		System.out.println("-------------------------------------------");
-		
+
 		simInstance.statCost.setConfidenceIntervalStudent();
 		System.out.println(simInstance.statCost.report(0.9, 3));
 		System.out.println("Total CPU time: "+timer.format());
 		System.out.println(simInstance.statCost.average());
-
+		 */
 
 
 	}
