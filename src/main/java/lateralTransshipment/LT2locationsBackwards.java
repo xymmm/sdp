@@ -1,5 +1,9 @@
 package lateralTransshipment;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.IntStream;
@@ -263,6 +267,37 @@ public class LT2locationsBackwards {
 			System.out.println();
 		}
 	}
+	
+	public static void writeSolution(LTsolution solution, String fileName) {
+		//cost
+		FileWriter fw = null;
+		try {
+			File f = new File(fileName);
+			fw = new FileWriter(f, true);//true, continue to write
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PrintWriter pw = new PrintWriter(fw);
+		for(int i=0; i<solution.inventoryPairs.length; i++) {
+			pw.print(Arrays.toString(solution.inventoryPairs[i])+"\t");
+			for(int t=0; t<solution.optimalCost.length;t++) {
+				pw.print(solution.optimalCost[t][i]+"\t");
+			}
+			for(int t=0; t<solution.optimalCost.length;t++) {
+				pw.print(Arrays.toString(solution.optimalAction[t][i])+"\t");
+			}
+			pw.println();
+		}
+		pw.println();
+		pw.flush();
+		try {
+			fw.flush();
+			pw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 
 	/************************************************************************************************************************************/
@@ -281,9 +316,10 @@ public class LT2locationsBackwards {
 		for(int t=Stages-1;t>=0;t--) { 	
 
 			System.out.println("period "+(t+1));
+			long timePeriodStart = System.currentTimeMillis();
 
 			for(int i=0;i<inventoryPairs.length;i++) { 
-//				System.out.println("state: "+Arrays.toString(inventoryPairs[i]));
+//				System.out.println(Arrays.toString(inventoryPairs[i]));
 				int[][] actions = null;
 				if(t==0 && noInitialTransship == true && noInitialOrder == true) {//work as normal
 					actions = new int[][]{{0, 0, 0}};
@@ -330,6 +366,8 @@ public class LT2locationsBackwards {
 				int optimalActionIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
 				optimalAction[t][i] = actions[optimalActionIdx];
 			}
+			long timePeriodEnd = System.currentTimeMillis();
+			System.out.println("time for period "+(t+1)+" = "+ (timePeriodEnd - timePeriodStart)/1000+"s");
 		}
 		return new LTsolution(inventoryPairs, optimalAction, optimalCost);
 	}
@@ -337,10 +375,10 @@ public class LT2locationsBackwards {
 
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {1, 2};
-		int[] demandMean2 = {2, 3};
-		int maxInventory  = 10;
-		int minInventory  = -10;
+		int[] demandMean1 = {2, 4, 6, 4};
+		int[] demandMean2 = {3, 2, 1, 4};
+		int maxInventory  = 20;
+		int minInventory  = -20;
 		int maxQuantity   = 20;
 		double K = 10;
 		double z = 0;
@@ -358,6 +396,7 @@ public class LT2locationsBackwards {
 		LTsolution solution = computeLTinstance(instance, noInitialTransship, noInitialOrder);
 
 		printLTsolution(solution);
+		writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");
 		
 		long timeEnd = System.currentTimeMillis();
 		System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
