@@ -299,6 +299,87 @@ public class LT2locationsBackwards {
 		}
 	}
 
+	/** convert solution cost matrix [Stages][inventoryPairs.length] to [inventory][inventory] and write to text**/
+	public static void convertCostMatrix(LTinstance instance, LTsolution solution, int periodIndex, String fileName){
+		double[][] costContour = new double[instance.maxInventory-instance.minInventory+1][instance.maxInventory-instance.minInventory+1];
+		for(int i=0; i<costContour.length; i++) {
+			for(int j=0; j<costContour[0].length; j++) {
+				int index = i*costContour.length + j;
+				costContour[i][j] = solution.optimalCost[periodIndex][index];
+			}
+		}
+		FileWriter fw = null;
+		try {
+			File f = new File(fileName);
+			fw = new FileWriter(f, true);//true, continue to write
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PrintWriter pw = new PrintWriter(fw);
+		//first line: \t minInventory minInventory+1, ..., maxInventory
+		pw.print("\t");
+		for(int j=0; j<costContour[0].length; j++) {
+			pw.print(j+instance.minInventory + "\t");
+		}pw.println();
+		
+		for(int i=0; i<costContour.length; i++) {
+			pw.print(i+instance.minInventory+"\t");			
+			for(int j=0; j<costContour[0].length; j++) {
+				pw.print(costContour[i][j]+"\t");							
+			}
+			pw.println();
+		}
+		pw.println();
+		pw.flush();
+		try {
+			fw.flush();
+			pw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	/** convert solution cost matrix [Stages][inventoryPairs.length] to [inventory][inventory] and write to text**/
+	public static void convertActionMatrix(LTinstance instance, LTsolution solution, int periodIndex, String fileName){
+		int[][][] ActionContour = new int[instance.maxInventory-instance.minInventory+1][instance.maxInventory-instance.minInventory+1][3];
+		for(int i=0; i<ActionContour.length; i++) {
+			for(int j=0; j<ActionContour[0].length; j++) {
+				int index = i*ActionContour.length + j;
+				ActionContour[i][j] = solution.optimalAction[periodIndex][index];
+			}
+		}
+		FileWriter fw = null;
+		try {
+			File f = new File(fileName);
+			fw = new FileWriter(f, true);//true, continue to write
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PrintWriter pw = new PrintWriter(fw);
+		//first line: \t minInventory minInventory+1, ..., maxInventory
+		pw.print("\t");
+		for(int j=0; j<ActionContour[0].length; j++) {
+			pw.print(j+instance.minInventory + "\t");
+		}pw.println();
+		
+		for(int i=0; i<ActionContour.length; i++) {
+			pw.print(i+instance.minInventory+"\t");			
+			for(int j=0; j<ActionContour[0].length; j++) {
+				pw.print(ActionContour[i][j][0]+"|"+ActionContour[i][j][1]+"|"+ActionContour[i][j][2]+"\t");							
+			}
+			pw.println();
+		}
+		pw.println();
+		pw.flush();
+		try {
+			fw.flush();
+			pw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
 
 	/************************************************************************************************************************************/
 	public static LTsolution computeLTinstance(LTinstance instance, boolean noInitialTransship, boolean noInitialOrder) {
@@ -319,7 +400,7 @@ public class LT2locationsBackwards {
 			long timePeriodStart = System.currentTimeMillis();
 
 			for(int i=0;i<inventoryPairs.length;i++) { 
-				System.out.println(Arrays.toString(inventoryPairs[i]));
+//				System.out.println(Arrays.toString(inventoryPairs[i]));
 				int[][] actions = null;
 				if(t==0 && noInitialTransship == true && noInitialOrder == true) {//work as normal
 					actions = new int[][]{{0, 0, 0}};
@@ -375,11 +456,11 @@ public class LT2locationsBackwards {
 
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {10, 6, 4, 8};
-		int[] demandMean2 = {4, 10, 12, 8};
-		int maxInventory  = 30;
-		int minInventory  = -30;
-		int maxQuantity   = 30;
+		int[] demandMean1 = {1,2};
+		int[] demandMean2 = {2,3};
+		int maxInventory  = 10;
+		int minInventory  = -10;
+		int maxQuantity   = 10;
 		double K = 5;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
 		double R = 7;
@@ -389,11 +470,11 @@ public class LT2locationsBackwards {
 		double tail = 0.0001;
 //		boolean noInitialTransship = false;
 //		boolean noInitialOrder = true;
-		boolean[] noInitialTransship = {true};//{false, true, true, false};
-		boolean[] noInitialOrder 	 = {true};//{false, true, false, true};
+		boolean[] noInitialTransship = {false};//{false, true, true, false};
+		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
 		
 		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
-		for(int i=0; i<4; i++) {
+		for(int i=0; i<noInitialTransship.length; i++) {
 			long timeStart = System.currentTimeMillis();
 			LTsolution solution = computeLTinstance(instance, noInitialTransship[i], noInitialOrder[i]);
 			long timeEnd = System.currentTimeMillis();
@@ -401,6 +482,9 @@ public class LT2locationsBackwards {
 //			printLTsolution(solution);
 			writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
 			System.out.println();
+			
+			convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertCostMatrix.txt");
+			convertActionMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
 		}
 		
 
