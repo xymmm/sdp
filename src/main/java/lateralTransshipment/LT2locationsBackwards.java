@@ -470,7 +470,7 @@ public class LT2locationsBackwards {
 		double tail = 0.0001;
 //		boolean noInitialTransship = false;
 //		boolean noInitialOrder = true;
-		boolean[] noInitialTransship = {false};//{false, true, true, false};
+		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
 		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
 		
 		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
