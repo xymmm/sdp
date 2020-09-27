@@ -318,11 +318,11 @@ public class LT2locationsBackwards {
 		PrintWriter pw = new PrintWriter(fw);
 		//first line: \t minInventory minInventory+1, ..., maxInventory
 		pw.print("\t");
-		for(int j=0; j<costContour[0].length; j++) {
+		for(int j=0; j<costContour.length; j++) {
 			pw.print(j+instance.minInventory + "\t");
 		}pw.println();
-		
-		for(int i=0; i<costContour.length; i++) {
+		//main body
+		for(int i=costContour.length-1; i>=0; i--) {
 			pw.print(i+instance.minInventory+"\t");			
 			for(int j=0; j<costContour[0].length; j++) {
 				pw.print(costContour[i][j]+"\t");							
@@ -362,8 +362,8 @@ public class LT2locationsBackwards {
 		for(int j=0; j<ActionContour[0].length; j++) {
 			pw.print(j+instance.minInventory + "\t");
 		}pw.println();
-		
-		for(int i=0; i<ActionContour.length; i++) {
+		//main boday
+		for(int i=ActionContour.length-1; i>=0; i--) {
 			pw.print(i+instance.minInventory+"\t");			
 			for(int j=0; j<ActionContour[0].length; j++) {
 				pw.print(ActionContour[i][j][0]+"|"+ActionContour[i][j][1]+"|"+ActionContour[i][j][2]+"\t");							
@@ -470,8 +470,8 @@ public class LT2locationsBackwards {
 		double tail = 0.0001;
 //		boolean noInitialTransship = false;
 //		boolean noInitialOrder = true;
-		boolean[] noInitialTransship = {false, true, true, false};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {false, true, false, true};//{false, true, false, true};
+		boolean[] noInitialTransship = {true};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {true};//{false, true, false, true};
 		
 		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
 		for(int i=0; i<noInitialTransship.length; i++) {
