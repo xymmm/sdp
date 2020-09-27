@@ -456,22 +456,22 @@ public class LT2locationsBackwards {
 
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {1,2};
-		int[] demandMean2 = {2,3};
-		int maxInventory  = 10;
-		int minInventory  = -10;
-		int maxQuantity   = 10;
-		double K = 5;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
+		int[] demandMean1 = {2, 4, 6, 4};
+		int[] demandMean2 = {3, 2, 1, 4};
+		int maxInventory  = 20;
+		int minInventory  = -20;
+		int maxQuantity   = 60;
+		double K = 50;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
-		double R = 7;
+		double R = 10;
 		double v = 0;
 		double h = 1;
-		double b = 3; 
+		double b = 5; 
 		double tail = 0.0001;
 //		boolean noInitialTransship = false;
 //		boolean noInitialOrder = true;
-		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
+		boolean[] noInitialTransship = {false, true, true, false};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {false, true, false, true};//{false, true, false, true};
 		
 		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
 		for(int i=0; i<noInitialTransship.length; i++) {
