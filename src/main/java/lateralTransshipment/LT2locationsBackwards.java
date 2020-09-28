@@ -417,8 +417,8 @@ public class LT2locationsBackwards {
 				for(int a=0; a<actions.length;a++) {
 
 					double scenarioProb = 0;
-//					totalCost[i][a] = computeActionCost(instance, actions[a]);
-					totalCost[i][a] = (t==0) ? 0 : computeActionCost(instance, actions[a]);		//mengyuan's formulation for joint replenishment
+					totalCost[i][a] = computeActionCost(instance, actions[a]);
+//					totalCost[i][a] = (t==0) ? 0 : computeActionCost(instance, actions[a]);		//mengyuan's formulation for joint replenishment
 					//					assert totalCost[i][a] >= 0;
 
 					for(int d=0;d<demand[t].length;d++) { // Demand
@@ -471,8 +471,8 @@ public class LT2locationsBackwards {
 		double tail = 0.0001;
 //		boolean noInitialTransship = false;
 //		boolean noInitialOrder = true;
-		boolean[] noInitialTransship = {false, true};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {false, true};//{false, true, false, true};
+		boolean[] noInitialTransship = {true, true, false};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {true, false, true};//{false, true, false, true};
 		
 		for(int k=0; k<R.length; k++) {
 		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
