@@ -417,7 +417,8 @@ public class LT2locationsBackwards {
 				for(int a=0; a<actions.length;a++) {
 
 					double scenarioProb = 0;
-					totalCost[i][a] = computeActionCost(instance, actions[a]);
+//					totalCost[i][a] = computeActionCost(instance, actions[a]);
+					totalCost[i][a] = (t==0) ? 0 : computeActionCost(instance, actions[a]);		//mengyuan's formulation for joint replenishment
 					//					assert totalCost[i][a] >= 0;
 
 					for(int d=0;d<demand[t].length;d++) { // Demand
@@ -457,23 +458,24 @@ public class LT2locationsBackwards {
 
 	public static void main(String[] args) {
 		int[] demandMean1 = {2, 4, 6, 4};
-		int[] demandMean2 = {3, 2, 1, 4};
+		int[] demandMean2 = {2, 4, 6, 4};
 		int maxInventory  = 20;
 		int minInventory  = -20;
 		int maxQuantity   = 60;
-		double K = 50;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
+		double K = 10;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
-		double R = 10;
+		double[] R = {0};
 		double v = 0;
 		double h = 1;
 		double b = 5; 
 		double tail = 0.0001;
 //		boolean noInitialTransship = false;
 //		boolean noInitialOrder = true;
-		boolean[] noInitialTransship = {true};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {true};//{false, true, false, true};
+		boolean[] noInitialTransship = {false, true};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {false, true};//{false, true, false, true};
 		
-		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b,tail);
+		for(int k=0; k<R.length; k++) {
+		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
 		for(int i=0; i<noInitialTransship.length; i++) {
 			long timeStart = System.currentTimeMillis();
 			LTsolution solution = computeLTinstance(instance, noInitialTransship[i], noInitialOrder[i]);
@@ -485,6 +487,8 @@ public class LT2locationsBackwards {
 			
 			convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertCostMatrix.txt");
 			convertActionMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
+		}
+		
 		}
 		
 
