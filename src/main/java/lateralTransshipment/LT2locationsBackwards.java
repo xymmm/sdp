@@ -247,7 +247,7 @@ public class LT2locationsBackwards {
 	}
 
 	/** print solution**/
-	
+
 	public static void printLTsolution(LTsolution solution) {
 		System.out.println("------------------optimal cost------------------");
 		for(int i=0; i<solution.inventoryPairs.length; i++) {
@@ -267,7 +267,7 @@ public class LT2locationsBackwards {
 			System.out.println();
 		}
 	}
-	
+
 	public static void writeSolution(LTsolution solution, String fileName) {
 		//cost
 		FileWriter fw = null;
@@ -339,7 +339,7 @@ public class LT2locationsBackwards {
 			e.printStackTrace();
 		}		
 	}
-	
+
 	/** convert solution cost matrix [Stages][inventoryPairs.length] to [inventory][inventory] and write to text**/
 	public static void convertActionMatrix(LTinstance instance, LTsolution solution, int periodIndex, String fileName){
 		int[][][] ActionContour = new int[instance.maxInventory-instance.minInventory+1][instance.maxInventory-instance.minInventory+1][3];
@@ -400,7 +400,7 @@ public class LT2locationsBackwards {
 			long timePeriodStart = System.currentTimeMillis();
 
 			for(int i=0;i<inventoryPairs.length;i++) { 
-//				System.out.println(Arrays.toString(inventoryPairs[i]));
+				//				System.out.println(Arrays.toString(inventoryPairs[i]));
 				int[][] actions = null;
 				if(t==0 && noInitialTransship == true && noInitialOrder == true) {//work as normal
 					actions = new int[][]{{0, 0, 0}};
@@ -418,7 +418,7 @@ public class LT2locationsBackwards {
 
 					double scenarioProb = 0;
 					totalCost[i][a] = computeActionCost(instance, actions[a]);
-//					totalCost[i][a] = (t==0) ? 0 : computeActionCost(instance, actions[a]);		//mengyuan's formulation for joint replenishment
+					//					totalCost[i][a] = (t==0) ? 0 : computeActionCost(instance, actions[a]);		//mengyuan's formulation for joint replenishment
 					//					assert totalCost[i][a] >= 0;
 
 					for(int d=0;d<demand[t].length;d++) { // Demand
@@ -457,40 +457,41 @@ public class LT2locationsBackwards {
 
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {2, 4, 6, 4};
-		int[] demandMean2 = {2, 4, 6, 4};
+		int[] demandMean1 = {1, 3, 8, 3};
+		int[] demandMean2 = {1, 3, 8, 3};
 		int maxInventory  = 20;
 		int minInventory  = -20;
 		int maxQuantity   = 60;
 		double K = 10;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
-		double[] R = {0};
+		double[] R = {1000000};
 		double v = 0;
 		double h = 1;
 		double b = 5; 
 		double tail = 0.0001;
-//		boolean noInitialTransship = false;
-//		boolean noInitialOrder = true;
-		boolean[] noInitialTransship = {true, true, false};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {true, false, true};//{false, true, false, true};
-		
-		for(int k=0; k<R.length; k++) {
-		LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
+		//		boolean noInitialTransship = false;
+		//		boolean noInitialOrder = true;
+		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
+
 		for(int i=0; i<noInitialTransship.length; i++) {
-			long timeStart = System.currentTimeMillis();
-			LTsolution solution = computeLTinstance(instance, noInitialTransship[i], noInitialOrder[i]);
-			long timeEnd = System.currentTimeMillis();
-			System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
-//			printLTsolution(solution);
-			writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
-			System.out.println();
-			
-			convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertCostMatrix.txt");
-			convertActionMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
+			for(int k=0; k<R.length; k++) {
+				LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
+
+				long timeStart = System.currentTimeMillis();
+				LTsolution solution = computeLTinstance(instance, noInitialTransship[i], noInitialOrder[i]);
+				long timeEnd = System.currentTimeMillis();
+				System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
+				//			printLTsolution(solution);
+				writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
+				System.out.println();
+
+				convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertCostMatrix.txt");
+				convertActionMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
+			}
+
 		}
-		
-		}
-		
+
 
 
 		/*
