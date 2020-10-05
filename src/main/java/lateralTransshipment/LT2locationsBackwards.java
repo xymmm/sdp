@@ -402,7 +402,7 @@ public class LT2locationsBackwards {
 			for(int i=0;i<inventoryPairs.length;i++) { 
 				//				System.out.println(Arrays.toString(inventoryPairs[i]));
 				int[][] actions = null;
-				if(t==0 && noInitialTransship == true && noInitialOrder == true) {//work as normal
+/*				if(t==0 && noInitialTransship == true && noInitialOrder == true) {//work as normal
 					actions = new int[][]{{0, 0, 0}};
 				}else if(t==0 && noInitialTransship == true && noInitialOrder == false) {//only no transship in the first period
 					actions = generateNoTransshipActions(inventoryPairs[i], instance);
@@ -411,7 +411,8 @@ public class LT2locationsBackwards {
 				}else {
 					actions =  generateFeasibleActions(inventoryPairs[i], instance);
 				}
-
+*/
+				actions = generateNoTransshipActions(inventoryPairs[i], instance);
 				totalCost = new double [inventoryPairs.length][actions.length];
 
 				for(int a=0; a<actions.length;a++) {
@@ -457,17 +458,17 @@ public class LT2locationsBackwards {
 
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {1, 3, 8, 3};
-		int[] demandMean2 = {1, 3, 8, 3};
-		int maxInventory  = 20;
-		int minInventory  = -20;
-		int maxQuantity   = 60;
-		double K = 10;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
+		int[] demandMean1 = {12, 12, 12, 12};
+		int[] demandMean2 = {12, 12, 12, 12};
+		int maxInventory  = 80;
+		int minInventory  = -50;
+		int maxQuantity   = 100;
+		double K = 50;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
-		double[] R = {1000000};
+		double R = 1000000;
 		double v = 0;
 		double h = 1;
-		double b = 5; 
+		double[] b = {30,10}; 
 		double tail = 0.0001;
 		//		boolean noInitialTransship = false;
 		//		boolean noInitialOrder = true;
@@ -475,8 +476,8 @@ public class LT2locationsBackwards {
 		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
 
 		for(int i=0; i<noInitialTransship.length; i++) {
-			for(int k=0; k<R.length; k++) {
-				LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
+			for(int k=0; k<b.length; k++) {
+				LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b[k],tail);
 
 				long timeStart = System.currentTimeMillis();
 				LTsolution solution = computeLTinstance(instance, noInitialTransship[i], noInitialOrder[i]);

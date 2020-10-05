@@ -223,21 +223,21 @@ public class sS {
 	/** main computation **/
 	public static void main(String[] args) {
 		
-		double fixedOrderingCost = 5;
+		double fixedOrderingCost = 10;
 		double unitCost = 0;
 		double holdingCost = 1;
-		double penaltyCost = 3;
+		double penaltyCost = 5;
 
-		double tail = 0.00000001;
+		double tail = 0.0001;
 
-		int minInventory = -50;
-		int maxInventory = 50;
-		int maxQuantity = 9;
+		int minInventory = -20;
+		int maxInventory = 20;
+		int maxQuantity = 60;
 
 		double stdParameter = 0.25;
 
 		//int[] demandMean = {2,4,6,4};
-		double[] demandMean = {2, 1, 5, 3};
+		double[] demandMean = {2, 4, 6, 4};
 		
 		boolean Normal = false;
 

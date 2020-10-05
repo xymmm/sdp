@@ -9,7 +9,7 @@ public class InstanceDouble {
 	   public double holdingCost;
 	   public double penaltyCost;
 	   public double[] demandMean;
-	   public double initialInventory = 0;
+	   public double initialInventory = 1;
 	   
 	   public double stdParameter;
 	   
