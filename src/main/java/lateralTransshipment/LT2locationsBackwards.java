@@ -402,7 +402,7 @@ public class LT2locationsBackwards {
 			for(int i=0;i<inventoryPairs.length;i++) { 
 				//				System.out.println(Arrays.toString(inventoryPairs[i]));
 				int[][] actions = null;
-/*				if(t==0 && noInitialTransship == true && noInitialOrder == true) {//work as normal
+				if(t==0 && noInitialTransship == true && noInitialOrder == true) {//work as normal
 					actions = new int[][]{{0, 0, 0}};
 				}else if(t==0 && noInitialTransship == true && noInitialOrder == false) {//only no transship in the first period
 					actions = generateNoTransshipActions(inventoryPairs[i], instance);
@@ -411,16 +411,14 @@ public class LT2locationsBackwards {
 				}else {
 					actions =  generateFeasibleActions(inventoryPairs[i], instance);
 				}
-*/
-				actions = generateNoTransshipActions(inventoryPairs[i], instance);
+
 				totalCost = new double [inventoryPairs.length][actions.length];
 
 				for(int a=0; a<actions.length;a++) {
 
 					double scenarioProb = 0;
 					totalCost[i][a] = computeActionCost(instance, actions[a]);
-					//					totalCost[i][a] = (t==0) ? 0 : computeActionCost(instance, actions[a]);		//mengyuan's formulation for joint replenishment
-					//					assert totalCost[i][a] >= 0;
+//					totalCost[i][a] = (t==0) ? 0 : computeActionCost(instance, actions[a]);		//mengyuan's formulation for joint replenishment
 
 					for(int d=0;d<demand[t].length;d++) { // Demand
 						if(
@@ -429,7 +427,6 @@ public class LT2locationsBackwards {
 								&& (inventoryPairs[i][1] + actions[a][0] + actions[a][2] - demand[t][d][2] <= instance.maxInventory) 
 								&& (inventoryPairs[i][1] + actions[a][0] + actions[a][2] - demand[t][d][2] >= instance.minInventory)
 								) {
-							//						   assert optimalCost[i+a-d][t+1] >= 0;
 							int[] closingState = {(int) (inventoryPairs[i][0] - actions[a][0] + actions[a][1] - demand[t][d][1]),
 									(int) (inventoryPairs[i][1] + actions[a][0] + actions[a][2] - demand[t][d][2])};
 							int closingStateIndex = getStateIndex(inventoryPairs, closingState);
