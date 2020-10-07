@@ -166,11 +166,12 @@ public class LT2Backwards2Stages {
 	}
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {2,3};
-		int[] demandMean2 = {2,3};
-		int maxInventory  = 10;
-		int minInventory  = -10;
-		int maxQuantity   = 20;
+		//test if this is uploaded successfully
+		int[] demandMean1 = {4, 6, 8, 6};
+		int[] demandMean2 = {4, 6, 8, 6};
+		int maxInventory  = 30;
+		int minInventory  = -30;
+		int maxQuantity   = 70;
 		double K = 20;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
 		double R = 1000000000;
@@ -178,8 +179,8 @@ public class LT2Backwards2Stages {
 		double h = 1;
 		double[] b = {5}; 
 		double tail = 0.0001;
-		//		boolean noInitialTransship = false;
-		//		boolean noInitialOrder = true;
+//		boolean noInitialTransship = false;
+//		boolean noInitialOrder = true;
 		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
 		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
 
