@@ -166,7 +166,6 @@ public class LT2Backwards2Stages {
 	}
 
 	public static void main(String[] args) {
-		//test if this is uploaded successfully
 		int[] demandMean1 = {4, 6, 8, 6};
 		int[] demandMean2 = {4, 6, 8, 6};
 		int maxInventory  = 30;
