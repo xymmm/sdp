@@ -174,7 +174,7 @@ public class LT2Backwards2Stages {
 		double K = 20;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
 		double R = 0;
-		double v = 0;
+		double v = 1;
 		double h = 1;
 		double[] b = {5}; 
 		double tail = 0.0001;
