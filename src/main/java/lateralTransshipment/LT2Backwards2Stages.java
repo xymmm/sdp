@@ -102,7 +102,7 @@ public class LT2Backwards2Stages {
 				for(int i=0; i<inventoryPairs.length; i++) {
 					int[][] order = null;
 //					System.out.println(Arrays.toString(inventoryPairs[i]));
-					if(noInitialOrder) {
+					if(noInitialOrder && t==0) {
 						order = new int[][] {{0,0}};
 					}else {
 						order = generateorderingQuantities(inventoryPairs[i], instance);
@@ -142,7 +142,7 @@ public class LT2Backwards2Stages {
 				for(int i=0;i<inventoryPairs.length;i++) {
 //					System.out.println(Arrays.toString(inventoryPairs[i]));
 					int[] transshipment = null;
-					if(noInitialTransship) {
+					if(noInitialTransship && t==0) {
 						transshipment = new int[] {0};
 					}else {	
 						transshipment = generateTransshipment4Quantity(inventoryPairs[i], instance, optimalOrder[actualIndex][i]);
