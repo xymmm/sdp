@@ -100,8 +100,13 @@ public class LT2Backwards2Stages {
 			if(t%2 == 1) {//stage 2 for period t: reorder
 				int actualIndex = ((t+1)/2)-1;
 				for(int i=0; i<inventoryPairs.length; i++) {
+					int[][] order = null;
 //					System.out.println(Arrays.toString(inventoryPairs[i]));
-					int[][] order = generateorderingQuantities(inventoryPairs[i], instance);
+					if(noInitialOrder) {
+						order = new int[][] {{0,0}};
+					}else {
+						order = generateorderingQuantities(inventoryPairs[i], instance);
+					}
 					totalCost = new double[inventoryPairs.length][order.length];
 					for(int a=0; a<order.length; a++) {
 						double scenarioProb = 0;
@@ -136,8 +141,12 @@ public class LT2Backwards2Stages {
 				int actualIndex = (t/2);
 				for(int i=0;i<inventoryPairs.length;i++) {
 //					System.out.println(Arrays.toString(inventoryPairs[i]));
-
-					int[] transshipment = generateTransshipment4Quantity(inventoryPairs[i], instance, optimalOrder[actualIndex][i]);
+					int[] transshipment = null;
+					if(noInitialTransship) {
+						transshipment = new int[] {0};
+					}else {	
+						transshipment = generateTransshipment4Quantity(inventoryPairs[i], instance, optimalOrder[actualIndex][i]);
+					}
 					totalCost = new double[inventoryPairs.length][transshipment.length];
 //					System.out.println(Arrays.toString(transshipment));
 					for(int k=0; k<transshipment.length; k++) {
@@ -173,30 +182,30 @@ public class LT2Backwards2Stages {
 		int maxQuantity   = 70;
 		double K = 20;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
-		double R = 0;
-		double v = 1;
+		double[] R = {0,1};//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
+		double v = 0;
 		double h = 1;
-		double[] b = {5}; 
+		double b = 5; 
 		double tail = 0.0001;
 //		boolean noInitialTransship = false;
 //		boolean noInitialOrder = true;
-		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
+		boolean[] noInitialTransship = {true};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {true};//{false, true, false, true};
 
 		for(int i=0; i<noInitialTransship.length; i++) {
-			for(int k=0; k<b.length; k++) {
-				LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R,v,h,b[k],tail);
+			for(int k=0; k<R.length; k++) {
+				LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
 
 				long timeStart = System.currentTimeMillis();
 				LTsolution solution = computeLTinstance2stages(instance, noInitialTransship[i], noInitialOrder[i]);
 				long timeEnd = System.currentTimeMillis();
 				System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
 				//			printLTsolution(solution);
-				LT2locationsBackwards.writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
-				System.out.println();
+//				LT2locationsBackwards.writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
+//				System.out.println();
 
 				LT2locationsBackwards.convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertCostMatrix.txt");
-				LT2locationsBackwards.convertActionMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
+				LT2locationsBackwards.convertActionMatrix(instance, solution, 1, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
 				
 /*				for(int l=0; l<solution.inventoryPairs.length; l++) {
 					System.out.print(Arrays.toString(solution.inventoryPairs[l])+"\t");
