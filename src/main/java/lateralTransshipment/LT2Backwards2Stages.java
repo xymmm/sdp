@@ -179,7 +179,7 @@ public class LT2Backwards2Stages {
 					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
 					
 					//---------------------if there are actions that produce the same cost----------------------------
-					ArrayList<int[]> equivalentAction_Quantity_List = new ArrayList<int[]>();
+/*					ArrayList<int[]> equivalentAction_Quantity_List = new ArrayList<int[]>();
 					equivalentAction_Quantity_List.add(inventoryPairs[i]);
 					for(int a=0; a<totalCost[i].length; a++) {
 						if(totalCost[i][a] == optimalCost[t][i]) {
@@ -190,7 +190,8 @@ public class LT2Backwards2Stages {
 					for(int l=0; l<equivalentAction_Quantity_List.size();l++) {
 						equivalentQuantity[l] = equivalentAction_Quantity_List.get(l);
 					}
-					writeEquivalentQuantity(equivalentQuantity, "src/main/java/lateralTransshipment/record_quantity_sameCost.txt");
+					writeEquivalentQuantity(equivalentQuantity, "src/main/java/lateralTransshipment/record_quantity_sameCost.txt");*/
+					detectEquivalentQuantity(inventoryPairs, i, totalCost, optimalCost, t, order);
 					//-------------------------------------------------------------------------------------------------
 					int optimalOrderIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
 					optimalOrder[actualIndex][i] = order[optimalOrderIdx];
