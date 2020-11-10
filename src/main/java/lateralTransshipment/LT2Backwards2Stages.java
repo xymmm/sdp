@@ -1,10 +1,54 @@
 package lateralTransshipment;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class LT2Backwards2Stages {
+	
+	public static void writeEquivalentQuantity(int[][] equivalentQs, String fileName) {
+		//cost
+		FileWriter fw = null;
+		try {
+			File f = new File(fileName);
+			fw = new FileWriter(f, true);//true, continue to write
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PrintWriter pw = new PrintWriter(fw);
+		for(int i=0; i<equivalentQs.length; i++) {
+			pw.print(Arrays.toString(equivalentQs[i])+"\t");
+		}
+		pw.println();
+		pw.flush();
+		try {
+			fw.flush();
+			pw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void detectEquivalentQuantity(int[][] inventoryPairs, int inventoryIndex, double[][] totalCost, double[][] optimalCost, int t, int[][] order) {
+		ArrayList<int[]> equivalentAction_Quantity_List = new ArrayList<int[]>();
+		equivalentAction_Quantity_List.add(inventoryPairs[inventoryIndex]);
+		for(int a=0; a<totalCost[inventoryIndex].length; a++) {
+			if(totalCost[inventoryIndex][a] == optimalCost[t][inventoryIndex]) {
+				equivalentAction_Quantity_List.add(order[a]);
+			}
+		}
+		int[][] equivalentQuantity = new int[equivalentAction_Quantity_List.size()][2];
+		for(int l=0; l<equivalentAction_Quantity_List.size();l++) {
+			equivalentQuantity[l] = equivalentAction_Quantity_List.get(l);
+		}
+		writeEquivalentQuantity(equivalentQuantity, "src/main/java/lateralTransshipment/record_quantity_sameCost.txt");
+//		else  {writeEquivalentQuantity(equivalentQuantity, "src/main/java/lateralTransshipment/record_transship_sameCost.txt");}
+	}
 
 	public static int[][] generateorderingQuantities(int[] state, LTinstance instance){
 		ArrayList<int[]> actions = new ArrayList<int[]>();
@@ -102,7 +146,7 @@ public class LT2Backwards2Stages {
 				for(int i=0; i<inventoryPairs.length; i++) {
 					int[][] order = null;
 //					System.out.println(Arrays.toString(inventoryPairs[i]));
-					if(noInitialOrder && t==0) {
+					if(noInitialOrder && t==1) {
 						order = new int[][] {{0,0}};
 					}else {
 						order = generateorderingQuantities(inventoryPairs[i], instance);
@@ -132,8 +176,22 @@ public class LT2Backwards2Stages {
 						}
 						totalCost[i][a] = totalCost[i][a]/scenarioProb;		
 					}//searched for all feasible order quantities for 2 locations
-					sdp.util.writeText.writeDoubleArray(totalCost[i], "src/main/java/lateralTransshipment/totalCost.txt");
 					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
+					
+					//---------------------if there are actions that produce the same cost----------------------------
+					ArrayList<int[]> equivalentAction_Quantity_List = new ArrayList<int[]>();
+					equivalentAction_Quantity_List.add(inventoryPairs[i]);
+					for(int a=0; a<totalCost[i].length; a++) {
+						if(totalCost[i][a] == optimalCost[t][i]) {
+							equivalentAction_Quantity_List.add(order[a]);
+						}
+					}
+					int[][] equivalentQuantity = new int[equivalentAction_Quantity_List.size()][2];
+					for(int l=0; l<equivalentAction_Quantity_List.size();l++) {
+						equivalentQuantity[l] = equivalentAction_Quantity_List.get(l);
+					}
+					writeEquivalentQuantity(equivalentQuantity, "src/main/java/lateralTransshipment/record_quantity_sameCost.txt");
+					//-------------------------------------------------------------------------------------------------
 					int optimalOrderIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
 					optimalOrder[actualIndex][i] = order[optimalOrderIdx];
 				}				
@@ -175,22 +233,21 @@ public class LT2Backwards2Stages {
 	}
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {4, 6, 8, 6};
-		int[] demandMean2 = {4, 6, 8, 6};
-		int maxInventory  = 30;
-		int minInventory  = -30;
-		int maxQuantity   = 70;
+		int[] demandMean1 = {4};//{4, 6, 8, 6};
+		int[] demandMean2 = {4};//{4, 6, 8, 6};
+		int maxInventory  = 10;//30;
+		int minInventory  = -10;//-30;
+		int maxQuantity   = 20;//70;
 		double K = 20;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
-		double[] R = {0,1};//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
+		double[] R = {50};//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
 		double v = 0;
 		double h = 1;
 		double b = 5; 
 		double tail = 0.0001;
-//		boolean noInitialTransship = false;
-//		boolean noInitialOrder = true;
-		boolean[] noInitialTransship = {true};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {true};//{false, true, false, true};
+
+		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
 
 		for(int i=0; i<noInitialTransship.length; i++) {
 			for(int k=0; k<R.length; k++) {
@@ -201,12 +258,12 @@ public class LT2Backwards2Stages {
 				long timeEnd = System.currentTimeMillis();
 				System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
 				//			printLTsolution(solution);
-//				LT2locationsBackwards.writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
+				LT2locationsBackwards.writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
 //				System.out.println();
 
 				LT2locationsBackwards.convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertCostMatrix.txt");
-				LT2locationsBackwards.convertActionMatrix(instance, solution, 1, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
-				
+				LT2locationsBackwards.convertActionMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
+
 /*				for(int l=0; l<solution.inventoryPairs.length; l++) {
 					System.out.print(Arrays.toString(solution.inventoryPairs[l])+"\t");
 					for(int t=0; t<instance.demandMean1.length; t++) {

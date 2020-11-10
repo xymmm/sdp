@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import sdp.data.Instance;
@@ -159,5 +160,27 @@ public class writeText {
 		}
 	}
 
+	public static void writeArrayList_Quantity(ArrayList list, String fileName) {
+		FileWriter fw = null;
+		try {
+			File f = new File(fileName);
+			fw = new FileWriter(f, true);//true, continue to write
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PrintWriter pw = new PrintWriter(fw);
+		for(int i=0; i<list.size(); i++) {
+			pw.print(list.get(i)+"\t");
+		}
+		pw.println();
+		pw.flush();
+		try {
+			fw.flush();
+			pw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
