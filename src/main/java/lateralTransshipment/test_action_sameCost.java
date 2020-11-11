@@ -11,7 +11,7 @@ public class test_action_sameCost {
 		int maxQuantity   = 20;
 		double K = 20;
 		double z = 0;
-		double[] R = {50};//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
+		double[] R = {0};//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
 		double v = 0;
 		double h = 1;
 		double b = 5; 

@@ -33,6 +33,31 @@ public class LT2Backwards2Stages {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void writeEquivalentTransshipment(int[] equivalentTs, String fileName) {
+		//cost
+		FileWriter fw = null;
+		try {
+			File f = new File(fileName);
+			fw = new FileWriter(f, true);//true, continue to write
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PrintWriter pw = new PrintWriter(fw);
+		pw.print("["+equivalentTs[0]+","+equivalentTs[1]+"] ");
+		for(int i=2; i<equivalentTs.length; i++) {
+			pw.print(equivalentTs[i]+"\t");
+		}
+		pw.println();
+		pw.flush();
+		try {
+			fw.flush();
+			pw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public static void detectEquivalentQuantity(int[][] inventoryPairs, int inventoryIndex, double[][] totalCost, double[][] optimalCost, int t, int[][] order) {
 		ArrayList<int[]> equivalentAction_Quantity_List = new ArrayList<int[]>();
@@ -50,6 +75,23 @@ public class LT2Backwards2Stages {
 //		else  {writeEquivalentQuantity(equivalentQuantity, "src/main/java/lateralTransshipment/record_transship_sameCost.txt");}
 	}
 
+	public static void detectEquivalentTransshipment(int[][] inventoryPairs, int inventoryIndex, double[][] totalCost, double[][] optimalCost, int t, int[] transshipment) {
+		ArrayList<Integer> equivalentAction_Transshipment_List = new ArrayList<Integer>();
+		equivalentAction_Transshipment_List.add(inventoryPairs[inventoryIndex][0]);
+		equivalentAction_Transshipment_List.add(inventoryPairs[inventoryIndex][1]);
+		for(int a=0; a<totalCost[inventoryIndex].length; a++) {
+			if(totalCost[inventoryIndex][a] == optimalCost[t][inventoryIndex]) {
+				equivalentAction_Transshipment_List.add(transshipment[a]);
+			}
+		}
+		int[] equivalentTransshipment = new int[equivalentAction_Transshipment_List.size()];
+		for(int l=0; l<equivalentAction_Transshipment_List.size();l++) {
+			equivalentTransshipment[l] = equivalentAction_Transshipment_List.get(l);
+		}
+		writeEquivalentTransshipment(equivalentTransshipment, "src/main/java/lateralTransshipment/record_transship_sameCost.txt");
+
+	}
+	
 	public static int[][] generateorderingQuantities(int[] state, LTinstance instance){
 		ArrayList<int[]> actions = new ArrayList<int[]>();
 		for(int i=0; i <= instance.maxInventory - state[0]; i++) {
@@ -177,24 +219,12 @@ public class LT2Backwards2Stages {
 						totalCost[i][a] = totalCost[i][a]/scenarioProb;		
 					}//searched for all feasible order quantities for 2 locations
 					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
-					
-					//---------------------if there are actions that produce the same cost----------------------------
-/*					ArrayList<int[]> equivalentAction_Quantity_List = new ArrayList<int[]>();
-					equivalentAction_Quantity_List.add(inventoryPairs[i]);
-					for(int a=0; a<totalCost[i].length; a++) {
-						if(totalCost[i][a] == optimalCost[t][i]) {
-							equivalentAction_Quantity_List.add(order[a]);
-						}
-					}
-					int[][] equivalentQuantity = new int[equivalentAction_Quantity_List.size()][2];
-					for(int l=0; l<equivalentAction_Quantity_List.size();l++) {
-						equivalentQuantity[l] = equivalentAction_Quantity_List.get(l);
-					}
-					writeEquivalentQuantity(equivalentQuantity, "src/main/java/lateralTransshipment/record_quantity_sameCost.txt");*/
-					detectEquivalentQuantity(inventoryPairs, i, totalCost, optimalCost, t, order);
-					//-------------------------------------------------------------------------------------------------
 					int optimalOrderIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
 					optimalOrder[actualIndex][i] = order[optimalOrderIdx];
+					
+					//---------------------if there are quantity that produce the same cost----------------------------
+					detectEquivalentQuantity(inventoryPairs, i, totalCost, optimalCost, t, order);
+					//-------------------------------------------------------------------------------------------------
 				}				
 			}else {//stage 1 for period t: transship
 				int actualIndex = (t/2);
@@ -217,6 +247,10 @@ public class LT2Backwards2Stages {
 					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
 					int optimalTransshipmentIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
 					optimalTransship[actualIndex][i] = transshipment[optimalTransshipmentIdx];
+					
+					//---------------------if there are transshipment that produce the same cost----------------------------
+					detectEquivalentTransshipment(inventoryPairs, i, totalCost, optimalCost, t, transshipment);
+					//------------------------------------------------------------------------------------------------
 				}
 			}
 
@@ -234,14 +268,14 @@ public class LT2Backwards2Stages {
 	}
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {4};//{4, 6, 8, 6};
-		int[] demandMean2 = {4};//{4, 6, 8, 6};
-		int maxInventory  = 10;//30;
-		int minInventory  = -10;//-30;
-		int maxQuantity   = 20;//70;
+		int[] demandMean1 = {4, 6, 8, 6};
+		int[] demandMean2 = {4, 6, 8, 6};
+		int maxInventory  = 30;
+		int minInventory  = -30;
+		int maxQuantity   = 70;
 		double K = 20;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
-		double[] R = {50};//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
+		double[] R = {0};//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
 		double v = 0;
 		double h = 1;
 		double b = 5; 
@@ -258,21 +292,12 @@ public class LT2Backwards2Stages {
 				LTsolution solution = computeLTinstance2stages(instance, noInitialTransship[i], noInitialOrder[i]);
 				long timeEnd = System.currentTimeMillis();
 				System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
-				//			printLTsolution(solution);
+				
+				// record results
 				LT2locationsBackwards.writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
-//				System.out.println();
-
 				LT2locationsBackwards.convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertCostMatrix.txt");
 				LT2locationsBackwards.convertActionMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
 
-/*				for(int l=0; l<solution.inventoryPairs.length; l++) {
-					System.out.print(Arrays.toString(solution.inventoryPairs[l])+"\t");
-					for(int t=0; t<instance.demandMean1.length; t++) {
-						System.out.print(solution.optimalCost[t][l]+"\t");
-					}
-					System.out.println();
-				}
-				*/
 			}
 		}
 	}
