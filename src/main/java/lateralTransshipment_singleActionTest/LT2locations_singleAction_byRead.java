@@ -11,10 +11,10 @@ import lateralTransshipment.LTinstance;
 import lateralTransshipment.LTsolution;
 
 public class LT2locations_singleAction_byRead {
-	
+
 	public static double[][] readFromTXT(double[][] array) throws Exception {
 
-		Scanner sc = new Scanner( new BufferedReader(new FileReader("src/main/java/lateralTransshipment/optimalCostToRead2-4.txt")));
+		Scanner sc = new Scanner( new BufferedReader(new FileReader("src/main/java/lateralTransshipment_singleActionTest/optimalCostToRead2_4.txt")));
 
 		while(sc.hasNextLine()) {
 			for (int i=0; i<array.length; i++) {
@@ -24,12 +24,12 @@ public class LT2locations_singleAction_byRead {
 				}
 			}
 		}
-//		System.out.println(Arrays.deepToString(array));
+		//		System.out.println(Arrays.deepToString(array));
 		return array;
 	}
-	
-	public static LTsolution LT2locations_singleAction_byRead(LTinstance instance, boolean noInitialTransship, boolean noInitialOrder,
-																int actionPeriodIdx, int[] testTransshipment, int[][] testOrder) {
+
+	public static LTsolution LT2locations_singleAction_byRead(LTinstance instance,
+			int actionPeriodIdx, int[] testTransshipment, int[][] testOrder) {
 		int Stages = instance.demandMean1.length;		
 		int[][] inventoryPairs = LT2locationsBackwards.generateInventoryPairs(instance);
 
@@ -45,17 +45,14 @@ public class LT2locations_singleAction_byRead {
 		int[][] optimalTransship = new int[Stages][inventoryPairs.length];
 
 		//read future cost: only care about the first-leading period
-		double[][] futureCost = new double[Stages-actionPeriodIdx-1][inventoryPairs.length];
+		double[][] futureCost = new double[inventoryPairs.length][Stages-actionPeriodIdx-1];		
 		try {
 			futureCost = readFromTXT(futureCost);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		for(int i=0; i<inventoryPairs.length; i++) {
-			optimalCost[actionPeriodIdx*2+2][i] = futureCost[0][i];
-		}
+		}		
 
-
+		//test single action with future cost
 		for(int t=actionPeriodIdx*2+1;t>=0;t--) { 	
 
 			System.out.println("period "+(t+1));
@@ -93,7 +90,7 @@ public class LT2locations_singleAction_byRead {
 					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
 				}				
 			}else {//stage 1 for period t: transship
-//				int actualIndex = (t/2);
+				//				int actualIndex = (t/2);
 				for(int i=0;i<inventoryPairs.length;i++) {
 
 					totalCost = new double[inventoryPairs.length][testTransshipment.length];
@@ -122,7 +119,7 @@ public class LT2locations_singleAction_byRead {
 		return new LTsolution(inventoryPairs, optimalAction, optimalCostResults);
 	}
 
-	
+
 	public static void main(String[] args) {
 		int[] demandMean1 = {4, 6, 8, 6};
 		int[] demandMean2 = {4, 6, 8, 6};
@@ -137,27 +134,23 @@ public class LT2locations_singleAction_byRead {
 		double b = 5; 
 		double tail = 0.0001;
 
-		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
-		
 		int actionPeriodIdx = 0;
-		int[] testTransshipment = {1};
-		int[][] testOrder = {{1,1}};
+		int[] testTransshipment = {0};
+		int[][] testOrder = {{0,0}};
 
-		for(int i=0; i<noInitialTransship.length; i++) {
-			for(int k=0; k<R.length; k++) {
-				LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
+		for(int k=0; k<R.length; k++) {
+			LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
 
-				long timeStart = System.currentTimeMillis();
-				LTsolution solution = LT2locations_singleAction_byRead(instance, noInitialTransship[i], noInitialOrder[i], 
-						 actionPeriodIdx, testTransshipment, testOrder);
-				long timeEnd = System.currentTimeMillis();
-				System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
-				LT2locationsBackwards.writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
+			long timeStart = System.currentTimeMillis();
+			LTsolution solution = LT2locations_singleAction_byRead(instance,
+					actionPeriodIdx, testTransshipment, testOrder);
+			long timeEnd = System.currentTimeMillis();
+			System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
+			LT2locationsBackwards.writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
 
-				LT2locationsBackwards.convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertCostMatrix.txt");
+			LT2locationsBackwards.convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertCostMatrix.txt");
 
-			}
+
 		}
 	}
 
