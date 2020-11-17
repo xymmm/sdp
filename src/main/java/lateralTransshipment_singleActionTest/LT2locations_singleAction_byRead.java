@@ -5,13 +5,12 @@ import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import lateralTransshipment.LT2Backwards2Stages;
 import lateralTransshipment.LT2locationsBackwards;
 import lateralTransshipment.LTinstance;
 import lateralTransshipment.LTsolution;
 
 public class LT2locations_singleAction_byRead {
-	
+
 	public static double[][] readFromTXT(double[][] array) throws Exception {
 
 		Scanner sc = new Scanner( new BufferedReader(new FileReader("src/main/java/lateralTransshipment_singleActionTest/optimalCostToRead2_4.txt")));
@@ -24,104 +23,84 @@ public class LT2locations_singleAction_byRead {
 				}
 			}
 		}
-//		System.out.println(Arrays.deepToString(array));
+		//		System.out.println(Arrays.deepToString(array));
 		return array;
 	}
-	
-	public static LTsolution LT2locations_singleAction_byRead(LTinstance instance, int actionPeriodIdx, int[] testTransshipment, int[][] testOrder) {
+
+	public static testSolution LT2locations_singleAction_byRead(LTinstance instance, int actionPeriodIdx, int[] testTransshipment, int[][] testOrder, int[] testInventory) {
 		int Stages = instance.demandMean1.length;		
 		int[][] inventoryPairs = LT2locationsBackwards.generateInventoryPairs(instance);
 
 		//demand[t][demandPairCount][3] ->{prob*prob, demand 1, demand 2}
 		double[][][] demand = LT2locationsBackwards.generatePMF(instance.demandMean1, instance.demandMean2, instance.tail);	
 
-		int[][][] optimalAction = new int [Stages][inventoryPairs.length][3];
-
-		double[][] optimalCost = new double [2*Stages][inventoryPairs.length]; 
-		double[][] totalCost = null;
-
-		int[][][] optimalOrder = new int[Stages][inventoryPairs.length][2];
-		int[][] optimalTransship = new int[Stages][inventoryPairs.length];
+		double[][] optimalCost = new double [Stages][inventoryPairs.length]; 
+		double totalCost = 0;
 
 		//read future cost: only care about the first-leading period
 		double[][] futureCost = new double[inventoryPairs.length][Stages-actionPeriodIdx-1];
-		try {
-			futureCost = readFromTXT(futureCost);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		for(int i=0; i<inventoryPairs.length; i++) {
-			optimalCost[actionPeriodIdx*2+2][i] = futureCost[i][0];
-		}
+		try {futureCost = readFromTXT(futureCost);
+		} catch (Exception e) {e.printStackTrace();}
 
+		for(int i=0; i<inventoryPairs.length; i++) {optimalCost[actionPeriodIdx+1][i] = futureCost[i][0];}
 
-		for(int t=actionPeriodIdx*2+1;t>=0;t--) { 	
+		double penaltyCost1 = 0; double penaltyCost2 = 0; double holdingCost1 = 0; double holdingCost2 = 0;		
 
-			System.out.println("period "+(t+1));
-			long timePeriodStart = System.currentTimeMillis();
+		int testInventoryIdx = LT2locationsBackwards.getStateIndex(inventoryPairs, testInventory);
 
-			if(t%2 == 1) {//stage 2 for period t: reorder
-				int actualIndex = ((t+1)/2)-1;
-				for(int i=0; i<inventoryPairs.length; i++) {
-					//testOrder
-					totalCost = new double[inventoryPairs.length][testOrder.length];
-					for(int a=0; a<testOrder.length; a++) {
-						double scenarioProb = 0;
-						totalCost[i][a] = ((testOrder[a][0] == 0) ? 0 : (instance.K+testOrder[a][0]*instance.z))
-								+ ((testOrder[a][1] == 0) ? 0 : (instance.K+testOrder[a][1]*instance.z));
-						for(int d=0;d<demand[actualIndex].length;d++) { // Demand
-							if(
-									(inventoryPairs[i][0] + testOrder[a][0] - demand[actualIndex][d][1] <= instance.maxInventory) 
-									&& (inventoryPairs[i][0] + testOrder[a][0] - demand[actualIndex][d][1] >= instance.minInventory)
-									&& (inventoryPairs[i][1] + testOrder[a][1] - demand[actualIndex][d][2] <= instance.maxInventory) 
-									&& (inventoryPairs[i][1] + testOrder[a][1] - demand[actualIndex][d][2] >= instance.minInventory)
-									) {
-								int[] closingState = {(int) (inventoryPairs[i][0] + testOrder[a][0] - demand[actualIndex][d][1]),
-										(int) (inventoryPairs[i][1] + testOrder[a][1] - demand[actualIndex][d][2])};
-								int closingStateIndex = LT2locationsBackwards.getStateIndex(inventoryPairs, closingState);
-								totalCost[i][a] += demand[actualIndex][d][0]*(
-										LT2locationsBackwards.computeImmediateCost(instance, closingState)
-										+((t==Stages*2-1) ? 0 : optimalCost[t+1][closingStateIndex])
-										);
-								scenarioProb += demand[actualIndex][d][0];
-							}//else, we do nothing - not added in scenarios	
-
-						}
-						totalCost[i][a] = totalCost[i][a]/scenarioProb;		
-					}//searched for all feasible order quantities for 2 locations
-					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
-				}				
-			}else {//stage 1 for period t: transship
-//				int actualIndex = (t/2);
-				for(int i=0;i<inventoryPairs.length;i++) {
-
-					totalCost = new double[inventoryPairs.length][testTransshipment.length];
-					//					System.out.println(Arrays.toString(transshipment));
-					for(int k=0; k<testTransshipment.length; k++) {
-						int[] inventoryAfterTransship = {inventoryPairs[i][0] - testTransshipment[k], inventoryPairs[i][1] + testTransshipment[k]};
-						int inventoryAfterTrnsshipIdx = LT2locationsBackwards.getStateIndex(inventoryPairs, inventoryAfterTransship);
-						totalCost[i][k] = (Math.abs(testTransshipment[k]) == 0? 0 : instance.R + Math.abs(testTransshipment[k])*instance.v)
-								+optimalCost[t+1][inventoryAfterTrnsshipIdx];
+		for(int t=actionPeriodIdx;t>=0;t--) { 	
+			int[] actions = new int[]{testTransshipment[0], testOrder[0][0], testOrder[0][1]};				
+			double scenarioProb = 0;
+			double sh1 = 0; double sh2 = 0; double sp1 = 0; double sp2 = 0;
+			totalCost = lateralTransshipment.LT2locationsBackwards.computeActionCost(instance, actions);
+			for(int d=0;d<demand[t].length;d++) { // Demand
+				if(
+						(testInventory[0] - actions[0] + actions[1] - demand[t][d][1] <= instance.maxInventory) 
+						&& (testInventory[0] - actions[0] + actions[1] - demand[t][d][1] >= instance.minInventory)
+						&& (testInventory[1] + actions[0] + actions[2] - demand[t][d][2] <= instance.maxInventory) 
+						&& (testInventory[1] + actions[0] + actions[2] - demand[t][d][2] >= instance.minInventory)
+						) {
+					int[] closingState = {(int) (testInventory[0] - actions[0] + actions[1] - demand[t][d][1]),
+							(int) (testInventory[1] + actions[0] + actions[2] - demand[t][d][2])};
+					int closingStateIndex = lateralTransshipment.LT2locationsBackwards.getStateIndex(inventoryPairs, closingState);
+					totalCost += demand[t][d][0]*(
+							lateralTransshipment.LT2locationsBackwards.computeImmediateCost(instance, closingState)
+							+((t==Stages-1) ? 0 : optimalCost[t+1][closingStateIndex])
+							);
+					scenarioProb += demand[t][d][0];
+					if(closingState[0]>=0) {
+						sh1+=demand[t][d][0];
+						holdingCost1+=demand[t][d][0]*(instance.h*closingState[0]);
+					}else {
+						sp1+=demand[t][d][0];
+						penaltyCost1+=demand[t][d][0]*(-instance.b*closingState[0]);
 					}
-					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
+					if(closingState[1]>=0) {
+						sh2+=demand[t][d][0];
+						holdingCost2+=demand[t][d][0]*(instance.h*closingState[1]);
+					}else {
+						sp2+=demand[t][d][0];
+						penaltyCost2+=demand[t][d][0]*(-instance.b*closingState[1]);
+					}
 
-				}
+				}//else, we do nothing - not added in scenarios
 			}
+			totalCost = totalCost/scenarioProb;
+			holdingCost1 /= sh1; holdingCost2 /= sh2; penaltyCost1 /= sp1; penaltyCost2 /= sp2;
 
-			long timePeriodEnd = System.currentTimeMillis();
-			System.out.println("time for period "+(t+1)+" = "+ (timePeriodEnd - timePeriodStart)/1000+"s");
-		}//t
-		double[][] optimalCostResults = new double[Stages][inventoryPairs.length];
-		for(int t=0; t<Stages; t++) {
-			for(int i=0; i<inventoryPairs.length; i++) {
-				optimalAction[t][i] = new int[] {optimalTransship[t][i], optimalOrder[t][i][0], optimalOrder[t][i][1]};
-				optimalCostResults[t][i] = optimalCost[2*t][i];
-			}
 		}
-		return new LTsolution(inventoryPairs, optimalAction, optimalCostResults);
+
+		System.out.println("h1 = "+holdingCost1);
+		System.out.println("h2 = "+holdingCost2);
+		System.out.println("b1 = "+penaltyCost1);
+		System.out.println("b2 = "+penaltyCost2);
+		System.out.println("sum of holding = "+(holdingCost1+holdingCost2));
+		System.out.println("sum of penalty = "+(penaltyCost1+penaltyCost2));
+		System.out.println("computation: "+(holdingCost1+holdingCost2+penaltyCost1+penaltyCost2)+" + "+optimalCost[actionPeriodIdx+1][testInventoryIdx]+" = "+totalCost);
+		return new testSolution(holdingCost1, holdingCost2, penaltyCost1, penaltyCost2, totalCost);
 	}
 
-	
+
 	public static void main(String[] args) {
 		int[] demandMean1 = {4, 6, 8, 6};
 		int[] demandMean2 = {4, 6, 8, 6};
@@ -135,24 +114,25 @@ public class LT2locations_singleAction_byRead {
 		double h = 1;
 		double b = 5; 
 		double tail = 0.0001;
-		
+
 		int actionPeriodIdx = 0;
-		int[] testTransshipment = {1};
+		int[] testTransshipment = {0};
 		int[][] testOrder = {{0,0}};
-		int[] testInventory = {30,29};
+		int[] testInventory = {30,30};
 
-			for(int k=0; k<R.length; k++) {
-				LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
-
-				long timeStart = System.currentTimeMillis();
-				LTsolution solution = LT2locations_singleAction_byRead(instance, actionPeriodIdx, testTransshipment, testOrder);
-				long timeEnd = System.currentTimeMillis();
-				System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
-				int testInventoryIdx = LT2locationsBackwards.getStateIndex(solution.inventoryPairs, testInventory);
-				System.out.println("optimal cost of "+Arrays.toString(solution.inventoryPairs[testInventoryIdx])+" = "+solution.optimalCost[0][testInventoryIdx]);
-
-//				LT2locationsBackwards.convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment_singleActionTest/convertCostMatrix.txt");
-
+		for(int k=0; k<R.length; k++) {
+			for(int i=0; i<=maxInventory; i++) {
+				for(int j=0; j<=maxInventory;j++) {
+					System.out.println("test inventory: "+Arrays.toString(testInventory));
+					System.out.println("test action: ["+testTransshipment[0]+", "+testOrder[0][0]+", "+testOrder[0][1]+"]");
+					LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
+					int[] inventory = {i,j};
+					testSolution solution = LT2locations_singleAction_byRead(instance, actionPeriodIdx, testTransshipment, testOrder, inventory);
+					System.out.println("optimal cost of "+Arrays.toString(testInventory)+" = "+solution.total);
+					double[] solutionArray = {solution.hc1, solution.hc2, solution.pc1, solution.pc2, solution.total};
+					sdp.util.writeText.writeDoubleArray(solutionArray, "src/main/java/lateralTransshipment_singleActionTest/writeSeperate.txt");
+				}
+			}
 		}
 	}
 

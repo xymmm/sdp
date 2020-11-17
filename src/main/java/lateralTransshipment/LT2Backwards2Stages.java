@@ -65,7 +65,8 @@ public class LT2Backwards2Stages {
 		ArrayList<int[]> equivalentAction_Quantity_List = new ArrayList<int[]>();
 		equivalentAction_Quantity_List.add(inventoryPairs[inventoryIndex]);
 		for(int a=0; a<totalCost[inventoryIndex].length; a++) {
-			if(totalCost[inventoryIndex][a] == optimalCost[t][inventoryIndex]) {
+			//if((totalCost[inventoryIndex][a] == optimalCost[t][inventoryIndex]){
+			if((totalCost[inventoryIndex][a] <= optimalCost[t][inventoryIndex]+0.000001)&&(totalCost[inventoryIndex][a] >= optimalCost[t][inventoryIndex]-0.000001)) {
 				equivalentAction_Quantity_List.add(order[a]);
 			}
 		}
@@ -82,7 +83,8 @@ public class LT2Backwards2Stages {
 		equivalentAction_Transshipment_List.add(inventoryPairs[inventoryIndex][0]);
 		equivalentAction_Transshipment_List.add(inventoryPairs[inventoryIndex][1]);
 		for(int a=0; a<totalCost[inventoryIndex].length; a++) {
-			if(totalCost[inventoryIndex][a] == optimalCost[t][inventoryIndex]) {
+			//if(totalCost[inventoryIndex][a] == optimalCost[t][inventoryIndex]) {
+			if((totalCost[inventoryIndex][a] <= optimalCost[t][inventoryIndex]+0.000001)&&(totalCost[inventoryIndex][a] >= optimalCost[t][inventoryIndex]-0.000001)) {
 				equivalentAction_Transshipment_List.add(transshipment[a]);
 			}
 		}
@@ -272,8 +274,8 @@ public class LT2Backwards2Stages {
 	}
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {4, 6, 8, 6};
-		int[] demandMean2 = {4, 6, 8, 6};
+		int[] demandMean1 = {1, 6, 8, 6};
+		int[] demandMean2 = {3, 6, 8, 6};
 		int maxInventory  = 30;
 		int minInventory  = -30;
 		int maxQuantity   = 70;
