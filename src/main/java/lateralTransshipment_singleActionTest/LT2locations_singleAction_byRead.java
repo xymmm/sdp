@@ -1,13 +1,16 @@
 package lateralTransshipment_singleActionTest;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Scanner;
 
 import lateralTransshipment.LT2locationsBackwards;
 import lateralTransshipment.LTinstance;
-import lateralTransshipment.LTsolution;
 
 public class LT2locations_singleAction_byRead {
 
@@ -26,6 +29,7 @@ public class LT2locations_singleAction_byRead {
 		//		System.out.println(Arrays.deepToString(array));
 		return array;
 	}
+	
 
 	public static testSolution LT2locations_singleAction_byRead(LTinstance instance, int actionPeriodIdx, int[] testTransshipment, int[][] testOrder, int[] testInventory) {
 		int Stages = instance.demandMean1.length;		
@@ -44,7 +48,7 @@ public class LT2locations_singleAction_byRead {
 
 		for(int i=0; i<inventoryPairs.length; i++) {optimalCost[actionPeriodIdx+1][i] = futureCost[i][0];}
 
-		double penaltyCost1 = 0; double penaltyCost2 = 0; double holdingCost1 = 0; double holdingCost2 = 0;		
+		double penaltyCost1 = 0; double penaltyCost2 = 0; double holdingCost1 = 0; double holdingCost2 = 0;	
 
 		int testInventoryIdx = LT2locationsBackwards.getStateIndex(inventoryPairs, testInventory);
 
@@ -96,12 +100,12 @@ public class LT2locations_singleAction_byRead {
 		System.out.println("b2 = "+penaltyCost2);
 		System.out.println("sum of holding = "+(holdingCost1+holdingCost2));
 		System.out.println("sum of penalty = "+(penaltyCost1+penaltyCost2));
-		System.out.println("computation: "+(holdingCost1+holdingCost2+penaltyCost1+penaltyCost2)+" + "+optimalCost[actionPeriodIdx+1][testInventoryIdx]+" = "+totalCost);
+//		System.out.println("computation: "+(holdingCost1+holdingCost2+penaltyCost1+penaltyCost2)+" + "+optimalCost[actionPeriodIdx+1][testInventoryIdx]+" = "+totalCost);
 		return new testSolution(holdingCost1, holdingCost2, penaltyCost1, penaltyCost2, totalCost);
 	}
 
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		int[] demandMean1 = {4, 6, 8, 6};
 		int[] demandMean2 = {4, 6, 8, 6};
 		int maxInventory  = 30;
@@ -117,22 +121,21 @@ public class LT2locations_singleAction_byRead {
 
 		int actionPeriodIdx = 0;
 		int[] testTransshipment = {0};
-		int[][] testOrder = {{0,0}};
-		int[] testInventory = {30,30};
-
+		int[][] testOrder = {{14,14}};
+		int[] testInventory = {0,0};
+ 
 		for(int k=0; k<R.length; k++) {
-			for(int i=0; i<=maxInventory; i++) {
-				for(int j=0; j<=maxInventory;j++) {
 					System.out.println("test inventory: "+Arrays.toString(testInventory));
 					System.out.println("test action: ["+testTransshipment[0]+", "+testOrder[0][0]+", "+testOrder[0][1]+"]");
 					LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
-					int[] inventory = {i,j};
-					testSolution solution = LT2locations_singleAction_byRead(instance, actionPeriodIdx, testTransshipment, testOrder, inventory);
+//					int[] inventory = {i,j};
+//					testOrder = new int[][]{{action[i][1], action[i][2]}};
+//					testTransshipment = new int[] {action[i][0]};
+					testSolution solution = LT2locations_singleAction_byRead(instance, actionPeriodIdx, testTransshipment, testOrder, testInventory);
 					System.out.println("optimal cost of "+Arrays.toString(testInventory)+" = "+solution.total);
 					double[] solutionArray = {solution.hc1, solution.hc2, solution.pc1, solution.pc2, solution.total};
 					sdp.util.writeText.writeDoubleArray(solutionArray, "src/main/java/lateralTransshipment_singleActionTest/writeSeperate.txt");
-				}
-			}
+
 		}
 	}
 
