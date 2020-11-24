@@ -274,25 +274,25 @@ public class LT2Backwards2Stages {
 	}
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {1, 6, 8, 6};
-		int[] demandMean2 = {3, 6, 8, 6};
+		int[] demandMean1 = {4, 6, 8, 6};
+		int[] demandMean2 = {4, 6, 8, 6};
 		int maxInventory  = 30;
 		int minInventory  = -30;
 		int maxQuantity   = 70;
-		double K = 20;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
-		double z = 0;
-		double[] R = {0};//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
-		double v = 0;
+		double[] K = {0,20};				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
+		double z = 1;
+		double R = 0;//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
+		double v = 1;
 		double h = 1;
 		double b = 5; 
 		double tail = 0.0001;
 
-		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
+		boolean[] noInitialTransship = {false,true};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {false,true};//{false, true, false, true};
 
-		for(int i=0; i<noInitialTransship.length; i++) {
-			for(int k=0; k<R.length; k++) {
-				LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K,z,R[k],v,h,b,tail);
+		for(int k=0; k<K.length; k++) {
+			for(int i=0; i<noInitialTransship.length; i++) {
+				LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K[k],z,R,v,h,b,tail);
 
 				long timeStart = System.currentTimeMillis();
 				LTsolution solution = computeLTinstance2stages(instance, noInitialTransship[i], noInitialOrder[i]);
@@ -300,9 +300,15 @@ public class LT2Backwards2Stages {
 				System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
 
 				// record results
-				LT2locationsBackwards.writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");		
+				LT2locationsBackwards.writeSolution(solution, "src/main/java/lateralTransshipment/writeResults.txt");
+				sdp.util.writeText.writeString("===================================================", "src/main/java/lateralTransshipment/writeResults.txt");
 				LT2locationsBackwards.convertCostMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertCostMatrix.txt");
+				sdp.util.writeText.writeString("===================================================", "src/main/java/lateralTransshipment/convertCostMatrix.txt");
 				LT2locationsBackwards.convertActionMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
+				sdp.util.writeText.writeString("===================================================", "src/main/java/lateralTransshipment/convertActionMatrix.txt");
+				
+				sdp.util.writeText.writeString("===================================================", "src/main/java/lateralTransshipment/record_quantity_sameCost.txt");
+				sdp.util.writeText.writeString("===================================================", "src/main/java/lateralTransshipment/record_transship_sameCost.txt");
 
 			}
 		}
