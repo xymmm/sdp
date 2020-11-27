@@ -455,17 +455,17 @@ public class LT2locationsBackwards {
 
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {12, 12, 12, 12};
-		int[] demandMean2 = {12, 12, 12, 12};
-		int maxInventory  = 80;
-		int minInventory  = -50;
-		int maxQuantity   = 100;
-		double K = 50;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
+		int[] demandMean1 = {3, 3, 3};
+		int[] demandMean2 = {3, 3, 3};
+		int maxInventory  = 15;
+		int minInventory  = -30;
+		int maxQuantity   = 50;
+		double K = 10;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 0;
 		double R = 1000000;
 		double v = 0;
 		double h = 1;
-		double[] b = {30,10}; 
+		double[] b = {3}; 
 		double tail = 0.0001;
 		//		boolean noInitialTransship = false;
 		//		boolean noInitialOrder = true;

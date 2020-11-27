@@ -16,7 +16,8 @@ public class LT2locations_singleAction_byRead {
 
 	public static double[][] readFromTXT(double[][] array) throws Exception {
 
-		Scanner sc = new Scanner( new BufferedReader(new FileReader("src/main/java/lateralTransshipment_singleActionTest/optimalCostToRead2_4.txt")));
+//		Scanner sc = new Scanner( new BufferedReader(new FileReader("src/main/java/lateralTransshipment_singleActionTest/optimalCostToRead2_4.txt")));
+		Scanner sc = new Scanner( new BufferedReader(new FileReader("src/main/java/lateralTransshipment_singleActionTest/K20z1R0v1-1qdrt-overall-2_4toRead.txt")));
 
 		while(sc.hasNextLine()) {
 			for (int i=0; i<array.length; i++) {
@@ -112,17 +113,17 @@ public class LT2locations_singleAction_byRead {
 		int minInventory  = -30;
 		int maxQuantity   = 70;
 		double K = 20;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
-		double z = 0;
+		double z = 1;//0
 		double[] R = {0};//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
-		double v = 0;
+		double v = 1;//0
 		double h = 1;
 		double b = 5; 
 		double tail = 0.0001;
 
 		int actionPeriodIdx = 0;
-		int[] testTransshipment = {0};
-		int[][] testOrder = {{14,14}};
-		int[] testInventory = {0,0};
+		int[] testTransshipment = {-1};
+		int[][] testOrder = {{0,0}};
+		int[] testInventory = {3,1};
  
 		for(int k=0; k<R.length; k++) {
 					System.out.println("test inventory: "+Arrays.toString(testInventory));
@@ -133,8 +134,8 @@ public class LT2locations_singleAction_byRead {
 //					testTransshipment = new int[] {action[i][0]};
 					testSolution solution = LT2locations_singleAction_byRead(instance, actionPeriodIdx, testTransshipment, testOrder, testInventory);
 					System.out.println("optimal cost of "+Arrays.toString(testInventory)+" = "+solution.total);
-					double[] solutionArray = {solution.hc1, solution.hc2, solution.pc1, solution.pc2, solution.total};
-					sdp.util.writeText.writeDoubleArray(solutionArray, "src/main/java/lateralTransshipment_singleActionTest/writeSeperate.txt");
+//					double[] solutionArray = {solution.hc1, solution.hc2, solution.pc1, solution.pc2, solution.total};
+//					sdp.util.writeText.writeDoubleArray(solutionArray, "src/main/java/lateralTransshipment_singleActionTest/writeSeperate.txt");
 
 		}
 	}
