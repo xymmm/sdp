@@ -245,10 +245,25 @@ public class LT2Backwards2Stages {
 					totalCost = new double[inventoryPairs.length][transshipment.length];
 					//					System.out.println(Arrays.toString(transshipment));
 					for(int k=0; k<transshipment.length; k++) {
+						double scenarioProbTran = 0;//added
 						int[] inventoryAfterTransship = {inventoryPairs[i][0] - transshipment[k], inventoryPairs[i][1] + transshipment[k]};
 						int inventoryAfterTrnsshipIdx = LT2locationsBackwards.getStateIndex(inventoryPairs, inventoryAfterTransship);
-						totalCost[i][k] = (Math.abs(transshipment[k]) == 0? 0 : instance.R + Math.abs(transshipment[k])*instance.v)
-								+optimalCost[t+1][inventoryAfterTrnsshipIdx];
+						for(int d=0;d<demand[actualIndex].length;d++) { // Demand
+							if(
+									(inventoryAfterTransship[0] - demand[actualIndex][d][1] <= instance.maxInventory) 
+									&& (inventoryAfterTransship[0] - demand[actualIndex][d][1] >= instance.minInventory)
+									&& (inventoryAfterTransship[1] - demand[actualIndex][d][2] <= instance.maxInventory) 
+									&& (inventoryAfterTransship[1] - demand[actualIndex][d][2] >= instance.minInventory)
+									) {
+								scenarioProbTran += demand[actualIndex][d][0];
+		//						totalCost[i][k] = (Math.abs(transshipment[k]) == 0? 0 : instance.R + Math.abs(transshipment[k])*instance.v)
+		//								+optimalCost[t+1][inventoryAfterTrnsshipIdx];
+								totalCost[i][k] += demand[t][d][0]*((Math.abs(transshipment[k]) == 0? 0 : instance.R + Math.abs(transshipment[k])*instance.v)
+										+optimalCost[t+1][inventoryAfterTrnsshipIdx]);
+
+							}//if
+						}//demand
+						totalCost[i][k] = totalCost[i][k]/scenarioProbTran;
 					}
 					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
 					int optimalTransshipmentIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
@@ -274,12 +289,12 @@ public class LT2Backwards2Stages {
 	}
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {4, 6, 8, 6};
-		int[] demandMean2 = {4, 6, 8, 6};
-		int maxInventory  = 30;
-		int minInventory  = -30;
-		int maxQuantity   = 70;
-		double[] K = {0,20};				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
+		int[] demandMean1 = {3,3,3};//{4, 6, 8, 6};
+		int[] demandMean2 = {3,3,3};//{4, 6, 8, 6};
+		int maxInventory  = 15;//30;
+		int minInventory  = -15;//-30;
+		int maxQuantity   = 30;//70;
+		double[] K = {20};				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 1;
 		double R = 0;//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
 		double v = 1;
@@ -287,8 +302,8 @@ public class LT2Backwards2Stages {
 		double b = 5; 
 		double tail = 0.0001;
 
-		boolean[] noInitialTransship = {false,true};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {false,true};//{false, true, false, true};
+		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
 
 		for(int k=0; k<K.length; k++) {
 			for(int i=0; i<noInitialTransship.length; i++) {
@@ -306,7 +321,7 @@ public class LT2Backwards2Stages {
 				sdp.util.writeText.writeString("===================================================", "src/main/java/lateralTransshipment/convertCostMatrix.txt");
 				LT2locationsBackwards.convertActionMatrix(instance, solution, 0, "src/main/java/lateralTransshipment/convertActionMatrix.txt");
 				sdp.util.writeText.writeString("===================================================", "src/main/java/lateralTransshipment/convertActionMatrix.txt");
-				
+
 				sdp.util.writeText.writeString("===================================================", "src/main/java/lateralTransshipment/record_quantity_sameCost.txt");
 				sdp.util.writeText.writeString("===================================================", "src/main/java/lateralTransshipment/record_transship_sameCost.txt");
 
