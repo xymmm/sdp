@@ -258,7 +258,7 @@ public class LT2Backwards2Stages {
 								scenarioProbTran += demand[actualIndex][d][0];
 		//						totalCost[i][k] = (Math.abs(transshipment[k]) == 0? 0 : instance.R + Math.abs(transshipment[k])*instance.v)
 		//								+optimalCost[t+1][inventoryAfterTrnsshipIdx];
-								totalCost[i][k] += demand[t][d][0]*((Math.abs(transshipment[k]) == 0? 0 : instance.R + Math.abs(transshipment[k])*instance.v)
+								totalCost[i][k] += demand[actualIndex][d][0]*((Math.abs(transshipment[k]) == 0? 0 : instance.R + Math.abs(transshipment[k])*instance.v)
 										+optimalCost[t+1][inventoryAfterTrnsshipIdx]);
 
 							}//if
