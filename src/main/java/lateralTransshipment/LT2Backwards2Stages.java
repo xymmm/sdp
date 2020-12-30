@@ -168,7 +168,7 @@ public class LT2Backwards2Stages {
 		}
 	}
 
-	public static LTsolution computeLTinstance2stages(LTinstance instance, boolean noInitialTransship, boolean noInitialOrder) {
+	public static LTsolution computeLTinstance2stages(LTinstance instance, boolean noInitialTransship, boolean noInitialOrder, boolean equivalentAction) {
 		int Stages = instance.demandMean1.length;		
 		int[][] inventoryPairs = LT2locationsBackwards.generateInventoryPairs(instance);
 
@@ -229,7 +229,7 @@ public class LT2Backwards2Stages {
 					optimalOrder[actualIndex][i] = order[optimalOrderIdx];
 
 					//---------------------if there are quantity that produce the same cost----------------------------
-					detectEquivalentQuantity(inventoryPairs, i, totalCost, optimalCost, t, order);
+					if(equivalentAction) detectEquivalentQuantity(inventoryPairs, i, totalCost, optimalCost, t, order);
 					//-------------------------------------------------------------------------------------------------
 				}				
 			}else {//stage 1 for period t: transship
@@ -270,7 +270,7 @@ public class LT2Backwards2Stages {
 					optimalTransship[actualIndex][i] = transshipment[optimalTransshipmentIdx];
 
 					//---------------------if there are transshipment that produce the same cost----------------------------
-					detectEquivalentTransshipment(inventoryPairs, i, totalCost, optimalCost, t, transshipment);
+					if(equivalentAction) detectEquivalentTransshipment(inventoryPairs, i, totalCost, optimalCost, t, transshipment);
 					//------------------------------------------------------------------------------------------------
 				}
 			}
@@ -289,28 +289,30 @@ public class LT2Backwards2Stages {
 	}
 
 	public static void main(String[] args) {
-		int[] demandMean1 = {3,3,3};//{4, 6, 8, 6};
-		int[] demandMean2 = {3,3,3};//{4, 6, 8, 6};
-		int maxInventory  = 15;//30;
-		int minInventory  = -15;//-30;
-		int maxQuantity   = 30;//70;
+		int[] demandMean1 = {4, 6, 8, 6};
+		int[] demandMean2 = {4, 6, 8, 6};
+		int maxInventory  = 30;
+		int minInventory  = -20;
+		int maxQuantity   = 70;
 		double[] K = {20};				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 1;
-		double R = 0;//{0, 1, 3, 5, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 1000000};
-		double v = 1;
-		double h = 1;
+		double R = 0;//5
+		double v = 0.5;
+		double h = 0.25;
 		double b = 5; 
 		double tail = 0.0001;
 
-		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
+		boolean[] noInitialTransship = {false,true};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {false,true};//{false, true, false, true};
+		
+		boolean equivalentAction = false;
 
 		for(int k=0; k<K.length; k++) {
 			for(int i=0; i<noInitialTransship.length; i++) {
 				LTinstance instance = new LTinstance(demandMean1,demandMean2,maxInventory,minInventory,maxQuantity,K[k],z,R,v,h,b,tail);
 
 				long timeStart = System.currentTimeMillis();
-				LTsolution solution = computeLTinstance2stages(instance, noInitialTransship[i], noInitialOrder[i]);
+				LTsolution solution = computeLTinstance2stages(instance, noInitialTransship[i], noInitialOrder[i], equivalentAction);
 				long timeEnd = System.currentTimeMillis();
 				System.out.println("time consumed for SDP = "+(timeEnd - timeStart)/1000 +"s");
 

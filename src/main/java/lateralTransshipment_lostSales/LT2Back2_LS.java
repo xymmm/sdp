@@ -307,7 +307,7 @@ public class LT2Back2_LS {
 
 	public static void main(String[] args) {
 		int[] demandMean1 = {4, 6, 8, 6};
-		int[] demandMean2 = {4, 6, 8, 6};
+		int[] demandMean2 = {8, 6, 4, 6};
 		int maxInventory  = 30;
 		int minInventory  = -30;
 		int maxQuantity   = 40;//70;

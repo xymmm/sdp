@@ -16,8 +16,8 @@ public class LT2locations_singleAction_byRead {
 
 	public static double[][] readFromTXT(double[][] array) throws Exception {
 
-//		Scanner sc = new Scanner( new BufferedReader(new FileReader("src/main/java/lateralTransshipment_singleActionTest/optimalCostToRead2_4.txt")));
-		Scanner sc = new Scanner( new BufferedReader(new FileReader("src/main/java/lateralTransshipment_singleActionTest/K20z1R0v1-1qdrt-overall-2_4toRead.txt")));
+		Scanner sc = new Scanner( new BufferedReader(new FileReader("src/main/java/lateralTransshipment_singleActionTest/optimalCostToRead2_4.txt")));
+//		Scanner sc = new Scanner( new BufferedReader(new FileReader("src/main/java/lateralTransshipment_singleActionTest/K20z1R0v1-1qdrt-overall-2_4toRead.txt")));
 
 		while(sc.hasNextLine()) {
 			for (int i=0; i<array.length; i++) {
@@ -51,7 +51,7 @@ public class LT2locations_singleAction_byRead {
 
 		double penaltyCost1 = 0; double penaltyCost2 = 0; double holdingCost1 = 0; double holdingCost2 = 0;	
 
-		int testInventoryIdx = LT2locationsBackwards.getStateIndex(inventoryPairs, testInventory);
+//		int testInventoryIdx = LT2locationsBackwards.getStateIndex(inventoryPairs, testInventory);
 
 		for(int t=actionPeriodIdx;t>=0;t--) { 	
 			int[] actions = new int[]{testTransshipment[0], testOrder[0][0], testOrder[0][1]};				
@@ -121,9 +121,9 @@ public class LT2locations_singleAction_byRead {
 		double tail = 0.0001;
 
 		int actionPeriodIdx = 0;
-		int[] testTransshipment = {-1};
-		int[][] testOrder = {{0,0}};
-		int[] testInventory = {3,1};
+		int[] testTransshipment = {1};
+		int[][] testOrder = {{0,28}};
+		int[] testInventory = {1,0};
  
 		for(int k=0; k<R.length; k++) {
 					System.out.println("test inventory: "+Arrays.toString(testInventory));
