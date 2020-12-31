@@ -9,9 +9,9 @@ public class globalMinimumIndex {
 			if(arr[i]<min) {
 				min = arr[i];
 				index = i;
-				break;
+//				break;
 			}
-			break;
+//			break;
 		}
 		return index;
 	}

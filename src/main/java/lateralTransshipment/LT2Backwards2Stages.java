@@ -235,7 +235,7 @@ public class LT2Backwards2Stages {
 			}else {//stage 1 for period t: transship
 				int actualIndex = (t/2);
 				for(int i=0;i<inventoryPairs.length;i++) {
-					//					System.out.println(Arrays.toString(inventoryPairs[i]));
+//					System.out.println(Arrays.toString(inventoryPairs[i]));
 					int[] transshipment = null;
 					if(noInitialTransship && t==0) {
 						transshipment = new int[] {0};
@@ -302,10 +302,10 @@ public class LT2Backwards2Stages {
 		double b = 5; 
 		double tail = 0.0001;
 
-		boolean[] noInitialTransship = {false,true};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {false,true};//{false, true, false, true};
+		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
 		
-		boolean equivalentAction = false;
+		boolean equivalentAction = true;
 
 		for(int k=0; k<K.length; k++) {
 			for(int i=0; i<noInitialTransship.length; i++) {
