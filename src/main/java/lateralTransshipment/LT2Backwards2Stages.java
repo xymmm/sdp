@@ -233,7 +233,7 @@ public class LT2Backwards2Stages {
 					//-------------------------------------------------------------------------------------------------
 				}				
 			}else {//stage 1 for period t: transship
-				int actualIndex = (t/2);
+/*				int actualIndex = (t/2);
 				for(int i=0;i<inventoryPairs.length;i++) {
 //					System.out.println(Arrays.toString(inventoryPairs[i]));
 					int[] transshipment = null;
@@ -268,7 +268,26 @@ public class LT2Backwards2Stages {
 					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
 					int optimalTransshipmentIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
 					optimalTransship[actualIndex][i] = transshipment[optimalTransshipmentIdx];
+*/
+				int actualIndex = (t/2);
+				for(int i=0;i<inventoryPairs.length;i++) {
+					int[] transshipment = null;
+					if(noInitialTransship && t==0) {
+						transshipment = new int[] {0};
+					}else {	
+						transshipment = generateTransshipment4Quantity(inventoryPairs[i], instance, optimalOrder[actualIndex][i]);
+					}
+					totalCost = new double[inventoryPairs.length][transshipment.length];
 
+					for(int k=0; k<transshipment.length; k++) {
+						int[] inventoryAfterTransship = {inventoryPairs[i][0] - transshipment[k], inventoryPairs[i][1] + transshipment[k]};
+						int inventoryAfterTrnsshipIdx = LT2locationsBackwards.getStateIndex(inventoryPairs, inventoryAfterTransship);
+						totalCost[i][k] = (Math.abs(transshipment[k]) == 0? 0 : instance.R + Math.abs(transshipment[k])*instance.v)
+								+optimalCost[t+1][inventoryAfterTrnsshipIdx];
+					}
+					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
+					int optimalTransshipmentIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
+					optimalTransship[actualIndex][i] = transshipment[optimalTransshipmentIdx];
 					//---------------------if there are transshipment that produce the same cost----------------------------
 					if(equivalentAction) detectEquivalentTransshipment(inventoryPairs, i, totalCost, optimalCost, t, transshipment);
 					//------------------------------------------------------------------------------------------------
@@ -296,14 +315,14 @@ public class LT2Backwards2Stages {
 		int maxQuantity   = 70;
 		double[] K = {20};				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 1;
-		double R = 0;//5
+		double R = 5;
 		double v = 0.5;
 		double h = 0.25;
 		double b = 5; 
 		double tail = 0.0001;
 
-		boolean[] noInitialTransship = {false};//{false, true, true, false}; both actions, neither, no transship, no order
-		boolean[] noInitialOrder 	 = {false};//{false, true, false, true};
+		boolean[] noInitialTransship = {false,true};//{false, true, true, false}; both actions, neither, no transship, no order
+		boolean[] noInitialOrder 	 = {false,true};//{false, true, false, true};
 		
 		boolean equivalentAction = true;
 
