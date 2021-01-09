@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class LT2Backwards2Stages {
+public class LT2Backwards2Stages_slow{
 
 	public static void writeEquivalentQuantity(int[][] equivalentQs, int t, String fileName) {
 		//cost
