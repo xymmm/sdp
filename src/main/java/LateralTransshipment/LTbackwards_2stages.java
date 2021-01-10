@@ -135,11 +135,6 @@ public class LTbackwards_2stages {
 		double GnTransshipment[][][] = new double [instance.getStages()][instance.stateSpaceSize()][instance.stateSpaceSize()];
 		double CnTransshipment[][][] = new double [instance.getStages()][instance.stateSpaceSize()][instance.stateSpaceSize()];
 
-		int[] inventory = new int[instance.stateSpaceSize()];
-		for(int i=0; i<inventory.length; i++) {
-			inventory[i] = i + instance.minInventory;
-		}
-		
 		/** Compute Expected Cost **/
 
 		for(int t = instance.getStages()-1; t >= 0; t--) {                               // Time
@@ -384,7 +379,7 @@ public class LTbackwards_2stages {
 			pw.println();
 		}
 		pw.println();
-		//second period (overall ETC)
+/*		//second period (overall ETC)
 		pw.println("Expected total cost (Cn_2): ");		      
 		pw.print("\t");
 		for(int j = 0; j < instance.stateSpaceSize(); j++) {
@@ -398,7 +393,7 @@ public class LTbackwards_2stages {
 			}
 			pw.println();
 		}
-		
+*/		
 		pw.flush();
 		try {
 			fw.flush();
@@ -472,11 +467,6 @@ public class LTbackwards_2stages {
 		}
 	}
 
-	public static void printTestComparison(Instance instance, Solution solution, int[] testInventory, int[] testAction) {
-		System.out.println("testInventory = "+Arrays.toString(testInventory));
-		System.out.println("Optimal Action = "
-							+solution.CnTransshipment[0][testInventory[0]-instance.minInventory][testInventory[1]-instance.minInventory]);
-	}
 	public static void solveSampleInstance(Instances problemInstance) {      
 		Instance instance; 
 		switch(problemInstance) {
@@ -491,7 +481,7 @@ public class LTbackwards_2stages {
 		System.out.println("time consumed = "+(timeEnd - timeStart)/1000.0+"s");
 //		printSolution(instance, solution);
 		writeResults(0, instance, solution, "src/main/java/lateralTransshipment/OverallResults.txt");
-//		writeCn(instance, solution, "src/main/java/lateralTransshipment/Cn's.txt");
+		writeCn(instance, solution, "src/main/java/lateralTransshipment/Cn's.txt");
 	}
 
 	public static void main(String[] args) {
