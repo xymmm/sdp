@@ -348,11 +348,6 @@ public class LTbackwards_2stages {
 			e.printStackTrace();
 		}
 		
-		for(int i=instance.stateSpaceSize()-1; i >= 0 ; i--) {
-			for(int j = 0; j < instance.stateSpaceSize(); j++) {
-				sdp.util.writeText.writeDouble(solution.CnTransshipment[1][i][j], "src/main/java/lateralTransshipment/futureCost.txt");
-			}
-		}
 	}
 
 	public static void writeCn(Instance instance, Solution solution, String FileName) {
@@ -364,7 +359,7 @@ public class LTbackwards_2stages {
 			e.printStackTrace();
 		}
 		PrintWriter pw = new PrintWriter(fw);
-		//first period (overall ETC)
+/*		//first period (overall ETC)
 		pw.println("Expected total cost (Cn_1): ");		      
 		pw.print("\t");
 		for(int j = 0; j < instance.stateSpaceSize(); j++) {
@@ -378,22 +373,22 @@ public class LTbackwards_2stages {
 			}
 			pw.println();
 		}
-		pw.println();
-/*		//second period (overall ETC)
-		pw.println("Expected total cost (Cn_2): ");		      
-		pw.print("\t");
-		for(int j = 0; j < instance.stateSpaceSize(); j++) {
-			pw.print(instance.inventory(j) + "\t");
-		}
-		pw.println();
+		pw.println();*/
+		//second period (overall ETC)
+//		pw.println("Expected total cost (Cn_2): ");		      
+//		pw.print("\t");
+//		for(int j = 0; j < instance.stateSpaceSize(); j++) {
+//			pw.print(instance.inventory(j) + "\t");
+//		}
+//		pw.println();
 		for(int i = instance.stateSpaceSize()-1; i >=0 ; i--) {
-			pw.print(instance.inventory(i) + "\t");
+//			pw.print(instance.inventory(i) + "\t");
 			for(int j = 0; j < instance.stateSpaceSize(); j++) {
 				pw.print(solution.CnTransshipment[1][i][j] + "\t");
 			}
 			pw.println();
 		}
-*/		
+		
 		pw.flush();
 		try {
 			fw.flush();
@@ -480,13 +475,28 @@ public class LTbackwards_2stages {
 		long timeEnd = System.currentTimeMillis();
 		System.out.println("time consumed = "+(timeEnd - timeStart)/1000.0+"s");
 //		printSolution(instance, solution);
-		writeResults(0, instance, solution, "src/main/java/lateralTransshipment/OverallResults.txt");
-		writeCn(instance, solution, "src/main/java/lateralTransshipment/Cn's.txt");
+//		writeResults(0, instance, solution, "src/main/java/lateralTransshipment/OverallResults.txt");
+//		writeCn(instance, solution, "src/main/java/lateralTransshipment/Cn.txt");
+		
+		/** test single Action*
+		System.out.println();
+		System.out.println("============== Single Action Test ===============================");
+		timeStart = System.currentTimeMillis();
+		int[][] testInventory = {{30,2}};
+		int[][] testAction = {{5,0,21},{4,0,21},{6,0,21}, {0,0,21}};
+		for(int i = 0; i<testInventory.length; i++) {
+			for(int j=0; j<testAction.length; j++) {
+				LTsingleAction.testSingleAction(instance, solution, testInventory[i], testAction[j]);
+			}
+		}
+		timeEnd = System.currentTimeMillis();
+		System.out.println("time consumed = "+(timeEnd - timeStart)/1000.0+"s");
+*/
 	}
 
 	public static void main(String[] args) {
 		Instances instance = Instances.SAMPLE_POISSON;
-		solveSampleInstance(instance);
+		solveSampleInstance(instance);		
 	}
 }
 
