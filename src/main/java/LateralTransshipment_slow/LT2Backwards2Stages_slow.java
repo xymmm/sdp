@@ -1,4 +1,4 @@
-package lateralTransshipment;
+package LateralTransshipment_slow;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -233,42 +233,6 @@ public class LT2Backwards2Stages_slow{
 					//-------------------------------------------------------------------------------------------------
 				}				
 			}else {//stage 1 for period t: transship
-/*				int actualIndex = (t/2);
-				for(int i=0;i<inventoryPairs.length;i++) {
-//					System.out.println(Arrays.toString(inventoryPairs[i]));
-					int[] transshipment = null;
-					if(noInitialTransship && t==0) {
-						transshipment = new int[] {0};
-					}else {	
-						transshipment = generateTransshipment4Quantity(inventoryPairs[i], instance, optimalOrder[actualIndex][i]);
-					}
-					totalCost = new double[inventoryPairs.length][transshipment.length];
-					//					System.out.println(Arrays.toString(transshipment));
-					for(int k=0; k<transshipment.length; k++) {
-						double scenarioProbTran = 0;//added
-						int[] inventoryAfterTransship = {inventoryPairs[i][0] - transshipment[k], inventoryPairs[i][1] + transshipment[k]};
-						int inventoryAfterTrnsshipIdx = LT2locationsBackwards.getStateIndex(inventoryPairs, inventoryAfterTransship);
-						for(int d=0;d<demand[actualIndex].length;d++) { // Demand
-							if(
-									(inventoryAfterTransship[0] - demand[actualIndex][d][1] <= instance.maxInventory) 
-									&& (inventoryAfterTransship[0] - demand[actualIndex][d][1] >= instance.minInventory)
-									&& (inventoryAfterTransship[1] - demand[actualIndex][d][2] <= instance.maxInventory) 
-									&& (inventoryAfterTransship[1] - demand[actualIndex][d][2] >= instance.minInventory)
-									) {
-								scenarioProbTran += demand[actualIndex][d][0];
-		//						totalCost[i][k] = (Math.abs(transshipment[k]) == 0? 0 : instance.R + Math.abs(transshipment[k])*instance.v)
-		//								+optimalCost[t+1][inventoryAfterTrnsshipIdx];
-								totalCost[i][k] += demand[actualIndex][d][0]*((Math.abs(transshipment[k]) == 0? 0 : instance.R + Math.abs(transshipment[k])*instance.v)
-										+optimalCost[t+1][inventoryAfterTrnsshipIdx]);
-
-							}//if
-						}//demand
-						totalCost[i][k] = totalCost[i][k]/scenarioProbTran;
-					}
-					optimalCost[t][i] = sdp.util.globleMinimum.getGlobalMinimum(totalCost[i]);
-					int optimalTransshipmentIdx = sdp.util.globalMinimumIndex.getGlobalMinimumJavaIndex(totalCost[i]);
-					optimalTransship[actualIndex][i] = transshipment[optimalTransshipmentIdx];
-*/
 				int actualIndex = (t/2);
 				for(int i=0;i<inventoryPairs.length;i++) {
 					int[] transshipment = null;
@@ -306,6 +270,8 @@ public class LT2Backwards2Stages_slow{
 		}
 		return new LTsolution(inventoryPairs, optimalAction, optimalCostResults);
 	}
+	
+
 
 	public static void main(String[] args) {
 		int[] demandMean1 = {4, 6, 8, 6};
@@ -349,5 +315,7 @@ public class LT2Backwards2Stages_slow{
 			}
 		}
 	}
+	
+
 
 }

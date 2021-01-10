@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lateralTransshipment.LT2locationsBackwards;
-import lateralTransshipment.LTinstance;
-import lateralTransshipment.LTsolution;
+import LateralTransshipment_slow.LT2locationsBackwards;
+import LateralTransshipment_slow.LTinstance;
+import LateralTransshipment_slow.LTsolution;
 
 public class LT2Back2_LS {
 	
@@ -345,6 +345,7 @@ public class LT2Back2_LS {
 			}
 		}
 	}
+
 
 
 

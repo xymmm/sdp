@@ -1,4 +1,4 @@
-package lateralTransshipment;
+package LateralTransshipment_slow;
 
 import umontreal.ssj.stat.Tally;
 

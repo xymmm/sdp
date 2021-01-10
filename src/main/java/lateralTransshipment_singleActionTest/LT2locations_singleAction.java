@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import lateralTransshipment.LT2locationsBackwards;
-import lateralTransshipment.LTinstance;
+import LateralTransshipment_slow.LT2locationsBackwards;
+import LateralTransshipment_slow.LTinstance;
 
 public class LT2locations_singleAction {
 
@@ -57,7 +57,7 @@ public class LT2locations_singleAction {
 			int[] actions = new int[]{testTransshipment[0], testOrder[0][0], testOrder[0][1]};				
 			double scenarioProb = 0;
 			double sh1 = 0; double sh2 = 0; double sp1 = 0; double sp2 = 0;
-			totalCost = lateralTransshipment.LT2locationsBackwards.computeActionCost(instance, actions);
+			totalCost = LateralTransshipment_slow.LT2locationsBackwards.computeActionCost(instance, actions);
 			for(int d=0;d<demand[t].length;d++) { // Demand
 				if(
 						(testInventory[0] - actions[0] + actions[1] - demand[t][d][1] <= instance.maxInventory) 
@@ -67,9 +67,9 @@ public class LT2locations_singleAction {
 						) {
 					int[] closingState = {(int) (testInventory[0] - actions[0] + actions[1] - demand[t][d][1]),
 							(int) (testInventory[1] + actions[0] + actions[2] - demand[t][d][2])};
-					int closingStateIndex = lateralTransshipment.LT2locationsBackwards.getStateIndex(inventoryPairs, closingState);
+					int closingStateIndex = LateralTransshipment_slow.LT2locationsBackwards.getStateIndex(inventoryPairs, closingState);
 					totalCost += demand[t][d][0]*(
-							lateralTransshipment.LT2locationsBackwards.computeImmediateCost(instance, closingState)
+							LateralTransshipment_slow.LT2locationsBackwards.computeImmediateCost(instance, closingState)
 							+((t==Stages-1) ? 0 : optimalCost[t+1][closingStateIndex])
 							);
 					scenarioProb += demand[t][d][0];
@@ -115,7 +115,7 @@ public class LT2locations_singleAction {
 		int[] testAction = new int[]{testTransshipment[0], testOrder[0][0], testOrder[0][1]};				
 		double scenarioProb = 0;
 		double sh1 = 0; double sh2 = 0; double sp1 = 0; double sp2 = 0;
-		totalCost = lateralTransshipment.LT2locationsBackwards.computeActionCost(instance, testAction);
+		totalCost = LateralTransshipment_slow.LT2locationsBackwards.computeActionCost(instance, testAction);
 		for(int d=0;d<demand[t].length;d++) { // Demand
 			if(
 					(testInventory[0] - testAction[0] + testAction[1] - demand[t][d][1] <= instance.maxInventory) 
@@ -126,7 +126,7 @@ public class LT2locations_singleAction {
 				int[] closingState = {(int) (testInventory[0] - testAction[0] + testAction[1] - demand[t][d][1]),
 						(int) (testInventory[1] + testAction[0] + testAction[2] - demand[t][d][2])};
 				totalCost += demand[t][d][0]*(
-						lateralTransshipment.LT2locationsBackwards.computeImmediateCost(instance, closingState)
+						LateralTransshipment_slow.LT2locationsBackwards.computeImmediateCost(instance, closingState)
 						);
 				scenarioProb += demand[t][d][0];
 				if(closingState[0]>=0) {

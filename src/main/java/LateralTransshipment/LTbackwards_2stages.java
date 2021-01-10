@@ -1,4 +1,4 @@
-package lateralTransshipment;
+package LateralTransshipment;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -66,15 +66,13 @@ public class LTbackwards_2stages {
 		return costA + costB;
 	}
 	
-	static double computeHolding(
-			int iA, int iB, int QA, int QB, int demandA, int demandB,
-			double hA, double hB, double pA, double pB) {
-		return hA*Math.max(0, iA + QA - demandA) + hB*Math.max(0, iB + QB - demandB);
+	static double computeSingleHolding(
+			int iA, int QA, int demandA, double hA) {
+		return hA*Math.max(0, iA + QA - demandA);
 	}
-	static double computePenalty(
-			int iA, int iB, int QA, int QB, int demandA, int demandB,
-			double hA, double hB, double pA, double pB) {
-		return pA*Math.max(0, demandA - iA - QA) + pB*Math.max(0, demandB - iB - QB);
+	static double computeSinglePenalty(
+			int iA, int QA, int demandA, double pA) {
+		return pA*Math.max(0, demandA - iA - QA);
 	}
 
 	static double getOptimalCost(double[][] expectedTotalCosts) {
@@ -137,10 +135,15 @@ public class LTbackwards_2stages {
 		double GnTransshipment[][][] = new double [instance.getStages()][instance.stateSpaceSize()][instance.stateSpaceSize()];
 		double CnTransshipment[][][] = new double [instance.getStages()][instance.stateSpaceSize()][instance.stateSpaceSize()];
 
+		int[] inventory = new int[instance.stateSpaceSize()];
+		for(int i=0; i<inventory.length; i++) {
+			inventory[i] = i + instance.minInventory;
+		}
+		
 		/** Compute Expected Cost **/
 
 		for(int t = instance.getStages()-1; t >= 0; t--) {                               // Time
-
+//			System.out.println("t = "+(t+1));
 			// Orders last
 			double totalCostO[][][][] = new double [instance.stateSpaceSize()][instance.stateSpaceSize()][instance.stateSpaceSize()+1][instance.stateSpaceSize()+1];
 			for(int iA = 0; iA < instance.stateSpaceSize(); iA++) {                          // Inventory A
@@ -159,7 +162,7 @@ public class LTbackwards_2stages {
 											(instance.inventory(iB) + QB - dB <= instance.maxInventory) && (instance.inventory(iB) + QB - dB >= instance.minInventory)) {
 										immediateCost = demandProbabilities[0][t][dA]*demandProbabilities[1][t][dB]*
 												computeImmediateEndOfPeriodCost(instance.inventory(iA),instance.inventory(iB), QA, QB, dA, dB, instance.hA, instance.hB, instance.pA, instance.pB);
-										futureCost = demandProbabilities[0][t][dA]*demandProbabilities[0][t][dB]*( (t==instance.getStages()-1) ? 0 : CnTransshipment[t+1][iA+QA-dA][iB+QB-dB]);
+										futureCost = demandProbabilities[0][t][dA]*demandProbabilities[1][t][dB]*( (t==instance.getStages()-1) ? 0 : CnTransshipment[t+1][iA+QA-dA][iB+QB-dB]);
 										totalProbabilityMass += demandProbabilities[0][t][dA]*demandProbabilities[1][t][dB];
 									}
 									totalCostO[iA][iB][QA][QB] += immediateCost + futureCost;
@@ -349,6 +352,12 @@ public class LTbackwards_2stages {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		for(int i=instance.stateSpaceSize()-1; i >= 0 ; i--) {
+			for(int j = 0; j < instance.stateSpaceSize(); j++) {
+				sdp.util.writeText.writeDouble(solution.CnTransshipment[1][i][j], "src/main/java/lateralTransshipment/futureCost.txt");
+			}
+		}
 	}
 
 	public static void writeCn(Instance instance, Solution solution, String FileName) {
@@ -397,7 +406,7 @@ public class LTbackwards_2stages {
 			fw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}		
 	}
 
 	public static void printSolution(Instance instance, Solution solution) {
@@ -482,7 +491,7 @@ public class LTbackwards_2stages {
 		System.out.println("time consumed = "+(timeEnd - timeStart)/1000.0+"s");
 //		printSolution(instance, solution);
 		writeResults(0, instance, solution, "src/main/java/lateralTransshipment/OverallResults.txt");
-		writeCn(instance, solution, "src/main/java/lateralTransshipment/Cn's.txt");
+//		writeCn(instance, solution, "src/main/java/lateralTransshipment/Cn's.txt");
 	}
 
 	public static void main(String[] args) {
@@ -512,7 +521,7 @@ class InstancePortfolio{
 		double vA = v;
 		double KB = K;
 		double vB = v;
-		double R = 0;
+		double R = 5;
 		double u = 0.5;
 		double hA = h;
 		double hB = h;
