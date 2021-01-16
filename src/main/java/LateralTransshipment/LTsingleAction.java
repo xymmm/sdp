@@ -82,7 +82,7 @@ public class LTsingleAction {
 				+ (totalPenalty[0] + totalPenalty[1])+" = "
 				+ Arrays.toString(totalPenalty));
 
-		System.out.println("ETC = "+((totalHolding[0] + totalHolding[1] + totalPenalty[0] + totalPenalty[1])+totalFutureCost));
+		System.out.println("ETC = "+(transshippingCost + orderingCost[0] + orderingCost[1] +(totalHolding[0] + totalHolding[1] + totalPenalty[0] + totalPenalty[1])+totalFutureCost));
 		System.out.println("------------------------------------------------------------");
 
 	}

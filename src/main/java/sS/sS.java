@@ -241,18 +241,8 @@ public class sS {
 		
 		boolean Normal = false;
 
-		InstanceDouble instance = new InstanceDouble(
-										fixedOrderingCost,
-										unitCost,
-										holdingCost,
-										penaltyCost,
-										demandMean,
-										tail,
-										minInventory,
-										maxInventory,
-										maxQuantity,
-										stdParameter
-										);
+		InstanceDouble instance = new InstanceDouble(fixedOrderingCost, unitCost, holdingCost, penaltyCost,
+										demandMean, tail, minInventory, maxInventory, maxQuantity, stdParameter);
 
 		sSsolution solution = solveInstance(instance, true, Normal);	//with initial order 
 

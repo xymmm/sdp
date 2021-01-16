@@ -478,12 +478,12 @@ public class LTbackwards_2stages {
 //		writeResults(0, instance, solution, "src/main/java/lateralTransshipment/OverallResults.txt");
 //		writeCn(instance, solution, "src/main/java/lateralTransshipment/Cn.txt");
 		
-		/** test single Action*
+		/** test single Action**/
 		System.out.println();
 		System.out.println("============== Single Action Test ===============================");
 		timeStart = System.currentTimeMillis();
-		int[][] testInventory = {{30,2}};
-		int[][] testAction = {{5,0,21},{4,0,21},{6,0,21}, {0,0,21}};
+		int[][] testInventory = {{3,3}};
+		int[][] testAction = {{0,22,22},{0,22,23}, {0,22,0},{0,0,0}};
 		for(int i = 0; i<testInventory.length; i++) {
 			for(int j=0; j<testAction.length; j++) {
 				LTsingleAction.testSingleAction(instance, solution, testInventory[i], testAction[j]);
@@ -491,7 +491,7 @@ public class LTbackwards_2stages {
 		}
 		timeEnd = System.currentTimeMillis();
 		System.out.println("time consumed = "+(timeEnd - timeStart)/1000.0+"s");
-*/
+
 	}
 
 	public static void main(String[] args) {
