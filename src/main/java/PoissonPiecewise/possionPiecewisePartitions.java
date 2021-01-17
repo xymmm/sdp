@@ -84,9 +84,9 @@ public class possionPiecewisePartitions {
 		return coefficients;
 	}
 
-/**
+
 	public static void main(String[] args) {
-		double[] demandMean = {2.5, 1, 3.5, 4.5, 1.5, 3};
+		double[] demandMean = {4,6,8,6};//{2.5, 1, 3.5, 4.5, 1.5, 3};
 		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		//System.out.println(Arrays.deepToString(demandMeanInput));
 		int nbSamples = 100000;
@@ -98,7 +98,7 @@ public class possionPiecewisePartitions {
 		}
 	}
 
-
+/**
 	/** Test E[d|\Omega_i] 
 	 *  if included in .main, by //testExpectedValues();**/
 	/**
@@ -119,7 +119,7 @@ public class possionPiecewisePartitions {
 	public static void writeToText(double[][][] coefficients){
 		FileWriter fw = null;
 		try {
-			File f = new File("E:\\classicInstance.txt");
+			File f = new File("src/main/java/PoissonPiecewise/lamda_matrix.txt");
 			fw = new FileWriter(f, true);//true, continue to write
 		} catch (IOException e) {
 			e.printStackTrace();
