@@ -149,8 +149,8 @@ public class LT_combinedS {
 
 	
 	public static void main(String args[]) {
-		double[] 	demandMean1 = {4,6,8,6};
-		double[]	demandMean2 = {4,6,8,6};
+		double[] 	demandMean1 = {8.0, 12.0, 16.0, 12.0};//{4,6,8,6};
+		double[]	demandMean2 = {8.0, 12.0, 16.0, 12.0};//{4,6,8,6};
 		double 		holdingCost = 0.25;
 		double 		fixedCost = 20;
 		double 		unitCost = 1;
@@ -158,8 +158,8 @@ public class LT_combinedS {
 		double[] 	initialStock;
 		int 		partitions = 4;
 		
-		int minInventory = -20;
-		int maxInventory = 30;
+		int minInventory = -50;//-20;
+		int maxInventory = 50;//30;
 		String model = "LT_combinedS";
 
 		
