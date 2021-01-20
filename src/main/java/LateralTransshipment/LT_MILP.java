@@ -25,7 +25,7 @@ import ilog.opl.IloOplSettings;
 import minlp_Poisson.sQminlp_oneRun;
 import minlp_Poisson.sQminlp_recursive;
 
-public class LT_combinedS {
+public class LT_MILP {
 	
 	double[] 	demandMean1;
 	double[]	demandMean2;
@@ -38,7 +38,7 @@ public class LT_combinedS {
 
 	String instanceIdentifier;
 
-	public LT_combinedS(double[] demandMean1, double[] demandMean2, 
+	public LT_MILP(double[] demandMean1, double[] demandMean2, 
 			double holdingCost, double fixedCost, double unitCost, double penaltyCost,
 			double[] initialStock, int partitions, String instanceIdentifier) {
 		this.demandMean1	= demandMean1;
@@ -73,7 +73,7 @@ public class LT_combinedS {
 		IloOplModel opl=oplF.createOplModel(def,cplex);
 		cplex.setParam(IloCplex.IntParam.Threads, 8);
 		cplex.setParam(IloCplex.IntParam.MIPDisplay, 2);
-		IloOplDataSource dataSource = new LT_combinedS.recursiveData(oplF);
+		IloOplDataSource dataSource = new LT_MILP.recursiveData(oplF);
 		opl.addDataSource(dataSource);
 		opl.generate();
 		cplex.setOut(null);
@@ -171,7 +171,7 @@ public class LT_combinedS {
 		for(int i=0; i<initialOrder.length; i++) {
 			for(int j=0; j<initialOrder[i].length; j++) {
 				initialStock = new double[]{i+minInventory,j+minInventory};
-				LT_combinedS instance = new LT_combinedS(demandMean1, demandMean2, 
+				LT_MILP instance = new LT_MILP(demandMean1, demandMean2, 
 						 holdingCost,  fixedCost,  unitCost,  penaltyCost,
 						initialStock,  partitions, null);
 				try {
@@ -189,7 +189,7 @@ public class LT_combinedS {
 		//Gn
 		FileWriter fw = null;
 		try {
-			File f = new File("src/main/java/lateralTransshipment/LT_combinedS.txt");
+			File f = new File("src/main/java/lateralTransshipment/LT_MILP.txt");
 			fw = new FileWriter(f, true);//true, continue to write
 		} catch (IOException e) {
 			e.printStackTrace();
