@@ -90,7 +90,7 @@ public class possionPiecewisePartitions {
 		double[][] demandMeanInput = sdp.util.demandMeanInput.createDemandMeanInput(demandMean);
 		//System.out.println(Arrays.deepToString(demandMeanInput));
 		int nbSamples = 100000;
-		int partitions = 4;
+		int partitions = 8;
 		for(int d=0; d<demandMeanInput.length; d++) {
 			double[][][] coefficients = lamdaMatrix(demandMeanInput[d], partitions, nbSamples);
 			System.out.println(Arrays.deepToString(coefficients));	

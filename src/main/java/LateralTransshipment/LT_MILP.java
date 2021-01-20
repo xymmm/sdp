@@ -160,7 +160,7 @@ public class LT_MILP {
 		
 		int minInventory = -50;//-20;
 		int maxInventory = 50;//30;
-		String model = "LT_combinedS";
+		String model = "LT_MILP_G";
 
 		
 		double initialOrder[][][] = new double[maxInventory - minInventory + 1][maxInventory - minInventory + 1][2];
