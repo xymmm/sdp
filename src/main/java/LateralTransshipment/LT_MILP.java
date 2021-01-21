@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
 
+import LateralTransshipment.LT_MILP.LT_MILP_solution;
 import ilog.concert.IloException;
 import ilog.opl.IloCplex;
 import ilog.opl.IloCustomOplDataSource;
@@ -24,29 +26,36 @@ import ilog.opl.IloOplModelSource;
 import ilog.opl.IloOplSettings;
 import minlp_Poisson.sQminlp_oneRun;
 import minlp_Poisson.sQminlp_recursive;
+import umontreal.ssj.stat.Tally;
+import umontreal.ssj.util.Chrono;
 
 public class LT_MILP {
-	
+
 	double[] 	demandMean1;
 	double[]	demandMean2;
 	double 		holdingCost;
-	double 		fixedCost;
-	double 		unitCost;
+	double 		fixedOrderingCost;
+	double 		unitOrderingCost;
 	double 		penaltyCost;
 	double[] 	initialStock;
 	int 		partitions;
+	double		fixedTransshippingCost;
+	double		unitTransshippingCost;
 
 	String instanceIdentifier;
+	public Tally statCost = new Tally("stats on cost");
 
 	public LT_MILP(double[] demandMean1, double[] demandMean2, 
 			double holdingCost, double fixedCost, double unitCost, double penaltyCost,
-			double[] initialStock, int partitions, String instanceIdentifier) {
+			double[] initialStock, int partitions, 
+			double fixedTransshippingCost, double unitTransshippingCost, 
+			String instanceIdentifier) {
 		this.demandMean1	= demandMean1;
 		this.demandMean2	= demandMean2;
 
 		this.holdingCost 	= holdingCost;
-		this.fixedCost 		= fixedCost;
-		this.unitCost 		= unitCost;
+		this.fixedOrderingCost 		= fixedCost;
+		this.unitOrderingCost 		= unitCost;
 		this.penaltyCost 	= penaltyCost;
 		this.initialStock 	= initialStock;
 		this.partitions 	= partitions;
@@ -63,7 +72,7 @@ public class LT_MILP {
 	}
 
 	/**main solving block *****************************************************/
-	public double[] solveLT_combinedS (String model_name) throws IloException{
+	public LT_MILP_solution solveLT_combinedS (String model_name) throws IloException{
 		IloOplFactory oplF = new IloOplFactory();
 		IloOplErrorHandler errHandler = oplF.createOplErrorHandler(System.out);
 		IloCplex cplex = oplF.createCplex();
@@ -78,18 +87,34 @@ public class LT_MILP {
 		opl.generate();
 		cplex.setOut(null);
 		boolean status =  cplex.solve();
+
+		double[] transship = new double[demandMean1.length];
+		double[] order1 = new double[demandMean1.length];
+		double[] order2 = new double[demandMean1.length];
+		double obj;
+
 		if(status){   
-			double[] initialOrder = new double[2];
-			for(int i = 0; i < initialOrder.length; i++){
-				initialOrder[i] = cplex.getValue(opl.getElement("initialOrder").asNumVarMap().get(i+1));
+			obj = cplex.getObjValue();
+			for(int t = 0; t < transship.length; t++){
+				transship[t] = cplex.getValue(opl.getElement("transship").asNumVarMap().get(t+1));
+				order1[t] = cplex.getValue(opl.getElement("Q1").asNumVarMap().get(t+1));
+				order2[t] = cplex.getValue(opl.getElement("Q2").asNumVarMap().get(t+1));
 			}
-			sdp.util.writeText.writeDoubleArray(initialOrder, "src/main/java/lateralTransshipment/temp.txt");
-			return initialOrder;
-		}else{
-			System.out.println("No solution!");
+			opl.postProcess();
 			oplF.end();
 			System.gc();
-			return new double[]{Double.NaN, Double.NaN};
+			return new LT_MILP_solution(obj, transship, order1, order2);
+		}else{
+			System.out.println("No solution!");
+			obj = Double.NaN;
+			for(int t = 0; t < transship.length; t++){
+				transship[t] = Double.NaN;
+				order1[t] = Double.NaN;
+				order2[t] = Double.NaN;
+			}
+			oplF.end();
+			System.gc();
+			return new LT_MILP_solution(obj, transship, order1, order2);
 		}
 	}
 
@@ -101,19 +126,21 @@ public class LT_MILP {
 			IloOplDataHandler handler = getDataHandler();
 			//problem parameters
 			handler.startElement("nbmonths"); handler.addIntItem(demandMean1.length); handler.endElement();
-			handler.startElement("fc"); handler.addNumItem(fixedCost); handler.endElement();
+			handler.startElement("fc"); handler.addNumItem(fixedOrderingCost); handler.endElement();
 			handler.startElement("h"); handler.addNumItem(holdingCost); handler.endElement();
 			handler.startElement("p"); handler.addNumItem(penaltyCost); handler.endElement();
-			handler.startElement("v"); handler.addNumItem(unitCost); handler.endElement();
-			
+			handler.startElement("v"); handler.addNumItem(unitOrderingCost); handler.endElement();
+			handler.startElement("ft");handler.addNumItem(fixedTransshippingCost); handler.endElement();
+			handler.startElement("ut");handler.addNumItem(unitTransshippingCost); handler.endElement();
+
 			handler.startElement("meandemand1"); handler.startArray();            
 			for (int j = 0 ; j<demandMean1.length ; j++) {handler.addNumItem(demandMean1[j]);}
 			handler.endArray(); handler.endElement();
-			
+
 			handler.startElement("meandemand2"); handler.startArray();            
 			for (int j = 0 ; j<demandMean2.length ; j++) {handler.addNumItem(demandMean2[j]);}
 			handler.endArray(); handler.endElement();
-			
+
 			handler.startElement("initialStock"); handler.startArray();            
 			for (int j = 0 ; j<initialStock.length ; j++) {handler.addNumItem(initialStock[j]);}
 			handler.endArray(); handler.endElement();
@@ -145,48 +172,62 @@ public class LT_MILP {
 		}
 
 	}
-	
 
-	
-	public static void main(String args[]) {
-		double[] 	demandMean1 = {8.0, 12.0, 16.0, 12.0};//{4,6,8,6};
-		double[]	demandMean2 = {8.0, 12.0, 16.0, 12.0};//{4,6,8,6};
+
+
+	public static void main(String args[]) throws Exception {
+		double[] 	demandMean1 = {4,6,8,6};
+		double[]	demandMean2 = {4,6,8,6};
 		double 		holdingCost = 0.25;
 		double 		fixedCost = 20;
 		double 		unitCost = 1;
 		double 		penaltyCost = 5;
 		double[] 	initialStock;
-		int 		partitions = 4;
-		
-		int minInventory = -50;//-20;
-		int maxInventory = 50;//30;
+		int 		partitions = 10;
+		double 		R = 5;
+		double 		u = 0.5;
+
+
+		int minInventory = -20;//-20;
+		int maxInventory = 60;//30;
 		String model = "LT_MILP_G";
 
-		
-		double initialOrder[][][] = new double[maxInventory - minInventory + 1][maxInventory - minInventory + 1][2];
-		double[][] S = new double[maxInventory - minInventory + 1][maxInventory - minInventory + 1];
+		double inventory[][][] = new double[maxInventory - minInventory + 1][maxInventory - minInventory + 1][2];
+
+		double cplexObj[][] = new double[maxInventory - minInventory + 1][maxInventory - minInventory + 1];				
+		double simCost[][] = new double[maxInventory - minInventory + 1][maxInventory - minInventory + 1];
 
 		long timeStart = System.currentTimeMillis();
-		
-		for(int i=0; i<initialOrder.length; i++) {
-			for(int j=0; j<initialOrder[i].length; j++) {
+		for(int i=0; i<inventory.length; i++) {
+			for(int j=0; j<inventory[i].length; j++) {
 				initialStock = new double[]{i+minInventory,j+minInventory};
-				LT_MILP instance = new LT_MILP(demandMean1, demandMean2, 
-						 holdingCost,  fixedCost,  unitCost,  penaltyCost,
-						initialStock,  partitions, null);
-				try {
-					initialOrder[i][j] = instance.solveLT_combinedS(model);
-					S[i][j] = initialOrder[i][j][0] + initialOrder[i][j][1] + i+minInventory + j+minInventory;
-					System.out.println("i="+(i+minInventory)+", j="+(j+minInventory));
-				} catch (IloException e) {
-					e.printStackTrace();
-				}
+				System.out.println(Arrays.toString(initialStock));
+				LT_MILP milpInstance = new LT_MILP(demandMean1, demandMean2, 
+						holdingCost,  fixedCost,  unitCost,  penaltyCost,
+						initialStock,  partitions, R, u, null);
+
+				LT_MILP_solution milpSolution = milpInstance.solveLT_combinedS(model);
+				//System.out.println(Arrays.toString(milpSolution.transship));
+				//System.out.println(Arrays.toString(milpSolution.order1));
+				//System.out.println(Arrays.toString(milpSolution.order2));
+				//System.out.println("initial inventory = "+Arrays.toString(initialStock) + ", obj = "+milpSolution.obj);
+				cplexObj[i][j] = milpSolution.obj;
+				
+				//simulation
+				int count = 10000;
+				boolean print = false;				
+				LT_simulation.LTsimMultipleRuns(count, milpInstance, milpSolution, print);
+				milpInstance.statCost.setConfidenceIntervalStudent();
+				//System.out.println(milpInstance.statCost.report(0.9, 3));
+				//System.out.println(milpInstance.statCost.average());
+				simCost[i][j] = milpInstance.statCost.average();
+
 			}
 		}
 		long timeEnd = System.currentTimeMillis();
 		System.out.println("time consumed = "+(timeEnd - timeStart)/1000 +"s");
-		
-		//Gn
+
+		//obj
 		FileWriter fw = null;
 		try {
 			File f = new File("src/main/java/lateralTransshipment/LT_MILP.txt");
@@ -195,31 +236,32 @@ public class LT_MILP {
 			e.printStackTrace();
 		}
 		PrintWriter pw = new PrintWriter(fw);
-		pw.println("approximated up-to levels: ");		      
+		pw.println("obj from cplex: ");		      
 		pw.print("\t");
-		for(int j = 0; j < initialOrder.length; j++) {
+		for(int j = 0; j < inventory.length; j++) {
 			pw.print((j+minInventory) + "\t");
 		}
 		pw.println();
-		for(int i = initialOrder.length-1; i >=0 ; i--) {
+		for(int i = inventory.length-1; i >=0 ; i--) {
 			pw.print((i+minInventory) + "\t");
-			for(int j = 0; j < initialOrder.length; j++) {
-				pw.print(S[i][j] + "\t");
+			for(int j = 0; j < inventory.length; j++) {
+				pw.print(cplexObj[i][j] + "\t");
 			}
 			pw.println();
 		}
 		pw.println();
-		
-		pw.println("initial orders: ");		      
+
+		//simCost
+		pw.println("ETC by simulation");		      
 		pw.print("\t");
-		for(int j = 0; j < initialOrder.length; j++) {
+		for(int j = 0; j < inventory.length; j++) {
 			pw.print((j+minInventory) + "\t");
 		}
 		pw.println();
-		for(int i = initialOrder.length-1; i >=0 ; i--) {
+		for(int i = inventory.length-1; i >=0 ; i--) {
 			pw.print((i+minInventory) + "\t");
-			for(int j = 0; j < initialOrder.length; j++) {
-				pw.print(initialOrder[i][j][0] + ","+ initialOrder[i][j][1] + "\t");
+			for(int j = 0; j < inventory.length; j++) {
+				pw.print(simCost[i][j] + "\t");
 			}
 			pw.println();
 		}
@@ -234,8 +276,22 @@ public class LT_MILP {
 			e.printStackTrace();
 		}
 
-		
-	
+
+
+	}
+
+	class LT_MILP_solution {
+		public double obj;
+		public double[] transship;
+		public double[] order1;
+		public double[] order2;
+
+		public LT_MILP_solution(double obj, double[] transship, double[] order1, double[] order2) {
+			this.obj = obj;
+			this.transship = transship;
+			this.order1 = order1;
+			this.order2 = order2;
+		}
 	}
 
 }
