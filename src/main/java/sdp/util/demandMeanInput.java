@@ -1,5 +1,7 @@
 package sdp.util;
 
+import java.util.Arrays;
+
 public class demandMeanInput {
 
 	
@@ -34,5 +36,11 @@ public class demandMeanInput {
 			demandMeanInput[t] = createDemandMeanInputRowInt(demandMean, t);
 		}
 		return demandMeanInput;
+	}
+	
+	public static void main(String[] args) {
+		double[] arr= {1,2,3,3,4};
+		double[] row = createDemandMeanInputRow(arr,3);
+		System.out.println(Arrays.toString(row));
 	}
 }

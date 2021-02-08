@@ -145,8 +145,8 @@ public class LTbackwards_2stages {
 				for(int iB = 0; iB < instance.stateSpaceSize(); iB++) {                       // Inventory B
 					for(int QA = 0; QA <= instance.stateSpaceSize(); QA++) {                   // Order A
 						for(int QB = 0; QB <= instance.stateSpaceSize(); QB++) {                // Order B
-							totalCostO[iA][iB][QA][QB] += (QA > 0) ? instance.KA + instance.vA * QA : 0;
-							totalCostO[iA][iB][QA][QB] += (QB > 0) ? instance.KB + instance.vB * QB : 0;
+							totalCostO[iA][iB][QA][QB] += (QA > 0) ? (instance.KA + instance.vA * QA) : 0;
+							totalCostO[iA][iB][QA][QB] += (QB > 0) ? (instance.KB + instance.vB * QB) : 0;
 							double totalProbabilityMass = 0;
 							for(int dA = 0; dA < demandProbabilities[0][t].length; dA++) {       // Demand A
 								for(int dB = 0; dB < demandProbabilities[1][t].length; dB++) {    // Demand B
@@ -276,7 +276,7 @@ public class LTbackwards_2stages {
 		}
 		pw.println();
 		//inventory A after action
-		pw.println("inventory A after action");
+		/*pw.println("inventory A after action");
 		pw.print("\t");
 		for(int j = 0; j < instance.stateSpaceSize(); j++) {
 			pw.print(instance.inventory(j) + "\t");
@@ -322,7 +322,7 @@ public class LTbackwards_2stages {
 			}
 			pw.println();
 		}
-		pw.println();
+		pw.println();*/
 		//overall action
 		pw.println("overall action");
 		pw.print("\t");
@@ -475,8 +475,8 @@ public class LTbackwards_2stages {
 		long timeEnd = System.currentTimeMillis();
 		System.out.println("time consumed = "+(timeEnd - timeStart)/1000.0+"s");
 //		printSolution(instance, solution);
-		writeResults(0, instance, solution, "src/main/java/lateralTransshipment/OverallResults.txt");
-		writeCn(instance, solution, "src/main/java/lateralTransshipment/Cn.txt");
+		writeResults(0, instance, solution, "src/main/java/LateralTransshipment/OverallResults.txt");
+		writeCn(instance, solution, "src/main/java/LateralTransshipment/Cn.txt");
 		
 		/** test single Action*
 		System.out.println();

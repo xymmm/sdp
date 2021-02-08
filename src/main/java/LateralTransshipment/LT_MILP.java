@@ -41,24 +41,27 @@ public class LT_MILP {
 	int 		partitions;
 	double		fixedTransshippingCost;
 	double		unitTransshippingCost;
+	double[][][] coefficients;
 
 	String instanceIdentifier;
 	public Tally statCost = new Tally("stats on cost");
 
 	public LT_MILP(double[] demandMean1, double[] demandMean2, 
-			double holdingCost, double fixedCost, double unitCost, double penaltyCost,
-			double[] initialStock, int partitions, 
-			double fixedTransshippingCost, double unitTransshippingCost, 
-			String instanceIdentifier) {
+				   double fixedOrderingCost, double unitOrderingCost,
+				   double fixedTransshippingCost, double unitTransshippingCost, 
+				   double holdingCost,  double penaltyCost,
+				   double[] initialStock, int partitions, 			
+				   String instanceIdentifier, double[][][] coefficients) {
 		this.demandMean1	= demandMean1;
 		this.demandMean2	= demandMean2;
 
 		this.holdingCost 	= holdingCost;
-		this.fixedOrderingCost 		= fixedCost;
-		this.unitOrderingCost 		= unitCost;
+		this.fixedOrderingCost 		= fixedOrderingCost;
+		this.unitOrderingCost 		= unitOrderingCost;
 		this.penaltyCost 	= penaltyCost;
 		this.initialStock 	= initialStock;
 		this.partitions 	= partitions;
+		this.coefficients 	= coefficients;
 	}
 
 	public InputStream getMINLPmodelStream(File file) {
@@ -153,7 +156,7 @@ public class LT_MILP {
 			handler.endArray(); handler.endElement();
 
 			//symmetric instance
-			double[][][] coefficients = sQminlp_oneRun.getLamdaMatrix (demandMean1, partitions, 100000);
+			//double[][][] coefficients = sQminlp_oneRun.getLamdaMatrix (demandMean1, partitions, 100000);
 			handler.startElement("lamda_matrix");
 			handler.startArray();
 			for(int t=0; t<demandMean1.length; t++) {
@@ -191,6 +194,8 @@ public class LT_MILP {
 		int minInventory = -20;//-20;
 		int maxInventory = 60;//30;
 		String model = "LT_MILP_G";
+		
+		double[][][] coefficients = sQminlp_oneRun.getLamdaMatrix (demandMean1, partitions, 100000);
 
 		double inventory[][][] = new double[maxInventory - minInventory + 1][maxInventory - minInventory + 1][2];
 
@@ -203,8 +208,10 @@ public class LT_MILP {
 				initialStock = new double[]{i+minInventory,j+minInventory};
 				System.out.println(Arrays.toString(initialStock));
 				LT_MILP milpInstance = new LT_MILP(demandMean1, demandMean2, 
-						holdingCost,  fixedCost,  unitCost,  penaltyCost,
-						initialStock,  partitions, R, u, null);
+												   fixedCost, unitCost,
+												   R, u,
+												   holdingCost, penaltyCost,
+												   initialStock,  partitions, null, coefficients);
 
 				LT_MILP_solution milpSolution = milpInstance.solveLT_combinedS(model);
 				//System.out.println(Arrays.toString(milpSolution.transship));

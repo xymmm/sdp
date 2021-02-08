@@ -462,9 +462,9 @@ public class LT2locationsBackwards {
 		int maxQuantity   = 30;
 		double K = 20;				//{K, R, b}: {7, 5, 3}  {5, 7, 3} 
 		double z = 1;
-		double R = 0;
-		double v = 1;
-		double h = 1;
+		double R = 5;
+		double v = 0.5;
+		double h = 0.25;
 		double[] b = {5}; 
 		double tail = 0.0001;
 		//		boolean noInitialTransship = false;
