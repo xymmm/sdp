@@ -12,25 +12,27 @@ import umontreal.ssj.randvar.PoissonGen;
 import umontreal.ssj.randvar.RandomVariateGenInt;
 import umontreal.ssj.rng.MRG32k3a;
 
-public class LT_RQ_RecedingHorizon {
+/**
+ * solve single problem to get order quantities, 
+ * meet demand,
+ * receding for the next period
+ * 
+ * no transshipment involved
+ * **/
 
-	public static singleSimRH singleSimulationRH(
-			double quantityA, double quantityB, double transshipment,
+public class singleProblemRH {
+	
+	static singleProblemRHsolution singleSimulationRH(
+			double quantityA, double quantityB, 
 			double demandA, double demandB,
-			double fixedOrderingCost, double unitOrderingCost, double fixedTransshippingCost, double unitTransshippingCost,
+			double fixedOrderingCost, double unitOrderingCost,
 			double holdingCost, double penaltyCost, double openingInventoryA, double openingInventoryB,
 			boolean print) {
 
-		double costA = 0; double costB = 0; double costT = 0;
+		double costA = 0; double costB = 0; 
 		double inventoryLevelA = openingInventoryA;
 		double inventoryLevelB = openingInventoryB;
-
-		if(Math.abs(transshipment) >0) {
-			costT += fixedTransshippingCost + Math.abs(transshipment) * unitTransshippingCost;
-			inventoryLevelA = inventoryLevelA - transshipment;
-			inventoryLevelB = inventoryLevelB + transshipment;
-			if(print) System.out.println("transshipment cost = "+costT+", inventory = ["+inventoryLevelA +", "+ inventoryLevelB+"].");
-		}		
+		
 		if(quantityA>0) {
 			costA += fixedOrderingCost + unitOrderingCost * quantityA;
 			inventoryLevelA += quantityA;
@@ -58,10 +60,10 @@ public class LT_RQ_RecedingHorizon {
 		}else {
 			costB += -inventoryLevelB * penaltyCost;
 		}
-		if(print) System.out.println("closing total cost = "+(costA + costB + costT)+".");
+		if(print) System.out.println("closing total cost = "+(costA + costB)+".");
 		if(print) System.out.println();
 
-		return new singleSimRH(costA, costB, costT, inventoryLevelA, inventoryLevelB);
+		return new singleProblemRHsolution(costA, costB, inventoryLevelA, inventoryLevelB);
 	}
 
 	public static double[] futureDemandSegment(double[] demand, int currentTimeIndex) {
@@ -70,44 +72,6 @@ public class LT_RQ_RecedingHorizon {
 			demandSec[t] = demand[currentTimeIndex + t];
 		}
 		return demandSec;
-	}
-
-	double[] 	demandMeanA;
-	double[]	demandMeanB;
-
-	double 		fixedOrderingCost;
-	double 		unitOrderingCost;
-
-	double		fixedTransshippingCost;
-	double		unitTransshippingCost;
-
-	double 		holdingCost;
-	double 		penaltyCost;
-
-	double 		initialStockA;
-	double		initialStockB;
-
-	int 		partitions;
-
-	String 		instancIdentifier;
-
-	public LT_RQ_RecedingHorizon(double[] demandMeanA, double[] demandMeanB,
-			double fixedOrderingCost, double unitOrderingCost,
-			double fixedTransshippingCost, double unitTransshippingCost,
-			double holdingCost, double penaltyCost,
-			double initialStockA, double initialStockB, 
-			int partitions, 
-			String instanceIdentifier) {
-		this.demandMeanA 	= demandMeanA;
-		this.demandMeanB 	= demandMeanB;
-		this.fixedOrderingCost = fixedOrderingCost;
-		this.unitOrderingCost = unitOrderingCost;
-		this.fixedTransshippingCost = fixedTransshippingCost;
-		this.unitTransshippingCost = unitTransshippingCost;
-		this.holdingCost 	= holdingCost;
-		this.penaltyCost 	= penaltyCost;			
-		this.partitions 	= partitions;		
-
 	}
 
 	static MRG32k3a randomStream = new MRG32k3a();	
@@ -125,57 +89,51 @@ public class LT_RQ_RecedingHorizon {
 
 	/**For one step of receding horizon. 
 	 * solve problem FROM the current period with mean of demand
-	 * initialStock is substituted as the closing inventory of last iteration
+	 * initialStock is substituted as the closing inventory of last iteration (here solves all scenarioes)
 	 * @throws Exception **/
-	public static singleRHsolution oneStepRH_sQt(
+	public static singleProblemRHsolution singleProblemOneStepRH(
 			double[] demandMeanA, double[] demandMeanB, 
 			double randomDemandA, double randomDemandB, 
 			double fixedOrderingCost, double unitOrderingCost,
-			double fixedTransshippingCost, double unitTransshippingCost,
 			double holdingCost, double penaltyCost,
 			double openingInventoryA, double openingInventoryB,
-			int partitions,
-			int currentTimeIndex, boolean print,
-			String model, double[][][] coefficients) throws Exception {
+			int minInventory, int maxInventory, int maxQuantity,
+			int currentTimeIndex, boolean print) throws Exception {
 
 		//obtain the demandMean from the current period to T
-		double[] futureDemandA = futureDemandSegment(demandMeanA, currentTimeIndex);
-		double[] futureDemandB = futureDemandSegment(demandMeanB, currentTimeIndex);
+		//double[] futureDemandA = futureDemandSegment(demandMeanA, currentTimeIndex);
+		//double[] futureDemandB = futureDemandSegment(demandMeanB, currentTimeIndex);
 
-		//solve current MINLP
-		double[] initialStock = {openingInventoryA, openingInventoryB};
-		LT_MILP milpInstance = new LT_MILP(futureDemandA, futureDemandB, 
-				fixedOrderingCost, unitOrderingCost,
-				fixedTransshippingCost, unitTransshippingCost,
-				holdingCost, penaltyCost,
-				initialStock,  partitions, null, coefficients);//where initialStock will be an input, taking value of previous closing inventory
-		LT_MILP_solution milpSolution = milpInstance.solveLT_combinedS(model);
-		if(print)System.out.println("action = "+ milpSolution.order1[0]+"\t"+milpSolution.order2[0]+"\t"+milpSolution.transship[0]);
+		//solve current SDP
+		double q1 = sS.solveSinglePeriod.solveSinglePeriodsS(fixedOrderingCost, unitOrderingCost, holdingCost, penaltyCost, 
+				0.0001, minInventory, maxInventory, maxQuantity, 0.25, 
+				demandMeanA, currentTimeIndex, (int)openingInventoryA);
+		double q2 = sS.solveSinglePeriod.solveSinglePeriodsS(fixedOrderingCost, unitOrderingCost, holdingCost, penaltyCost, 
+				0.0001, minInventory, maxInventory, maxQuantity, 0.25, 
+				demandMeanB, currentTimeIndex, (int)openingInventoryB);
+		if(print)System.out.println("action = "+ q1+"\t"+q2);
 
 		//get solution to this current period and simulate current period
-		singleSimRH currentPeriodEnd = singleSimulationRH(
-				milpSolution.order1[0], milpSolution.order2[0], milpSolution.transship[0],
+		singleProblemRHsolution currentPeriodEnd = singleSimulationRH(
+				q1, q2,
 				randomDemandA, randomDemandB,		//generated demand with demandMean
-				fixedOrderingCost, unitOrderingCost, fixedTransshippingCost, unitTransshippingCost,
+				fixedOrderingCost, unitOrderingCost, 
 				holdingCost, penaltyCost, openingInventoryA, openingInventoryB,		//same for the initialStock
 				print);
 
-		return new singleRHsolution(currentPeriodEnd.costA, currentPeriodEnd.costB, currentPeriodEnd.costT, 
+		return new singleProblemRHsolution(currentPeriodEnd.costA, currentPeriodEnd.costB, 
 				currentPeriodEnd.closingInventoryA, currentPeriodEnd.closingInventoryB);
 	}
 
 
 	/**Main computation of receding horizon - lateral transshipment with static strategy
 	 * @throws Exception **/
-	public static double LT_RHcomplete(double[] demandMeanA, double[] demandMeanB,
+	public static double singleProblemLT_RHcomplete(double[] demandMeanA, double[] demandMeanB,
 			double fixedOrderingCost, double unitOrderingCost,
-			double fixedTransshippingCost, double unitTransshippingCost,
 			double holdingCost, double penaltyCost,
 			double openingInventoryA, double openingInventoryB, 			 									
-			int partitions, String model,
 			boolean print,
-			double[][][][] coefficients) throws Exception {
-
+			int minInventory, int maxInventory, int maxQuantity) throws Exception {
 
 		double[] totalCost = new double[demandMeanA.length];
 
@@ -194,23 +152,20 @@ public class LT_RQ_RecedingHorizon {
 
 		for(int t=0; t<demandMeanA.length; t++) {
 			if(print) System.out.println((t+1)+": openingInventory = "+ closingInventoryA[t] +", "+closingInventoryB[t]);
-			singleRHsolution solution = oneStepRH_sQt(
+			singleProblemRHsolution solution = singleProblemOneStepRH(
 					demandMeanA, demandMeanB, 
 					randomDemandA[t], randomDemandB[t], 
 					fixedOrderingCost, unitOrderingCost,
-					fixedTransshippingCost, unitTransshippingCost,
 					holdingCost, penaltyCost,
-					closingInventoryA[t], closingInventoryB[t],
-					partitions,
-					t, print,
-					model, coefficients[t]);
-			totalCost[t] = solution.costA + solution.costB + solution.costT;
+					openingInventoryA, openingInventoryB,
+					minInventory, maxInventory, maxQuantity,
+					t, print);
+			totalCost[t] = solution.costA + solution.costB;
 			if(t<demandMeanA.length-1) {
 				closingInventoryA[t+1] = solution.closingInventoryA;
 				closingInventoryB[t+1] = solution.closingInventoryB;
 			}
 		}
-
 
 		return sdp.util.sum.summation(totalCost);
 	}
@@ -224,8 +179,6 @@ public class LT_RQ_RecedingHorizon {
 
 		double fixedOrderingCost = 20;
 		double unitOrderingCost = 1;
-		double fixedTransshippingCost = 5;
-		double unitTransshippingCost = 0.5;
 
 		double holdingCost = 0.25;
 		double penaltyCost = 5;
@@ -233,39 +186,30 @@ public class LT_RQ_RecedingHorizon {
 		double openingInventoryA;
 		double openingInventoryB;
 
-		int partitions = 10;
 
 		double minInventory = -20;
-		double maxInventory = 30;//60;
+		double maxInventory = 60;
+		double maxQuantity = maxInventory - minInventory;
 		double[][] RHapproximatedCost = new double[(int) (maxInventory - minInventory+1)][(int) (maxInventory - minInventory+1)];
 
 		boolean print = false;
 
-		String model = "LT_MILP_C";
-
 		long timeStart = System.currentTimeMillis();
 
 		int count = 5;
-		
-		double[][][][] coefficients = new double[demandMeanA.length][demandMeanA.length][demandMeanA.length][partitions];
-		for(int t=0; t<demandMeanA.length;t++) {
-			double[] demandMeanRow = sdp.util.demandMeanInput.createDemandMeanInputRow(demandMeanA, t);
-			coefficients[t] = sQminlp_oneRun.getLamdaMatrix (demandMeanRow, partitions, 100000);
-		}
-
 
 		for(int i=0; i<RHapproximatedCost.length; i++) {
 			for(int j=0; j<RHapproximatedCost[i].length;j++) {
 				System.out.println((i+minInventory)+", "+(j+minInventory));
 				double[] costAll = new double[count];
 				for(int c=0; c<count; c++) {
-					costAll[c] = LT_RHcomplete(demandMeanA, demandMeanB,
-							fixedOrderingCost,  unitOrderingCost,
-							fixedTransshippingCost,  unitTransshippingCost,
-							holdingCost,  penaltyCost,
-							i+minInventory,  j+minInventory, 			 						//openingInventory A and B			
-							partitions,  model,
-							print, coefficients);
+					costAll[c] = singleProblemLT_RHcomplete(
+							demandMeanA, demandMeanB,
+							fixedOrderingCost, unitOrderingCost,
+							holdingCost, penaltyCost,
+							i+minInventory,  j+minInventory,  			 									
+							print,
+							(int) minInventory, (int) maxInventory, (int) maxQuantity);
 					//System.out.println(costAll[c]);
 				}
 				RHapproximatedCost[i][j] = sdp.util.sum.average(costAll);
@@ -277,13 +221,13 @@ public class LT_RQ_RecedingHorizon {
 
 		FileWriter fw = null;
 		try {
-			File f = new File("src/main/java/LateralTransshipment/RH_static.txt");
+			File f = new File("src/main/java/LateralTransshipment/singleProblemRH.txt");
 			fw = new FileWriter(f, true);//true, continue to write
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		PrintWriter pw = new PrintWriter(fw);
-		pw.println("C_n approximated by receding horizon - static policy: ");		      
+		pw.println("C_n approximated by receding horizon - solving sinble problem separately: ");		      
 		pw.print("\t");
 		for(int j = 0; j < RHapproximatedCost.length; j++) {
 			pw.print( (j+minInventory) + "\t");
@@ -311,50 +255,19 @@ public class LT_RQ_RecedingHorizon {
 }
 
 
-
-class RHpolicy{
-	public double quantityA;
-	public double quantityB;
-	public double transshipment;
-	public double totalCost;
-
-	public RHpolicy(double quantityA, double quantityB, double transshipment, double totalCost) {
-		this.quantityA = quantityA;
-		this.quantityB = quantityB;
-		this.transshipment = transshipment;
-		this.totalCost = totalCost;		
-	}
-
-}
-
-class singleRHsolution{
+class singleProblemRHsolution{
 	public double costA;
 	public double costB;
-	public double costT;
 	public double closingInventoryA;
 	public double closingInventoryB;
 
-	public singleRHsolution(double costA, double costB, double costT, double closingInventoryA, double closingInventoryB) {
+	public singleProblemRHsolution(double costA, double costB, double closingInventoryA, double closingInventoryB) {
 		this.costA = costA;
 		this.costB = costB;
-		this.costT = costT;
 		this.closingInventoryA = closingInventoryA;
 		this.closingInventoryB = closingInventoryB;
 	}
 }
 
-class singleSimRH{
-	public double costA;
-	public double costB;
-	public double costT;
-	public double closingInventoryA;
-	public double closingInventoryB;
 
-	public singleSimRH(double costA, double costB, double costT, double closingInventoryA, double closingInventoryB) {
-		this.costA = costA;
-		this.costB = costB;
-		this.costT = costT;
-		this.closingInventoryA = closingInventoryA;
-		this.closingInventoryB = closingInventoryB;
-	}
-}
+

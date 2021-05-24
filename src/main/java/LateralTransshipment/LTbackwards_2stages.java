@@ -207,7 +207,7 @@ public class LTbackwards_2stages {
 	}
 	
 	public static void writeResults(int timeIndex, Instance instance, Solution solution, String FileName) {
-		//Gn
+
 		FileWriter fw = null;
 		try {
 			File f = new File(FileName);
@@ -216,6 +216,8 @@ public class LTbackwards_2stages {
 			e.printStackTrace();
 		}
 		PrintWriter pw = new PrintWriter(fw);
+		
+		//Gn
 		pw.println("Expected total cost with zero initial inventory (Gn): ");		      
 		pw.print("\t");
 		for(int j = 0; j < instance.stateSpaceSize(); j++) {
@@ -230,6 +232,7 @@ public class LTbackwards_2stages {
 			pw.println();
 		}
 		pw.println();
+/*		
 		//transshipment
 		pw.println("Optimal transshipment: ");
 		pw.print("\t");
@@ -244,7 +247,8 @@ public class LTbackwards_2stages {
 			}
 			pw.println();
 		}
-		pw.println();
+		pw.println();	
+
 		//ordering at A
 		pw.println("Optimal ordering at location A:");
 		pw.print("\t");
@@ -275,6 +279,7 @@ public class LTbackwards_2stages {
 			pw.println();
 		}
 		pw.println();
+		
 		//inventory A after action
 		/*pw.println("inventory A after action");
 		pw.print("\t");
@@ -307,22 +312,27 @@ public class LTbackwards_2stages {
 			pw.println();
 		}
 		pw.println();
-		//inventory A + inventory B after action
-		pw.println("inventory SUM after action");
+*/
+		
+		//inventory sum
+		pw.println("sum of inventory after actions: ");
 		pw.print("\t");
 		for(int j = 0; j < instance.stateSpaceSize(); j++) {
 			pw.print(instance.inventory(j) + "\t");
 		}
 		pw.println();
-		for(int i = instance.stateSpaceSize()-1; i >= 0 ; i--) {
+		for(int i = instance.stateSpaceSize()-1; i >=0 ; i--) {
 			pw.print(instance.inventory(i) + "\t");
 			for(int j = 0; j < instance.stateSpaceSize(); j++) {
-				pw.print(i+instance.minInventory + solution.optimalActionOrder[timeIndex][i][j][0] + 
-						 j+instance.minInventory + solution.optimalActionOrder[timeIndex][i][j][1] + "\t");
+				pw.print(
+						(solution.optimalActionOrder[timeIndex][i][j][0] + solution.optimalActionOrder[timeIndex][i][j][1] 
+								+ instance.inventory(i) + instance.inventory(j))
+						+ "\t");
 			}
 			pw.println();
 		}
-		pw.println();*/
+		pw.println();
+		
 		//overall action
 		pw.println("overall action");
 		pw.print("\t");
@@ -359,7 +369,7 @@ public class LTbackwards_2stages {
 			e.printStackTrace();
 		}
 		PrintWriter pw = new PrintWriter(fw);
-/*		//first period (overall ETC)
+		//first period (overall ETC)
 		pw.println("Expected total cost (Cn_1): ");		      
 		pw.print("\t");
 		for(int j = 0; j < instance.stateSpaceSize(); j++) {
@@ -373,7 +383,7 @@ public class LTbackwards_2stages {
 			}
 			pw.println();
 		}
-		pw.println();*/
+		pw.println();
 		//second period (overall ETC)
 //		pw.println("Expected total cost (Cn_2): ");		      
 //		pw.print("\t");
@@ -381,13 +391,13 @@ public class LTbackwards_2stages {
 //			pw.print(instance.inventory(j) + "\t");
 //		}
 //		pw.println();
-		for(int i = instance.stateSpaceSize()-1; i >=0 ; i--) {
+//		for(int i = instance.stateSpaceSize()-1; i >=0 ; i--) {
 //			pw.print(instance.inventory(i) + "\t");
-			for(int j = 0; j < instance.stateSpaceSize(); j++) {
-				pw.print(solution.CnTransshipment[1][i][j] + "\t");
-			}
+//			for(int j = 0; j < instance.stateSpaceSize(); j++) {
+//				pw.print(solution.CnTransshipment[1][i][j] + "\t");
+//			}
 			pw.println();
-		}
+//		}
 		
 		pw.flush();
 		try {
@@ -527,9 +537,9 @@ class InstancePortfolio{
 		double pA = p;
 		double pB = p;
 
-		double[] meanDemandA = {4,6,8,6};
+		double[] meanDemandA = {4,6,8,6};//{4,6,8,6,4,6,8,6};
 		Distribution[] demandA = Arrays.stream(meanDemandA).mapToObj(d -> new PoissonDist(d)).toArray(Distribution[]::new);
-		double[] meanDemandB = {4,6,8,6};
+		double[] meanDemandB = {4,6,8,6};//{4,6,8,6,4,6,8,6};
 		Distribution[] demandB = Arrays.stream(meanDemandB).mapToObj(d -> new PoissonDist(d)).toArray(Distribution[]::new);
 
 		System.out.println(

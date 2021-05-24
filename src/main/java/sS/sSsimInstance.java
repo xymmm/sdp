@@ -9,7 +9,7 @@ public class sSsimInstance {
 	public double holdingCost;
 	public double penaltyCost;
 	public int[] demandMean;
-	public int initialInventory = 0;
+	public int initialInventory;
 
 
 	/** SDP boundary conditions **/
