@@ -100,10 +100,6 @@ public class singleProblemRH {
 			int minInventory, int maxInventory, int maxQuantity,
 			int currentTimeIndex, boolean print) throws Exception {
 
-		//obtain the demandMean from the current period to T
-		//double[] futureDemandA = futureDemandSegment(demandMeanA, currentTimeIndex);
-		//double[] futureDemandB = futureDemandSegment(demandMeanB, currentTimeIndex);
-
 		//solve current SDP
 		double q1 = sS.solveSinglePeriod.solveSinglePeriodsS(fixedOrderingCost, unitOrderingCost, holdingCost, penaltyCost, 
 				0.0001, minInventory, maxInventory, maxQuantity, 0.25, 
@@ -157,7 +153,7 @@ public class singleProblemRH {
 					randomDemandA[t], randomDemandB[t], 
 					fixedOrderingCost, unitOrderingCost,
 					holdingCost, penaltyCost,
-					openingInventoryA, openingInventoryB,
+					closingInventoryA[t], closingInventoryB[t],
 					minInventory, maxInventory, maxQuantity,
 					t, print);
 			totalCost[t] = solution.costA + solution.costB;
@@ -183,10 +179,6 @@ public class singleProblemRH {
 		double holdingCost = 0.25;
 		double penaltyCost = 5;
 
-		double openingInventoryA;
-		double openingInventoryB;
-
-
 		double minInventory = -20;
 		double maxInventory = 60;
 		double maxQuantity = maxInventory - minInventory;
@@ -196,7 +188,7 @@ public class singleProblemRH {
 
 		long timeStart = System.currentTimeMillis();
 
-		int count = 5;
+		int count = 10;
 
 		for(int i=0; i<RHapproximatedCost.length; i++) {
 			for(int j=0; j<RHapproximatedCost[i].length;j++) {
